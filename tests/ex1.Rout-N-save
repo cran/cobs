@@ -13,7 +13,6 @@ Type `demo()' for some demos, `help()' for on-line help, or
 `help.start()' for a HTML browser interface to help.
 Type `q()' to quit R.
 
-> T <- F <- NULL
 > #### OOps! Running this in 'CMD check' or in *R* __for the first time__
 > #### ===== gives a wrong result (at the end) than when run a 2nd time
 > ####-- problem disappears with introduction of   if (psw) call ... in Fortran

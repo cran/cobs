@@ -7,12 +7,14 @@
   algorithm.
 }
 \usage{
-drqssbc(x, y, w, pw, knots, degree, Tlambda, constraint,
-        n.sub = n1000cut(n),
-        equal, smaller, greater, gradient, coef, maxiter,
-        trace, n.equal, n.smaller, n.greater, n.gradient,
-        nrq, nl1, neqc, niqc, nvar, nj0,
-        tau, lam, tmin, kmax, lstart, factor,
+drqssbc(x, y, w= rep(1,n), pw, knots, degree, Tlambda, constraint,
+        n.sub = n1000cut(nrq),
+        equal, smaller, greater, gradient, coef, maxiter = 20 * n,
+        trace = 1,
+        n.equal = nrow(equal), n.smaller = nrow(smaller),
+        n.greater = nrow(greater), n.gradient = nrow(gradient),
+        nrq = length(x), nl1, neqc, niqc, nvar, nj0,
+        tau = 0.5, lam, tmin, kmax, lstart, factor,
         eps = .Machine$double.eps, print.warn)
 }
 \arguments{

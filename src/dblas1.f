@@ -48,7 +48,7 @@ c
       subroutine srotm1 (n,sx,incx,sy,incy,sparam)
 c
       integer incx,incy,n
-      double precision sparam(5),sx(1),sy(1)
+      double precision sparam(5),sx(*),sy(*)
 c
 c     apply the modified givens transformation, h, to the 2 by n matrix
 c

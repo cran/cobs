@@ -1,5 +1,6 @@
 Package: cobs
-Version: 0.9-3
+Version: 0.9-4
+Date: 2003-11-07
 Title: COBS -- Constrained B-splines
 Author: Pin T. Ng <Pin.Ng@nau.edu> and Xuming He, U. Illinois;
 	R port by Martin Maechler

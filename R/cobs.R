@@ -378,7 +378,7 @@ getdim <- function(degree, nknots,
         nknots - 1 - as.integer(degree == 1)
     else if(constraint == "periodic" || constraint == "none")
          0
-    return(n.iqc = n.iqc, n.eqc = n.eqc, ks = ks, nvar = nvar)
+    list(n.iqc = n.iqc, n.eqc = n.eqc, ks = ks, nvar = nvar)
 } ## getdim()
 
 ### These are (only) used for confidence intervals :

@@ -225,7 +225,7 @@ mesg <- function(number,...) {
               as.double(zo),
               as.integer(nz),
               derivs,
-              y = double(nz)) $ y
+              y = double(nz), PACKAGE = "cobs") $ y
     ##
     ## compute the residual
     ##
@@ -237,7 +237,7 @@ mesg <- function(number,...) {
              as.double(xo),
              as.integer(n),
              derivs,
-             y = double(n))
+             y = double(n), PACKAGE = "cobs")
     resid <- (y[ox] - z2$y)[order(ox)]
     ##
     ## compute the confidence band
@@ -251,7 +251,7 @@ mesg <- function(number,...) {
              derivs = integer(nz),# 0
              as.integer(nz),
              design = array(0, c(ks, nz)),
-             offsets = integer(nz))
+             offsets = integer(nz), PACKAGE = "cobs")
     idx <- cbind(rep(oz, rep(ks, nz)),
                  c(outer(1:ks, z3$offsets, "+")))
     X[idx] <- z3$design
@@ -277,11 +277,11 @@ mesg <- function(number,...) {
     an <- sqrt(chisq.alpha) * cn * s
     bn <- z.alpha * cn * s
 
-    return(coef = Tcoef, fit = fit, resid = resid,
-           z = zo, knots = knots, ifl = qsbs.o$ifl, icyc = qsbs.o$icyc,
-           k = min(qsbs.o$k, nknots-2+ks), lambda = qsbs.o$lambda,
-           pp.lambda = if(lambda < 0) qsbs.o$pp.lambda,
-           sic       = if(lambda < 0) log(qsbs.o$sic),
-           cb.lo = fit - an, cb.up = fit + an,
-           ci.lo = fit - bn, ci.up = fit + bn)
+    list(coef = Tcoef, fit = fit, resid = resid,
+         z = zo, knots = knots, ifl = qsbs.o$ifl, icyc = qsbs.o$icyc,
+         k = min(qsbs.o$k, nknots-2+ks), lambda = qsbs.o$lambda,
+         pp.lambda = if(lambda < 0) qsbs.o$pp.lambda,
+         sic       = if(lambda < 0) log(qsbs.o$sic),
+         cb.lo = fit - an, cb.up = fit + an,
+         ci.lo = fit - bn, ci.up = fit + bn)
 }## cobsOld()

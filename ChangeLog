@@ -1,3 +1,19 @@
+2003-11-07  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version, Date): 0.9-4 for CRAN
+
+	* R/cobsOld.R (cobsOld): eliminate multi-value return()
+	* R/cobs.R (getdim):	<ditto>
+	* R/drqssbc.R (drqssbc): <ditto>
+	* R/qbsks.R (qbsks): 	<ditto>
+	* R/cobsOld.R (cobsOld): give PACKAGE even in old code.
+
+	* man/drqssbc.Rd: for "codoc": add same default values as in *.R
+
+2002-08-28  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/dblas1.f (srotm1): declare sx(*) not sx(1)
+
 2002-04-18  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* tests/README: new file; also renamed *.Rout.save to -N-save
@@ -10,7 +26,7 @@
 2002-04-15  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* inst/scripts/README: new files: Three examples from Hg & Ng (1999)
-		the installed scripts should become short than the ./tests/ ones
+		the installed scripts should become shorter than the ./tests/ ones
 
 	* R/cobs.R (summary): slight improvement; R^2 only for median
 	* R/cobs.R (mesg): eliminated (improves readability)

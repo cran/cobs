@@ -1,19 +1,19 @@
 
-R : Copyright 2002, The R Development Core Team
-Version 1.5.0 Under development (unstable) (2002-04-17)
+R : Copyright 2003, The R Foundation for Statistical Computing
+Version 1.9.0 Under development (unstable) (2003-11-04), ISBN 3-900051-00-3
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
-Type `license()' or `licence()' for distribution details.
+Type 'license()' or 'licence()' for distribution details.
 
 R is a collaborative project with many contributors.
-Type `contributors()' for more information.
+Type 'contributors()' for more information and
+'citation()' on how to cite R in publications.
 
-Type `demo()' for some demos, `help()' for on-line help, or
-`help.start()' for a HTML browser interface to help.
-Type `q()' to quit R.
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for a HTML browser interface to help.
+Type 'q()' to quit R.
 
-> T <- F <- NULL
 > library(cobs)
 > options(digits = 6)
 > 
@@ -133,7 +133,7 @@ R^2 = 99.84% ;  empirical tau (over all): 5/7  = 0.714286 (target tau : 0.5)
  [36,]  4.888885 39.11108 36.86257 41.3596 36.87788 41.3443
  [37,]  4.999997 39.99997 37.72413 42.2758 37.73963 42.2603
  [38,]  5.111108 40.88886 38.58661 43.1911 38.60229 43.1754
- [39,]  5.222219 41.77776 39.45015 44.1054 39.46601 44.0895
+ [39,]  5.222219 41.77776 39.45015 44.1054 39.46600 44.0895
  [40,]  5.333331 42.66665 40.31488 45.0184 40.33090 45.0024
  [41,]  5.444442 43.55554 41.18091 45.9302 41.19708 45.9140
  [42,]  5.555554 44.44443 42.04831 46.8405 42.06463 46.8242

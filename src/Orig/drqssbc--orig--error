@@ -1,0 +1,93 @@
+Using Sun's Workshop 6  "Ratfor"
+as
+	ratfor -C drqssbc.r > drqssbc.f.SUN_WS6U1
+	-----------------------------------------
+	ln -s drqssbc.f.SUN_WS6U1 drqssbc.f
+	-----------------------------------
+On Sun:
+=======
+
+
+midget{maechler}98% f77 -PIC -u -O2 -c drqssbc.f -o drqssbc.o
+drqssbc.f:
+        drqssbc:
+        dcrql1lt:
+"drqssbc.f", line 376: Error: attempt to use undefined variable "i"
+        drql1nlt:
+"drqssbc.f", line 387: Error: attempt to use undefined variable "alpha"
+"drqssbc.f", line 431: Error: attempt to use undefined variable "nacpt"
+"drqssbc.f", line 432: Error: attempt to use undefined variable "i"
+"drqssbc.f", line 436: Error: attempt to use undefined variable "j"
+"drqssbc.f", line 470: Error: attempt to use undefined variable "allq"
+        drql1sup:
+        dnewpen:
+        drql1up:
+        drql1fp:
+        drql1stp:
+        drql1rf:
+"drqssbc.f", line 1432: Error: attempt to use undefined variable "i"
+        ddelcol1:
+        dresid:
+        daddcol:
+        drql1obj:
+        drql1gv:
+        ddkheap:
+        dunif01:
+        dzdrcin:
+        dzdrcou:
+        dzdrgit:
+        dzdrgnv:
+        dzdrpoc:
+midget{maechler}99%
+
+
+Then on Linux :
+=============
+
+lynne{maechler}222>
+
+lynne{maechler}223> R COMPILE !$
+R COMPILE drqssbc.f
+g77   -fPIC  -g -O2 -Wall -fno-f90  -c drqssbc.f -o drqssbc.o
+drqssbc.f: In subroutine `drqssbc':
+drqssbc.f:263: warning:
+   &      ner,x,f,erql1n,res,indx,w,nt,nsol,sol,tl(1),tl(2),toler,big,eps,
+                                                         ^
+Array element value at (^) out of defined range
+drqssbc.f: In subroutine `drql1nlt':
+drqssbc.f:353: warning:
+               call drql1nlt(nt,tmin,tmax,res,e,f,ner,indx,nact,nvars,nrq,
+                    1
+drqssbc.f:385: (continued):
+         subroutine drql1nlt(nt,tmin,tmax,res,e,f,ner,indx,nact,nvars,nrq,
+                    2
+Argument #27 (named `alpha') of `drql1nlt' is one precision at (2) but is some other precision at (1) [info -f g77 M GLOBALS]
+drqssbc.f:398: warning: `isave' might be used uninitialized in this function
+drqssbc.f:431: warning: `nacpt' might be used uninitialized in this function
+drqssbc.f:470: warning: `allq' might be used uninitialized in this function
+drqssbc.f: In subroutine `drql1sup':
+drqssbc.f:782: warning: unused variable `oct'
+drqssbc.f: In subroutine `dnewpen':
+drqssbc.f:901: warning: unused variable `one'
+drqssbc.f: In subroutine `drql1up':
+drqssbc.f:958: warning: unused variable `zero'
+drqssbc.f:958: warning: unused variable `one'
+drqssbc.f: In subroutine `drql1fp':
+drqssbc.f:996:
+   &      nrql1
+          1
+drqssbc.f:1020: (continued):
+         integer coefx,i,ix,nallq,nalqp1,ncols,nqnp1,topx,nrql1
+                                                          2
+Invalid declaration of or reference to symbol `nrql1' at (2) [initially seen at (1)]
+drqssbc.f:1020: warning: `i' might be used uninitialized in this function
+drqssbc.f:1020: warning: `nqnp1' might be used uninitialized in this function
+drqssbc.f: In subroutine `drql1rf':
+drqssbc.f:1413: warning: `fail' might be used uninitialized in this function
+drqssbc.f: In subroutine `drql1obj':
+drqssbc.f:1711: warning: unused variable `half'
+drqssbc.f: In subroutine `drql1gv':
+drqssbc.f:1817: warning: `s' might be used uninitialized in this function
+drqssbc.f: In subroutine `dzdrcou':
+drqssbc.f:2355: warning: `lstrt' might be used uninitialized in this function
+make: *** [drqssbc.o] Fehler 1

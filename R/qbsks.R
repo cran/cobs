@@ -207,8 +207,8 @@ qbsks <- function(x,y,w,pw, knots,nknots, degree,Tlambda, constraint,
                     tau,lam,tmin,kmax,lstart,
                     factor, eps,print.warn)
     constraint <- constraint.old
-    return(coef = rqss$coef, fidel = rqss$fidel,
-           k = nknots-2+ks, ifl = rqss$ifl, icyc = rqss$icyc,
-           knots = knots, nknots = nknots, nvar = Tnvar, lambda = Tlambda,
-           pseudo.x = rqss$pseudo.x)
+    list(coef = rqss$coef, fidel = rqss$fidel,
+         k = nknots-2+ks, ifl = rqss$ifl, icyc = rqss$icyc,
+         knots = knots, nknots = nknots, nvar = Tnvar, lambda = Tlambda,
+         pseudo.x = rqss$pseudo.x)
 }# end qbsks()

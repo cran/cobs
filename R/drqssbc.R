@@ -92,7 +92,8 @@ drqssbc <- function(x,y, w = rep(1,n), pw, knots, degree,Tlambda, constraint,
 		   k = integer(1),
 		   as.integer(kmax),	# k0
 		   as.double(lstart),
-		   as.double(factor))
+		   as.double(factor),
+                   PACKAGE = "cobs")
     sol <- z0$sol[,1:z0$nt]
     names(z0$icyc) <- c("icyc", "tot.cyc")
     if(lam < 0) {
@@ -140,30 +141,30 @@ drqssbc <- function(x,y, w = rep(1,n), pw, knots, degree,Tlambda, constraint,
         }
         if(n.old != n) { ## was sub sampling; refit full sample for one Tlambda
             Tlambda <- sol[,ifl.idx][2,mlam.idx]
-            rqss <- drqssbc(x.old,y.old,w.old, pw,knots,degree, Tlambda,
-                            constraint, n.sub,
-                            equal,smaller,greater,gradient,
-                            Tcoef,maxiter,trace,
-                            n.equal,n.smaller,n.greater,n.gradient,
-                            nrq = n.old, nl1,neqc,niqc,nvar, nj0 = 1,
-                            tau,lam = 1, tmin,kmax,lstart,
-                            factor, eps, print.warn)
-            return(coef = rqss$coef, ifl = sol[,ifl.idx][3,mlam.idx],
-                   icyc = rqss$icyc, nvar = nvar, lambda = Tlambda,
-                   pp.lambda = sol[,ifl.idx][2,], sic = sic,
-                   k = min(rqss$k, length(knots)-2+degree+1), pseudo.x = X)
-        }
-        else
-            return(coef = Tcoef, ifl = sol[,ifl.idx][3,mlam.idx],
-                   icyc = z0$icyc, nvar = nvar,
-                   lambda    = sol[,ifl.idx][2,mlam.idx],
-                   pp.lambda = sol[,ifl.idx][2,], sic = sic,
-                   k = min(sol[,ifl.idx][6,mlam.idx], length(knots)-2+degree+1),
-                   pseudo.x = X)
+	    rqss <- drqssbc(x.old,y.old,w.old, pw,knots,degree, Tlambda,
+			    constraint, n.sub,
+			    equal,smaller,greater,gradient,
+			    Tcoef,maxiter,trace,
+			    n.equal,n.smaller,n.greater,n.gradient,
+			    nrq = n.old, nl1,neqc,niqc,nvar, nj0 = 1,
+			    tau,lam = 1, tmin,kmax,lstart,
+			    factor, eps, print.warn)
+	    list(coef = rqss$coef, ifl = sol[,ifl.idx][3,mlam.idx],
+		 icyc = rqss$icyc, nvar = nvar, lambda = Tlambda,
+		 pp.lambda = sol[,ifl.idx][2,], sic = sic,
+		 k = min(rqss$k, length(knots)-2+degree+1), pseudo.x = X)
+	}
+	else
+	    list(coef = Tcoef, ifl = sol[,ifl.idx][3,mlam.idx],
+		 icyc = z0$icyc, nvar = nvar,
+		 lambda	   = sol[,ifl.idx][2,mlam.idx],
+		 pp.lambda = sol[,ifl.idx][2,], sic = sic,
+		 k = min(sol[,ifl.idx][6,mlam.idx], length(knots)-2+degree+1),
+		 pseudo.x = X)
     }
     else # `lam >= 0'
-        return(coef = z0$coef,
-               fidel = sum((tau-(-z0$resid[1:n] < 0))*(-z0$resid[1:n]))*2,
-               k = min(z0$k, length(knots)-2+degree+1), ifl = z0$ifl,
-               icyc = z0$icyc, nvar = nvar, lambda = Tlambda, pseudo.x = X)
+	list(coef = z0$coef,
+	     fidel = sum((tau-(-z0$resid[1:n] < 0))*(-z0$resid[1:n]))*2,
+	     k = min(z0$k, length(knots)-2+degree+1), ifl = z0$ifl,
+	     icyc = z0$icyc, nvar = nvar, lambda = Tlambda, pseudo.x = X)
 }## drqssbc

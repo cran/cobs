@@ -1,14 +1,14 @@
-DublinWind              Daily Wind Speeds in Dublin
-USArmyRoofs             Roof Quality in US Army Bases
-cobs-internal           Internal COBS functions
-cobs-methods            Methods for COBS Objects
-cobs                    COnstrained B-Splines Nonparametric Regression
-                        Quantiles
-cobsOld                 COnstrained B-Splines Nonparametric Regression
-                        Quantiles
-drqssbc                 Regression Quantile Smoothing Spline with
-                        Constraints
-exHe                    Small Dataset Example of He
-globtemp                Annual Average Global Surface Temperature
-predict.cobs            Predict method for COBS Fits
-qbsks                   Quantile B-Spline with Fixed Knots
+DublinWind               Daily Wind Speeds in Dublin
+USArmyRoofs              Dataset on Roof Quality
+cobs-internal            Internal COBS functions
+cobs-methods             Methods for COBS Objects
+cobs                     COnstrained B-Splines Nonparametric Regression
+                         Quantiles
+cobsOld                  COnstrained B-Splines Nonparametric Regression
+                         Quantiles
+drqssbc                  Regression Quantile Smoothing Spline with
+                         Constraints
+exHe                     Small Dataset Example of He
+globtemp                 Global Temperature Data
+predict.cobs             Predict method for COBS Fits
+qbsks                    ~~function to do ... ~~
