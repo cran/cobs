@@ -1,0 +1,19 @@
+M-x ess-fix-miscellaneous
+M-x ess-MM-fix-src
+
+(query-replace ".Uminus" "-" nil nil nil)
+(query-replace-regexp "^###" "##=" nil nil nil)
+
+use builtin "pi" instead of "PI <- 3.14159"
+
+added ^L after the main function
+
+s/null()/NULL/
+s/S-plus/S/
+
+Comment out  x <- as.matrix(x, ncol = 1)
+## It's unnecessary and  R does not allow `ncol' in as.matrix()
+
+.Machine$single..  replaced by explicit numeric constants valid for IEEE arithm
+
+Replace quite a few ' (single quotes) by " (double q.) or '..' by `..'

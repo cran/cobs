@@ -1,0 +1,33 @@
+
+R : Copyright 2002, The R Development Core Team
+Version 1.5.0 Under development (unstable) (2002-04-17)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type `license()' or `licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type `contributors()' for more information.
+
+Type `demo()' for some demos, `help()' for on-line help, or
+`help.start()' for a HTML browser interface to help.
+Type `q()' to quit R.
+
+> T <- F <- NULL
+> library(cobs)
+> options(digits = 6)
+> postscript("ex3.ps")
+> 
+> data(women) # 15 obs.
+> attach(women)
+> 
+> ## Interpolation! very easy problem,   BUT :
+> try( ## gives  "ifl = 5" !!!!!
++ cobw <- cobs(weight, height, knots = weight, nknots = length(weight))
++ )
+
+ You are using 15 knots instead of the default number of 6 knots.
+  N[rq,L1]= (15, 0); ([ei]qc= 0,0, vars=16)  _fixed_ (tau,lam)= (0.5, 1):
+Error in switch(rr$ifl, 1, stop("At least one of the additional pointwise constraints is not feasible.\n Please check your `pointwise' argument and rerun cobs."),  : 
+	 ifl = 5 -- shold not have happened
+> 

@@ -1,0 +1,14 @@
+NOTE
+----
+All the *.Rout-N-save files have been renamed from
+        *.Rout.save
+because the result of these examples depend *very* much
+on the exact platform (compiler/machine) used -- unfortunately :
+
+R CMD check cobs
+gave too many differences (April 2002), dependent on the platform
+used.  I have seen big differences on the same Linux
+architecture, just from using different version of gcc (2.96 <-> 3.0.1)
+The current ./tests/*.Rout.save  files were produced on an oldish "robust"
+Solaris compiler set.
+				Martin Maechler

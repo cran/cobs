@@ -1,0 +1,23 @@
+drqssbc.r ---> drqssbc.f  via "ratfor77 -C"  ( == current ./drqssbc.f.~1~)
+
+However the resulting code does not compile (with g77) and
+the original ratfor code shouldn't have compiled either !!
+
+Fixed two SEVERE typos -- look for "ORIGINAL code had" in the source  !!!!!!
+
+Finally compiles, Dec.21,2001  -- M.Maechler, ETHZ
+
+-----------------------------------
+`Log' (after the fact):
+
+./drqssbc.f.~2~ : some manual wrapping around and "C -----" added
+		  __still__ does not compile!
+
+./drqssbc.f.~3~ : all indenting and (much) more manual wrapping around; + space
+		  __still__ does not compile, also because of
+		  double/single mismatch in saxpy(), scopy1() calls
+./drqssbc.f.~4~ : more indenting and manual wrapping;
+		  using "implicit none" -- proper declarations ---> Finally
+		  compiles, and -- when used with dblas1.f.~2~ or ~1~ --  `works'
+		  ==> already has the `problem' (of no lambda in [20,180])
+		  with the roof data set ( -> ../new-shar/roof.R )

@@ -1,0 +1,11 @@
+The following three R script files recreate the figures from
+He & Ng (1999) 's COBS paper
+
+ ./temp.R  Example 1 : data(globtemp)		Global warming, increase?
+ ./roof.R  Example 2 : data(USArmyRoofs)	decreasing
+ ./wind.R  Example 3 : data(DublinWind)		periodic; large n = 6574
+
+---
+
+The corresponding scripts in the source ../../tests/ directory
+produce more output for consistency testing purposes

@@ -1,0 +1,40 @@
+- Documentation (and examples!) for the intermediate/ auxiliary functions
+  qsbks() and drqssbcs(), i.e.  man/qbsks.Rd & man/drqssbc.Rd
+
+- need examples with degree = 1
+  and several other values of tau
+  also extreme cases of interpolation and global linear/quadratic
+
+- src/splines.c is UN-needed in R --- rather use library(splines) !!
+  ------------- now have .Call(*) there instead of .C() here.
+
+   partly done: now use .splBasis() and .splValue() <<<<-- R/splines.R -->
+   --> tests/spline-ex.R  shows how .splBasis() can be done via library(splines)
+
+
+- src/drqssbc.f (originally ratfor): has its own RNG  dunif01() !!
+  ------------- this ensures 100% portability, but...
+
+- lambda < 0; for each pp.lambda, instead of (only) $sic,
+  return both components : Log.lik. and p[lambda] ( = k[lambda] ), the dim.
+
+-----------------------------
+
+Old `TODOs' which are done (here for reference only):
+==========            ====
+
+- add the three interesting real data examples from the COBS "paper".
+  in the paper, they say that S-plus code for these examples is available
+  as well. --> see also ./inst/scripts/ and ./tests/
+
+- example(cobs) gives lots of warnings;
+  the upper and lower quantiles are not plotted (not properly computed ??)
+
+- man/cobs.Rd  needs the current reference list !
+
+- cobs() should keep its call and return an object of class "cobs".
+
+  Then print.cobs(), summary.cobs(), predict.cobs() and plot.cobs() should
+  be designed!
+	---> this is now done  { --> old & original code in ./R/cobsOld.R }
+

@@ -1,0 +1,275 @@
+
+R : Copyright 2002, The R Development Core Team
+Version 1.5.0 Under development (unstable) (2002-04-17)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type `license()' or `licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type `contributors()' for more information.
+
+Type `demo()' for some demos, `help()' for on-line help, or
+`help.start()' for a HTML browser interface to help.
+Type `q()' to quit R.
+
+> #### Experiment with spline code --- want to use
+> library(splines) ## for the splines
+> library(cobs)##-> ../R/splines.R
+> 
+> options(digits = 9)
+> 
+> ### -- 1) -- Look at `splines' pkg code :
+> data(women)
+> yw <- women$weight
+> xh <- women$height# == 58:72; too trivial; modify a bit:
+> ii <- c(2,5,9,11); xh[ii] <- xh[ii]+ 0.2
+> ii <- c(3:4,8,13); xh[ii] <- xh[ii]+ 0.25
+> str(bIspl <- interpSpline( xh, yw, bSpl = TRUE))
+List of 3
+ $ knots       : num [1:21] 54.8 56.0 57.0 58.0 59.2 ...
+ $ coefficients: num [1:17] 114 115 117 120 123 ...
+ $ order       : num 4
+ - attr(*, "formula")=Class 'formula' length 3 yw ~ xh
+  .. ..- attr(*, ".Environment")=length 17 <environment>
+ - attr(*, "class")= chr [1:3] "nbSpline" "bSpline" "spline"
+> print.default(bIspl[1:3])
+$knots
+ [1] 54.75 55.95 57.00 58.00 59.20 60.25 61.25 62.20 63.00 64.00 65.25 66.20
+[13] 67.00 68.20 69.00 70.25 71.00 72.00 73.25 74.00 75.00
+
+$coefficients
+ [1] 113.638072 115.089307 116.540542 119.984831 122.953207 125.659847
+ [7] 129.393071 132.490763 134.035450 138.946156 142.678498 144.712402
+[13] 151.573711 151.891329 160.111134 164.353533 168.595932
+
+$order
+[1] 4
+
+> str(pIspl <- interpSpline( xh, yw, bSpl = FALSE))
+List of 2
+ $ knots       : num [1:15] 58.0 59.2 60.2 61.2 62.2 ...
+ $ coefficients: num [1:15, 1:4] 115 117 120 123 126 129 132 135 139 142 ...
+ - attr(*, "formula")=Class 'formula' length 3 yw ~ xh
+  .. ..- attr(*, ".Environment")=length 17 <environment>
+ - attr(*, "class")= chr [1:3] "npolySpline" "polySpline" "spline"
+> p2Ispl <- polySpline(bIspl)
+> all.equal(pIspl, p2Ispl, tol = 1e-15)# TRUE
+[1] TRUE
+> ##--> could use polySpline() at end of interpSpline(.)
+> 
+> 
+> ### -- 2) --- substituting our .splBasis()  by splines package splineDesign() --
+> ### ========
+> ### ---> done (in principle; not yet implemented!),  Feb.2002
+> 
+> str(.splBasis(4, bIspl$knots, length(bIspl$coef) + 6, x = .5 + 57:72))# outside!
+List of 2
+ $ design : num [1:4, 1:16] 0.0188 0.5030 0.4607 0.0175 0.0400 ...
+ $ offsets: int [1:16] 2 3 4 5 6 7 8 9 10 11 ...
+> xo <- 0.5 + 59:70 # should work up to ord = 5
+> 
+> ## ord <- 4 # cubic splines
+> ## ord <- 3 # quadratic splines
+> for(ord in 5:1) {
++     cat("\n\nord = ",ord,"\n========\n")
++     print(spB <- .splBasis(ord, bIspl$knots,
++                            length(bIspl$coef) + ord + 2, x = xo))
++     ## Gives error for ord = 5:4 --- data must be INSIDE :
++     try(       splineDesign(bIspl$knots, x = 0.5 + 57:72, ord = ord))
++     str(spD <- splineDesign(bIspl$knots, x = xo,          ord = ord))
++ 
++     ## splineDesign() contains:
++     tmp <- .Call("spline_basis", bIspl$knots, ord=ord, x= xo,
++                  derivs = integer(length(xo)), PACKAGE = "splines")
++     print(offs.tmp <- attr(tmp, "Offsets"))
++     attr(tmp, "Offsets") <- NULL
++     print(all.equal(tmp, spB$design, tol = 4e-16)) # TRUE
++     print(all(spB$offsets - offs.tmp == ord - 1)) # TRUE
++ }
+
+
+ord =  5 
+========
+$design
+               [,1]           [,2]           [,3]           [,4]          [,5]
+[1,] 0.009583439816 0.011174263326 0.010286399760 0.004272043746 0.00336700337
+[2,] 0.280435006587 0.296657516457 0.281745544903 0.252221462748 0.25986987360
+[3,] 0.573664212402 0.576469363376 0.587416092679 0.611946455184 0.58503981930
+[4,] 0.135987247669 0.115504606647 0.120338360470 0.131098972749 0.14955316485
+[5,] 0.000330093526 0.000194250194 0.000213602187 0.000461065574 0.00217013889
+              [,6]           [,7]           [,8]          [,9]          [,10]
+[1,] 0.00922131148 0.008975029904 0.003720238095 0.00807438795 0.003720238095
+[2,] 0.26415680887 0.247489106288 0.264754001883 0.25087436104 0.263186358207
+[3,] 0.55841638723 0.598069153889 0.600681833468 0.59365435778 0.572303736049
+[4,] 0.16640174062 0.145254314523 0.130397497982 0.14539368810 0.160325473628
+[5,] 0.00180375180 0.000212395395 0.000446428571 0.00200320513 0.000464194022
+             [,11]          [,12]
+[1,] 0.00938086304 0.003720238095
+[2,] 0.24130176226 0.235158208020
+[3,] 0.59605693702 0.603091675267
+[4,] 0.15129965337 0.157765328354
+[5,] 0.00196078431 0.000264550265
+
+$offsets
+ [1]  4  5  6  7  8  9 10 11 12 13 14 15
+
+Error in splineDesign(bIspl$knots, x = 0.5 + 57:72, ord = ord) : 
+	The x data must be in the range 59.2 to 71
+ num [1:12, 1:16] 0.00958 0.00000 0.00000 0.00000 0.00000 ...
+ [1]  0  1  2  3  4  5  6  7  8  9 10 11
+[1] TRUE
+[1] TRUE
+
+
+ord =  4 
+========
+$design
+              [,1]          [,2]          [,3]          [,4]         [,5]
+[1,] 0.05494505495 0.06332082552 0.06171839856 0.03246753247 0.0252525253
+[2,] 0.57089252211 0.60408588701 0.58346098346 0.56006493506 0.5439642325
+[3,] 0.36998123827 0.32967953456 0.35140298298 0.40131999148 0.4134221311
+[4,] 0.00418118467 0.00291375291 0.00341763500 0.00614754098 0.0173611111
+             [,6]          [,7]          [,8]         [,9]         [,10]
+[1,] 0.0491803279 0.05128588517 0.02976190476 0.0484463277 0.02790178571
+[2,] 0.5275242176 0.54714200273 0.58975988701 0.5262560533 0.55312541879
+[3,] 0.4081439394 0.39838618117 0.37445142252 0.4092719780 0.41309300456
+[4,] 0.0151515152 0.00318593093 0.00602678571 0.0160256410 0.00587979094
+            [,11]         [,12]
+[1,] 0.0506566604 0.02976190476
+[2,] 0.5334025730 0.52976190476
+[3,] 0.3992740999 0.43650793651
+[4,] 0.0166666667 0.00396825397
+
+$offsets
+ [1]  4  5  6  7  8  9 10 11 12 13 14 15
+
+Error in splineDesign(bIspl$knots, x = 0.5 + 57:72, ord = ord) : 
+	The x data must be in the range 58 to 72
+ num [1:12, 1:17] 0 0 0 0 0 0 0 0 0 0 ...
+ [1]  1  2  3  4  5  6  7  8  9 10 11 12
+[1] TRUE
+[1] TRUE
+
+
+ord =  3 
+========
+$design
+             [,1]         [,2]         [,3]        [,4]        [,5]
+[1,] 0.2380952381 0.2743902439 0.2645074224 0.178571429 0.138888889
+[2,] 0.7200929152 0.6935584740 0.6978985926 0.758928571 0.750000000
+[3,] 0.0418118467 0.0320512821 0.0375939850 0.062500000 0.111111111
+             [,6]         [,7]        [,8]        [,9]        [,10]       [,11]
+[1,] 0.2000000000 0.2344497608 0.178571429 0.204166667 0.1562500000 0.219512195
+[2,] 0.7090909091 0.7279562543 0.765178571 0.691666667 0.7888719512 0.680487805
+[3,] 0.0909090909 0.0375939850 0.056250000 0.104166667 0.0548780488 0.100000000
+            [,12]
+[1,] 0.1666666667
+[2,] 0.7857142857
+[3,] 0.0476190476
+
+$offsets
+ [1]  4  5  6  7  8  9 10 11 12 13 14 15
+
+ num [1:12, 1:18] 0 0 0 0 0 0 0 0 0 0 ...
+ [1]  2  3  4  5  6  7  8  9 10 11 12 13
+[1] TRUE
+[1] TRUE
+
+
+ord =  2 
+========
+$design
+            [,1] [,2]        [,3]  [,4] [,5] [,6]        [,7]  [,8]        [,9]
+[1,] 0.714285714 0.75 0.736842105 0.625  0.5  0.6 0.736842105 0.625 0.583333333
+[2,] 0.285714286 0.25 0.263157895 0.375  0.5  0.4 0.263157895 0.375 0.416666667
+     [,10] [,11]       [,12]
+[1,] 0.625   0.6 0.666666667
+[2,] 0.375   0.4 0.333333333
+
+$offsets
+ [1]  4  5  6  7  8  9 10 11 12 13 14 15
+
+ num [1:12, 1:19] 0 0 0 0 0 0 0 0 0 0 ...
+ [1]  3  4  5  6  7  8  9 10 11 12 13 14
+[1] TRUE
+[1] TRUE
+
+
+ord =  1 
+========
+$design
+     [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10] [,11] [,12]
+[1,]    1    1    1    1    1    1    1    1    1     1     1     1
+
+$offsets
+ [1]  4  5  6  7  8  9 10 11 12 13 14 15
+
+ num [1:12, 1:20] 0 0 0 0 0 0 0 0 0 0 ...
+ [1]  4  5  6  7  8  9 10 11 12 13 14 15
+[1] TRUE
+[1] TRUE
+> 
+> ## This (comments dropped) checks the same but gives no output (iff OK)
+> for(ord in 5:1) {
++     spB <- .splBasis(ord, bIspl$knots, length(bIspl$coef) + ord + 2, x = xo)
++     tmp <- .Call("spline_basis", bIspl$knots, ord=ord, x= xo,
++                  derivs = integer(length(xo)), PACKAGE = "splines")
++     offs.tmp <- attr(tmp, "Offsets")
++     attr(tmp, "Offsets") <- NULL
++     stopifnot(all.equal(tmp, spB$design, tol = 4e-16),
++               all(spB$offsets - offs.tmp == ord - 1))
++ }
+> 
+> ### -- 3) --- substituting our .splValue() by splines package predict.bSpline
+> ### ========
+> ### ----------- STILL TODO !! ------------
+> 
+> ### ~/R/D/r-devel/R/src/library/splines/R/splineClasses.R  has
+> ##    predict.polySpline
+> ##    predict.bSpline    <- function(object, x, nseg = 50, deriv = 0, ...)
+> ##    predict.nbSpline
+> ##    predict.pbSpline         ((all with the same argument list))
+> ##    predict.npolySpline
+> ##    predict.ppolySpline
+> 
+> str(bIspl) # the interpolating B-spline from above
+List of 3
+ $ knots       : num [1:21] 54.8 56.0 57.0 58.0 59.2 ...
+ $ coefficients: num [1:17] 114 115 117 120 123 ...
+ $ order       : num 4
+ - attr(*, "formula")=Class 'formula' length 3 yw ~ xh
+  .. ..- attr(*, ".Environment")=length 17 <environment>
+ - attr(*, "class")= chr [1:3] "nbSpline" "bSpline" "spline"
+> ## List of 3
+> ##  $ knots       : num [1:21] 54.8 56.0 57.0 58.0 59.2 ...
+> ##  $ coefficients: num [1:17] 114 115 117 120 123 ...
+> ##  $ order       : num 4
+> ##  - attr(*, "formula")=Class 'formula' length 3 yw ~ xh
+> ##   .. ..- attr(*, ".Environment")=length 17 <environment>
+> ##  - attr(*, "class")= chr [1:3] "nbSpline" "bSpline" "spline"
+> predict(bIspl, xo)
+$x
+ [1] 59.5 60.5 61.5 62.5 63.5 64.5 65.5 66.5 67.5 68.5 69.5 70.5
+
+$y
+ [1] 117.761938 120.761884 123.743134 127.112180 130.660049 133.066681
+ [7] 135.940123 140.232337 143.472651 147.532222 151.495247 155.519340
+
+attr(,"class")
+[1] "xyVector"
+> ## $x
+> ##  [1] 59.5 60.5 61.5 62.5 63.5 64.5 65.5 66.5 67.5 68.5 69.5 70.5
+> ##
+> ## $y
+> ##  [1] 117.761938 120.761884 123.743134 127.112180 130.660049 133.066681
+> ##  [7] 135.940123 140.232337 143.472651 147.532222 151.495247 155.519340
+> ##
+> ## attr(,"class")
+> ## [1] "xyVector"
+> 
+> .splValue(deg = 3, knots = bIspl$knots, coef = bIspl$coef, xo = xo)
+ [1] 126.920915 130.191453 132.864449 136.009196 140.465290 143.459842
+ [7] 147.364414 151.539891 155.439793 161.684181 166.132561 174.635514
+> ## hmm, not the same as $ y above ...
+> 

@@ -1,0 +1,140 @@
+There's a problem (seen by Pin Ng as well),
+seen in the roof example, where no lambda values are taken between 20 & 189
+
+That already happens in the almost unaltered Fortran code;
+MM, see in ../../cobs.Rcheck-lynne-older-Fortran/tests/roof.Rout
+
+Old Fortran means
+ dblas1.f  -> dblas1.f.~2~
+ drqssbc.f -> drqssbc.f.~4~
+
+i.e, after doing
+
+     mv dblas1.f  dblas1.f++  ; ln -s dblas1.f.~2~  dblas1.f
+     mv drqssbc.f drqssbc.f++ ; ln -s drqssbc.f.~4~ drqssbc.f
+reverse :
+     mv dblas1.f++  dblas1.f
+     mv drqssbc.f++ drqssbc.f
+
+
+-----------------------------------------------------------------------
+
+Calling Tree  {still incomplete !}
+~~~~~~~~~~~~
+drqssbc
+ |
+ dcrql1lt {identical; just splitting tl = (t, lam)
+  |
+  |- drql1sup
+  |
+  |- dnewpen
+  |   \- BLAS (ddot)
+  |
+  |- drql1up
+  |   |
+  |   |- ddelcol1
+  |   |   \- dzdrcou
+  |   |
+  |   |- dresid
+  |   |
+  |   |- daddcol
+  |   |
+  |   \- drql1obj
+  |
+  |- drql1fp
+  |   |
+  |   |- dzdrpoc
+  |   |
+  |   |- dzdrgnv
+  |   |
+  |   |- dzdrgit
+  |   |
+  |   \- BLAS (dscal, dasum)
+  |
+  |- drql1stp
+  |   |
+  |   |- ddkheap
+  |   |
+  |   \- BLAS (dasum, ddot, daxpy)
+  |
+  \- drql1nlt
+      |
+      |- BLAS (daxpy, dcopy)
+      |
+      \- dzdrgnv
+
+
+----------------------------------------------------------------
+
+produced by /u/sfs/bin/ftn-struc
+
+egrep -in '^  +(subroutine|entry|(...)?function)' drqssbc.f |grep -iv '^[1-9][0-9]*:[c*]'
+=====
+20:      subroutine drqssbc(nrq,nl1,neqc,niqc,niqc1,nvars,nact,ifl,mxs,
+268:      subroutine dcrql1lt(nrq,nl1,neqc,niqc,niqc1,nvars,nact,ifl,mxs,
+396:      subroutine drql1nlt(nt,tmin,tmax,res,e,f,ner,indx,
+742:      subroutine drql1sup(nrq,nl1,neqc,niqc,nvars,ddx,grdx,grd1x,
+860:      subroutine dnewpen(iaddc,idelc,nact,neqns,neqc,niqc,nvars,ifl,
+917:      subroutine drql1up(iaddc,idelc,nact,nrq,nl1,neqc,niqc,nvars,icyc,
+962:      subroutine drql1fp(idelc,nact,nrq,nl1,neqc,niqc,nvars,ifl,
+1161:      subroutine drql1stp(iaddc,nact,nrq,nl1,neqc,niqc,nvars,ifl,e,ner,
+1354:      subroutine drql1rf(nact,nrq,nl1,ncols,nvars,ifl, e,ner, x,f,
+1413:      subroutine ddelcol1(iaddc,idelc,nact,nrow,zz,nzzr,dd,rr,indx)
+1459:      subroutine dresid(iaddc,nact,ncols,nvars,e,ner,x,f,res,indx,eps)
+1571:      subroutine daddcol(iaddc,idelc,nact,nvars,zz,nzzr,dd,rr,
+1643:      subroutine drql1obj(iaddc,nact,nrq,nl1,nallq,ncols,nvars,e,ner,
+1747:      subroutine drql1gv(idelc,nact,nvars,nrq,nl1,nallq,e,ner,grd,
+1862:      subroutine ddkheap(make,ir,indx,aray)
+1976:      double precision function dunif01(iseed,ix)
+2068:      subroutine dzdrcin(n,k,zz,nzzr,dd,rr,col,fail,w)
+2227:      subroutine dzdrcou(n,k,zz,nzzr,dd,rr,ic,fail)
+2382:      subroutine dzdrgit(n,k,zz,nzzr,rr,gv,sol,fail,w,big,eps)
+2538:      subroutine dzdrgnv(n,k,zz,nzzr,rr,gv,sol,fail,big)
+2678:      subroutine dzdrpoc(n,k,zz,nzzr,dd,gv,poc,fail)
+
+------- NOT showing calls to 'FUNCTION's (see above) -----
+
+egrep -in '( |\))call  *([a-z_])* *\(' drqssbc.f  | grep -iv '^[1-9][0-9]*:[c*]'
+=====
+337:      call dnewpen(iaddc,idelc,nact,nrql1,neqc,niqc,nvars,ifl,e,ner,x,f,
+346:      if(psw) call dmonit(nact,neqc,niqc,nvars,icyc,psw,x,alpha,
+447:	 call dcopy(nvars,zero,0,a,1)
+448:	 call dcopy(nvars,zero,0,b,1)
+469:		     call daxpy(nvars,(one+sgn),e(1,ix),1,a,1)
+470:		     call daxpy(nvars,-two,e(1,ix),1,b,1)
+478:		     call daxpy(nvars,(one-two*thet+sgn),e(1,ix),1,a,1)
+492:	 call dzdrgnv(nvars,nact,zz,nzzr,rr,a,aa,fail,big)
+496:	    call dzdrgnv(nvars,nact,zz,nzzr,rr,b,bb,fail,big)
+658:	    call dcopy(nvars,x,1,sol(7,nt-1),1)
+686:	       call dcopy(nvars,x,1,sol(7,nt),1)
+688:	    call dcopy(nvars,x,1,sol(7,nt-1),1)
+700:	    call dcopy(nvars,x,1,sol(7,nt-1),1)
+724:	       call dcopy(nvars,x,1,sol(7,nt),1)
+726:	    call dcopy(nvars,x,1,sol(7,nt-1),1)
+953:	    call daddcol (iaddc,idelc,nact,nvars,zz,nzzr,dd,rr,e,ner,
+1027:	 call dzdrpoc(nvars,nact,zz,nzzr,dd,grd,p,fail)
+1031:	    call dscal(nvars,-one,p,1)
+1049:		  call dzdrgnv(nvars,nact,zz,nzzr,rr,grd,w(coefx),
+1253:		  call daxpy(nvars,sgn1,e(1,ix),1,grd1,1)
+1268:	       call daxpy(nvars,sgn1,e(1,ix),1,grd1,1)
+1306:	       call ddkheap(.true.,num,indx(nactp1),alf)
+1335:		  call ddkheap(.false.,iin,indx(nactp1),alf)
+1347:	       call daxpy(nvars,alpha,p,1,x,1)
+1453:	 call dzdrcou(nrow,nact,zz,nzzr,dd,rr,idelc,fail)
+1630:	    call dzdrpoc(nvars,nact,zz,nzzr,dd,e(1,ix),w,fail)
+1636:	       call dzdrcin(nvars,nact,zz,nzzr,dd,rr,e(1,ix),fail,w)
+1698:      call dcopy(nvars,zip,0,grd,1)
+1699:      call dcopy(nvars,zip,0,grd1,1)
+1739:	       call daxpy(nvars,wgt,e(1,ix),1,grd,1)
+1740:	       call daxpy(nvars,wgt1,e(1,ix),1,grd1,1)
+1847:	       call daxpy(nvars,tmp,e(1,ix),1,grd,1)
+2175:	    call dcopy(n,unity,0,dd,1)
+2176:	    call dcopy(n*n,zip,0,zz,1)
+2500:	 call dcopy(k,gv,1,w,1)
+2516:	       call daxpy(k-i,(-w(i)),rr(j+1),1,w(i+1),1)
+2527:	 call dcopy(n,zip,0,sol,1)
+2529:	    call daxpy(n,w(i),zz(1,i),1,sol,1)
+2788:	 call dcopy(n,gv,1,poc,1)
+2796:	 call dcopy(n,zip,0,poc,1)
+2806:	 call dcopy(n,zip,0,poc,1)
+2809:	    call daxpy(n,wi,zz(1,i),1,poc,1)

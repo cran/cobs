@@ -1,0 +1,112 @@
+2002-04-18  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* tests/README: new file; also renamed *.Rout.save to -N-save
+	                (such that they are *not* compared).
+
+	* DESCRIPTION (Version): 0.9-3  --> first version to CRAN
+
+	* README: mention other READMEs, etc
+
+2002-04-15  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* inst/scripts/README: new files: Three examples from Hg & Ng (1999)
+		the installed scripts should become short than the ./tests/ ones
+
+	* R/cobs.R (summary): slight improvement; R^2 only for median
+	* R/cobs.R (mesg): eliminated (improves readability)
+
+	* R/l1looDesign.R (l1.design, loo.design):
+	* R/drqssbc.R (drqssbc):
+	* R/qbsks.R (qbsks):      new files (splitting R/cobs.R)
+
+2002-04-13  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* tests/small-ex.R: new file
+
+	* R/cobs.R (predict.cobs): use crossprod(), colSums()
+	(shat): make sure bound stays in [0,1]
+
+2002-04-12  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 0.9-2  -- since we *have* problem, see, e.g.:
+	* src/README: added comment about roof example problem
+
+	* tests/wind.R:  Added the three examples stricts,
+	* tests/temp.R:  slightly improved to the tests directory
+	* tests/roof.R:  ___ not yet using any *.Rout.save !! __
+
+2002-04-01  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/splines.R (.splBasis): moved to this new file
+
+
+2002-03-26  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* data/globtemp.R,
+	* data/USArmyRoofs.tab,
+	* data/DublinWind.tab: The 3 example data sets from the COBS paper
+
+2002-02-27  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 1.0-1  -- `pre-released' MM's FTP dir.
+
+2002-02-20  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/splines.c: protoized (now ANSI headers!)
+
+	* R/cobs.R (predict.cobs): allow out-of-knots prediction.
+	  this only works in some cases!
+
+	* R/cobs.R (loo.design) & al.: added  PACKAGE = "cobs"
+	  (necessary when library(splines) is loaded with *same* routine names!)
+
+2002-02-19  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/cobs.R (qbsks), (cobs) and (drqssbc): new argument `eps'
+	  (with back-compatible default).
+
+	* tests/ex1.R,
+	* tests/ex1Old.R: added "lstart = 7872", to make both compatible
+
+	* man/cobs-methods.Rd:
+	* R/cobs.R (fitted.cobs), (residuals.cobs): new methods.
+
+2002-02-18  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/cobs.R (summary.cobs): new method, print.cobs();
+	predict.cobs() now `works' (NOT identically to cobsOld() !bug??)
+
+2002-02-16  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/cobsOld.R (cobsOld): new file for cobsOld() function
+	* R/cobs.R (cobs): newly return "cobs" object
+
+	* src/monitor.c: new printing of diagnostics during Fortran
+
+2002-02-15  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* src/README: new file showing call tree of Fortran code
+
+	* tests/dunif01.R: new file; some exploration of COBS-builtin RNG
+	* src/dunif01-tst.c: new: for the above
+
+2002-02-14  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/cobs.R (cobs): equal, smaller,.. : simplified ->
+	  instead of NULL, matrices w/ 0 rows  ==> change in other functions
+	  (qbsks) and others: get rid of warn() but do the "warnings"
+
+2002-02-13  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* man/cobs-internal.Rd: new file; now "R CMD check" is perfect
+
+	* tests/ex1.R: new file; test basic example;
+
+	* man/exHe.Rd: example fine
+
+	* man/cobs.Rd: example improved
+
+	* R/cobs.R (cobs): fix nknots to be smaller when unique(xo) is
+	  (this currently leads to a Warning and a seg.fault
+
+	  Added ``labels = FALSE'' to calls to cut() in order to get integers

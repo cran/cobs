@@ -1,0 +1,3 @@
+PKG_LIBS= $(BLAS_LIBS) $(FLIBS)
+## otherwise, for S+, need  ../src/Orig/dblas1.f
+## {need anyway at the moment : srotm1() and srotmg1()
