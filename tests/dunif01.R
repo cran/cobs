@@ -14,7 +14,7 @@ all( ii[-(1:9972)] == ii[-((n-9972+1):n)])# proof
 i0 <- ii[1:(9972 + 20)] # only first period + 20 obs
 i0[1:100]
 i0[9971 + 1:20]
-library(ts)
+
 lag.plot(i0)# looks fine (they said it passed the spectral test...)
 plot(ts(i0[1:200]))# fine
 acf(ts(i0[1:1000]))# fine

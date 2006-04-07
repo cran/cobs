@@ -43,7 +43,7 @@ Type `q()' to quit R.
 > i0[9971 + 1:20]
  [1]     2  6864 20968 56845 23592 86714  8128 70626 44532 47464 37358 59606
 [13] 21562  1124 67828 15875 33852 94344 65028 80086
-> library(ts)
+> 
 > lag.plot(i0)# looks fine (they said it passed the spectral test...)
 > plot(ts(i0[1:200]))# fine
 > acf(ts(i0[1:1000]))# fine
