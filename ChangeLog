@@ -1,133 +1,169 @@
-2006-04-04  Martin Maechler  <maechler@stat.math.ethz.ch>
+2006-09-27  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* DESCRIPTION (Version, Date): 0.9-5 for CRAN:
-		trivial change: move R/README and R/.R-porting to toplevel
+	* man/cobs.Rd: a small note about "quality" of pp.sic
 
-2003-11-07  Martin Maechler  <maechler@stat.math.ethz.ch>
+2006-09-09  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* DESCRIPTION (Version, Date): 0.9-4 for CRAN
+	* DESCRIPTION (Version): 1.1-3.5
+	* R/scobs.R (plot.cobs): more changes; based on such from Pin Ng.
 
-	* R/cobsOld.R (cobsOld): eliminate multi-value return()
-	* R/cobs.R (getdim):	<ditto>
-	* R/drqssbc.R (drqssbc): <ditto>
-	* R/qbsks.R (qbsks): 	<ditto>
-	* R/cobsOld.R (cobsOld): give PACKAGE even in old code.
+2006-08-16  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* man/drqssbc.Rd: for "codoc": add same default values as in *.R
+	* R/drqssbc.R (drqssbc2): rationalize and slightly modify the
+	warning messages.
+	* R/qbsks.R (qbsks2): use warnUP();
+	msg "final fit" only for print.msg >=2
 
-2002-08-28  Martin Maechler  <maechler@stat.math.ethz.ch>
+2006-08-14  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* src/dblas1.f (srotm1): declare sx(*) not sx(1)
+	* DESCRIPTION (URL): add the newly created R-Wiki entry on COBS
+	(Version): 1.1-3.4
 
-2002-04-18  Martin Maechler  <maechler@stat.math.ethz.ch>
+2006-08-12  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* tests/README: new file; also renamed *.Rout.save to -N-save
-	                (such that they are *not* compared).
+	* R/scobs.R (plot.cobs): ifl = 18 = 1+17 (instead of 11=1+10)
+	* R/scobs.R (".First.lib"): banner message
 
-	* DESCRIPTION (Version): 0.9-3  --> first version to CRAN
+2006-08-09  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* README: mention other READMEs, etc
+	* R/scobs.R (plot.cobs): improvement 'show.k'
+	* man/plot.cobs.Rd: newly document plot.cobs() separately.
 
-2002-04-15  Martin Maechler  <maechler@stat.math.ethz.ch>
+2006-08-07  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* inst/scripts/README: new files: Three examples from Hg & Ng (1999)
-		the installed scripts should become shorter than the ./tests/ ones
+	* DESCRIPTION (Version): 1.1-3.3
 
-	* R/cobs.R (summary): slight improvement; R^2 only for median
-	* R/cobs.R (mesg): eliminated (improves readability)
+	* R/drqssbc.R (summSparse): utility for nicer 'trace'ing of sparse
+	matrices.
 
-	* R/l1looDesign.R (l1.design, loo.design):
-	* R/drqssbc.R (drqssbc):
-	* R/qbsks.R (qbsks):      new files (splitting R/cobs.R)
+	* R/scobs.R (.print.part): utility function used in print.cobs()
+	and summary.cobs() for the 'coef'
+	* R/scobs.R (coef.cobs): accessor method
 
-2002-04-13  Martin Maechler  <maechler@stat.math.ethz.ch>
+	* tests/*.R and *.Rout.save: adaption to latest summary/trace features
 
-	* tests/small-ex.R: new file
+2006-08-05  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* R/cobs.R (predict.cobs): use crossprod(), colSums()
-	(shat): make sure bound stays in [0,1]
+	* R/scobs.R (cobs): changed defaults for lambda.lo and lambda.hi
+	to be scale-equivariant also with respect to x.  Then dropped '* sd(y)'
+	which was *wrong*.
+	(print.cobs): make sure that `ifl != 1' is "marked" in print, too.
 
-2002-04-12  Martin Maechler  <maechler@stat.math.ethz.ch>
+2006-08-04  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* DESCRIPTION (Version): 0.9-2  -- since we *have* problem, see, e.g.:
-	* src/README: added comment about roof example problem
+	* R/scobs.R (cobs): make 'lambdaSet' an argument with default as previously
+	* man/cobs.Rd:      dito;  added several plot[.cobs]() examples
 
-	* tests/wind.R:  Added the three examples stricts,
-	* tests/temp.R:  slightly improved to the tests directory
-	* tests/roof.R:  ___ not yet using any *.Rout.save !! __
+2006-08-02  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-2002-04-01  Martin Maechler  <maechler@stat.math.ethz.ch>
+	* DESCRIPTION (Version): 1.1-3.2
 
-	* R/splines.R (.splBasis): moved to this new file
+	* R/drqssbc.R (drqssbc2): tol.0res.y: not mean(y) but "scale(y)"
+	in order to aim for scale invariance.
+	Make default = 1e-8 * sc.y, since I found that quantreg's
+	sq.fit.sfn*() routines have their 'small' in "y scale".
+
+	* R/scobs.R (plot.cobs): many more improvements; latest is
+	'which' argument.
+
+2006-08-01  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/scobs.R (cobs): new argument 'keep.x.ps = TRUE' (for returning
+	pseudo X 'x.ps').
+
+	* R/drqssbc.R (drqssbc2): return pseudo.x only when 'give.pseudo.x = TRUE'
+	as per default, and do return the *sparse* version.
+
+2006-07-31  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/l1Design.R (l1.design2): if (nk <= 4) cannot build some constraints;
+		now allows some more "multi-constraints":
+	* tests/multi-constr.R: tested here
+
+2006-07-29  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 1.1-3.1
+
+	* tests/ex1.R, roof.R, wood.R: adapt to NON-compatible change of
+	using 'pp.sic' instead of 'sic'  (!)
+
+	* R/scobs.R (mk.pt.constr): use small helper function
+	* R/scobs.R (plot.cobs): small improvements
+	* R/scobs.R (cobs): moved arg. 'w' up to just after 'constraint';
+	ideally should even come after (x,y) ...;
+	add 'keep.data' argument and return more - even if(!keep.data)
 
 
-2002-03-26  Martin Maechler  <maechler@stat.math.ethz.ch>
+2006-07-28  Pin Ng  <pin.ng@nau.edu>
 
-	* data/globtemp.R,
-	* data/USArmyRoofs.tab,
-	* data/DublinWind.tab: The 3 example data sets from the COBS paper
+	* R/scobs.R (cobs): new default values for lambda.lo and lambda.hi;
+	slight changes in returned components: renamed 'sic' to 'pp.sic';
+	pp.ifl, icyc,..
 
-2002-02-27  Martin Maechler  <maechler@stat.math.ethz.ch>
+	* R/scobs.R (plot.cobs): new plot method for "cobs" objects
 
-	* DESCRIPTION (Version): 1.0-1  -- `pre-released' MM's FTP dir.
+	* R/drqssbc.R (drqssbc2): add 'small = 1e-8' to the
+	rq.fit.sfn[c]() calls. MM: --> becomes new function argument 'rq.tol'.
+	Better scaling of tol.0res for "eff.k" tolerance.
+	Tweaked definitions of ifl.idx, sic., k, icyc
 
-2002-02-20  Martin Maechler  <maechler@stat.math.ethz.ch>
+2006-07-25  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* src/splines.c: protoized (now ANSI headers!)
+	* R/l1looDesign.R: split this file into the two files
+	* R/l1Design.R (l1.design2):    since these are almost "parallel"
+	* R/looDesign.R (loo.design2):  it's easier to compare them.
+	TODO: modularize !
 
-	* R/cobs.R (predict.cobs): allow out-of-knots prediction.
-	  this only works in some cases!
+2006-07-24  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* R/cobs.R (loo.design) & al.: added  PACKAGE = "cobs"
-	  (necessary when library(splines) is loaded with *same* routine names!)
+	* R/drqssbc.R (drqssbc2): more cleanup of unused arguments; start
+	making more use of 'trace'.
+	* R/scobs.R (cobs, getdim2): allow multiple 'constraints'
 
-2002-02-19  Martin Maechler  <maechler@stat.math.ethz.ch>
+2006-07-19  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* R/cobs.R (qbsks), (cobs) and (drqssbc): new argument `eps'
-	  (with back-compatible default).
+	* R/drqssbc.R: get rid of 'nj0' argument (nj0 := length(Tlambda)
 
-	* tests/ex1.R,
-	* tests/ex1Old.R: added "lstart = 7872", to make both compatible
+2006-07-18  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* man/cobs-methods.Rd:
-	* R/cobs.R (fitted.cobs), (residuals.cobs): new methods.
+	* R/drqssbc.R (drqssbc2): drop unused 'eps' argument; use new
+	argument 'tol.0res' for testing |res| "=" 0 - on a *relative* scale.
 
-2002-02-18  Martin Maechler  <maechler@stat.math.ethz.ch>
+	* R/scobs.R (cobs): do not shift the outer knots before calling
+	qbsks2(), since that does shift anyway.  Do shift *as there*,
+	i.e., by a *relative*, rather than absolute amount.
 
-	* R/cobs.R (summary.cobs): new method, print.cobs();
-	predict.cobs() now `works' (NOT identically to cobsOld() !bug??)
+2006-07-16  Pin Ng  <pin.ng@nau.edu>
 
-2002-02-16  Martin Maechler  <maechler@stat.math.ethz.ch>
+	* R/scobs.R (cobs): Change default 'ic' from "aic" to "sic"; new
+		argument 'repeat.delete.add = FALSE', passed to
+	* R/qbsks.R (qbsks2): new arg. 'repeat.delete.add'; and loop to do
+		repeated knot additions and deletions.
+	* R/drqssbc.R (drqssbc2): fix typo 'msgT'; better warning msg for flag '4'
 
-	* R/cobsOld.R (cobsOld): new file for cobsOld() function
-	* R/cobs.R (cobs): newly return "cobs" object
+2006-07-15  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* src/monitor.c: new printing of diagnostics during Fortran
+	* many changes to rename the package and main function
+	  from "scobs" to "cobs" and similar for the qbsks2() and
+	  drqssbc2() functions.
 
-2002-02-15  Martin Maechler  <maechler@stat.math.ethz.ch>
+2006-07-07  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* src/README: new file showing call tree of Fortran code
+	* R/scobs.R (scobs): explicit (instead of "hidden") default
+		nknots = if(lambda == 0) 6 else 20; no warning any more
+		when user choses nknots (or 'knots') differently.
 
-	* tests/dunif01.R: new file; some exploration of COBS-builtin RNG
-	* src/dunif01-tst.c: new: for the above
+2006-06-19  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-2002-02-14  Martin Maechler  <maechler@stat.math.ethz.ch>
+	* R/scobs.R (scobs): added the 4 arguments from old cobs(),
+	* man/scobs.Rd:	     such that old cobs() calls should still work.
 
-	* R/cobs.R (cobs): equal, smaller,.. : simplified ->
-	  instead of NULL, matrices w/ 0 rows  ==> change in other functions
-	  (qbsks) and others: get rid of warn() but do the "warnings"
+2006-06-17  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-2002-02-13  Martin Maechler  <maechler@stat.math.ethz.ch>
+	* README: merged 'ReadMe' and removed that: Cannot have a file
+		with the same lowercase(name).
 
-	* man/cobs-internal.Rd: new file; now "R CMD check" is perfect
+--------------------------------------------------------------------------
 
-	* tests/ex1.R: new file; test basic example;
-
-	* man/exHe.Rd: example fine
-
-	* man/cobs.Rd: example improved
-
-	* R/cobs.R (cobs): fix nknots to be smaller when unique(xo) is
-	  (this currently leads to a Warning and a seg.fault
-
-	  Added ``labels = FALSE'' to calls to cut() in order to get integers
+Conceptually:  add ChangeLog from `old' 2003-cobs,
+------------   i.e. ../cobs99/ChangeLog  here :

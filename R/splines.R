@@ -13,9 +13,9 @@
     ## Author: Martin Maechler, Date: 20 Feb 2002, 14:46
 
     ord <- as.integer(ord)
-    new.knots <- c(rep(knots[1], ord-1),
+    new.knots <- c(rep.int(knots[1], ord-1:1),
                    knots,
-                   rep(knots[length(knots)], ord-1))
+                   rep.int(knots[length(knots)], ord-1:1))
 
     if(ord + length(knots) != ncoef + 2)
         warning(".splBasis(): (ord,length(knots),ncoef)=",
@@ -46,9 +46,9 @@
 
     degree <- as.integer(degree)
     ord <- as.integer(degree + 1)
-    new.knots <- c(rep(knots[1], degree),
+    new.knots <- c(rep.int(knots[1], degree),
                    knots,
-                   rep(knots[length(knots)], degree))
+                   rep.int(knots[length(knots)], degree))
     derivs <- as.integer(0)
     n <- length(xo)
     .C("spline_value",

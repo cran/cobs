@@ -18,3 +18,5 @@ lines(predict(c2), col=3)
 ##using browser() inside
 predict(c1, interval = "both")
 predict(c2, interval = "both")
+
+cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''

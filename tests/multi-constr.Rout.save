@@ -1,0 +1,394 @@
+
+R version 2.4.0 beta (2006-09-25 r39513)
+Copyright (C) 2006 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> #### Examples which use the new feature of more than one 'constraint'.
+> 
+> library(cobs)
+Loading required package: SparseM
+Package SparseM (0.71) loaded.  To cite, see citation("SparseM")
+Loading required package: quantreg
+> options(digits = 6)
+> postscript("multi-constr.ps")
+> 
+> source(system.file("util.R", package = "cobs"))
+> 
+> set.seed(908)
+> x <- seq(-1,2, len = 50)
+> f.true <- pnorm(2*x)
+> y <- f.true + rnorm(50)/10
+> plot(x,y); lines(x, f.true, col="gray", lwd=2, lty=3)
+> 
+> ## constraint on derivative at right end:
+> (con <- rbind(c(2 , max(x), 0))) # f'(x_n) == 0
+     [,1] [,2] [,3]
+[1,]    2    2    0
+> 
+> ## Using 'trace = 3' --> 'trace = 2' inside drqssbc2()
+> 
+> ## Regression splines (lambda = 0)
+> c2   <- cobs(x,y, trace = 3)
+qbsks2():
+ Performing general knot selection ...
+loo.design2(): ->  Xeq   50 x 3 (nz = 150 =^=     1%) 
+loo.design2(): ->  Xeq   50 x 4 (nz = 150 =^=  0.75%) 
+loo.design2(): ->  Xeq   50 x 5 (nz = 150 =^=   0.6%) 
+loo.design2(): ->  Xeq   50 x 6 (nz = 150 =^=   0.5%) 
+loo.design2(): ->  Xeq   50 x 7 (nz = 150 =^=  0.43%) 
+
+ Deleting unnecessary knots ...
+loo.design2(): ->  Xeq   50 x 4 (nz = 150 =^=  0.75%) 
+loo.design2(): ->  Xeq   50 x 4 (nz = 150 =^=  0.75%) 
+loo.design2(): ->  Xeq   50 x 3 (nz = 150 =^=     1%) 
+loo.design2(): ->  Xeq   50 x 4 (nz = 150 =^=  0.75%) 
+> c2i  <- cobs(x,y, constraint = c("increase"), trace = 3)
+qbsks2():
+ Performing general knot selection ...
+loo.design2(): ->  Xeq   50 x 3 (nz = 150 =^=     1%) 
+                  Xieq    2 x 3 (nz = 6 =^=     1%) 
+loo.design2(): ->  Xeq   50 x 4 (nz = 150 =^=  0.75%) 
+                  Xieq    3 x 4 (nz = 9 =^=  0.75%) 
+loo.design2(): ->  Xeq   50 x 5 (nz = 150 =^=   0.6%) 
+                  Xieq    4 x 5 (nz = 12 =^=   0.6%) 
+loo.design2(): ->  Xeq   50 x 6 (nz = 150 =^=   0.5%) 
+                  Xieq    5 x 6 (nz = 15 =^=   0.5%) 
+loo.design2(): ->  Xeq   50 x 7 (nz = 150 =^=  0.43%) 
+                  Xieq    6 x 7 (nz = 18 =^=  0.43%) 
+
+ Deleting unnecessary knots ...
+loo.design2(): ->  Xeq   50 x 3 (nz = 150 =^=     1%) 
+                  Xieq    2 x 3 (nz = 6 =^=     1%) 
+> c2c  <- cobs(x,y, constraint = c("concave"), trace = 3)
+qbsks2():
+ Performing general knot selection ...
+loo.design2(): ->  Xeq   50 x 3 (nz = 150 =^=     1%) 
+                  Xieq    1 x 3 (nz = 3 =^=     1%) 
+loo.design2(): ->  Xeq   50 x 4 (nz = 150 =^=  0.75%) 
+                  Xieq    2 x 4 (nz = 6 =^=  0.75%) 
+loo.design2(): ->  Xeq   50 x 5 (nz = 150 =^=   0.6%) 
+                  Xieq    3 x 5 (nz = 9 =^=   0.6%) 
+loo.design2(): ->  Xeq   50 x 6 (nz = 150 =^=   0.5%) 
+                  Xieq    4 x 6 (nz = 12 =^=   0.5%) 
+loo.design2(): ->  Xeq   50 x 7 (nz = 150 =^=  0.43%) 
+                  Xieq    5 x 7 (nz = 15 =^=  0.43%) 
+
+ Deleting unnecessary knots ...
+loo.design2(): ->  Xeq   50 x 3 (nz = 150 =^=     1%) 
+                  Xieq    1 x 3 (nz = 3 =^=     1%) 
+> 
+> c2IC <- cobs(x,y, constraint = c("inc", "concave"), trace = 3)
+qbsks2():
+ Performing general knot selection ...
+loo.design2(): ->  Xeq   50 x 3 (nz = 150 =^=     1%) 
+                  Xieq    3 x 3 (nz = 9 =^=     1%) 
+loo.design2(): ->  Xeq   50 x 4 (nz = 150 =^=  0.75%) 
+                  Xieq    5 x 4 (nz = 15 =^=  0.75%) 
+loo.design2(): ->  Xeq   50 x 5 (nz = 150 =^=   0.6%) 
+                  Xieq    7 x 5 (nz = 21 =^=   0.6%) 
+loo.design2(): ->  Xeq   50 x 6 (nz = 150 =^=   0.5%) 
+                  Xieq    9 x 6 (nz = 27 =^=   0.5%) 
+loo.design2(): ->  Xeq   50 x 7 (nz = 150 =^=  0.43%) 
+                  Xieq   11 x 7 (nz = 33 =^=  0.43%) 
+
+ Deleting unnecessary knots ...
+loo.design2(): ->  Xeq   50 x 3 (nz = 150 =^=     1%) 
+                  Xieq    3 x 3 (nz = 9 =^=     1%) 
+> ## here, it's the same as just "i":
+> all.equal(fitted(c2i), fitted(c2IC))
+[1] TRUE
+> 
+> c1   <- cobs(x,y, degree = 1, trace = 3)
+qbsks2():
+ Performing general knot selection ...
+ l1.design2(): ->  Xeq   50 x 2 (nz = 100 =^=     1%) 
+ l1.design2(): ->  Xeq   50 x 3 (nz = 100 =^=  0.67%) 
+ l1.design2(): ->  Xeq   50 x 4 (nz = 100 =^=   0.5%) 
+ l1.design2(): ->  Xeq   50 x 5 (nz = 100 =^=   0.4%) 
+ l1.design2(): ->  Xeq   50 x 6 (nz = 100 =^=  0.33%) 
+
+ Deleting unnecessary knots ...
+ l1.design2(): ->  Xeq   50 x 4 (nz = 100 =^=   0.5%) 
+ l1.design2(): ->  Xeq   50 x 4 (nz = 100 =^=   0.5%) 
+ l1.design2(): ->  Xeq   50 x 4 (nz = 100 =^=   0.5%) 
+ l1.design2(): ->  Xeq   50 x 5 (nz = 100 =^=   0.4%) 
+> c1i  <- cobs(x,y, degree = 1, constraint = c("increase"), trace = 3)
+qbsks2():
+ Performing general knot selection ...
+ l1.design2(): ->  Xeq   50 x 2 (nz = 100 =^=     1%) 
+                  Xieq    1 x 2 (nz = 2 =^=     1%) 
+ l1.design2(): ->  Xeq   50 x 3 (nz = 100 =^=  0.67%) 
+                  Xieq    2 x 3 (nz = 4 =^=  0.67%) 
+ l1.design2(): ->  Xeq   50 x 4 (nz = 100 =^=   0.5%) 
+                  Xieq    3 x 4 (nz = 6 =^=   0.5%) 
+ l1.design2(): ->  Xeq   50 x 5 (nz = 100 =^=   0.4%) 
+                  Xieq    4 x 5 (nz = 8 =^=   0.4%) 
+ l1.design2(): ->  Xeq   50 x 6 (nz = 100 =^=  0.33%) 
+                  Xieq    5 x 6 (nz = 10 =^=  0.33%) 
+
+ Deleting unnecessary knots ...
+ l1.design2(): ->  Xeq   50 x 4 (nz = 100 =^=   0.5%) 
+                  Xieq    3 x 4 (nz = 6 =^=   0.5%) 
+ l1.design2(): ->  Xeq   50 x 4 (nz = 100 =^=   0.5%) 
+                  Xieq    3 x 4 (nz = 6 =^=   0.5%) 
+ l1.design2(): ->  Xeq   50 x 4 (nz = 100 =^=   0.5%) 
+                  Xieq    3 x 4 (nz = 6 =^=   0.5%) 
+ l1.design2(): ->  Xeq   50 x 5 (nz = 100 =^=   0.4%) 
+                  Xieq    4 x 5 (nz = 8 =^=   0.4%) 
+> c1c  <- cobs(x,y, degree = 1, constraint = c("concave"), trace = 3)
+qbsks2():
+ Performing general knot selection ...
+ l1.design2(): ->  Xeq   50 x 2 (nz = 100 =^=     1%) 
+ l1.design2(): ->  Xeq   50 x 3 (nz = 100 =^=  0.67%) 
+                  Xieq    1 x 3 (nz = 3 =^=     1%) 
+ l1.design2(): ->  Xeq   50 x 4 (nz = 100 =^=   0.5%) 
+                  Xieq    2 x 4 (nz = 6 =^=  0.75%) 
+ l1.design2(): ->  Xeq   50 x 5 (nz = 100 =^=   0.4%) 
+                  Xieq    3 x 5 (nz = 9 =^=   0.6%) 
+ l1.design2(): ->  Xeq   50 x 6 (nz = 100 =^=  0.33%) 
+                  Xieq    4 x 6 (nz = 12 =^=   0.5%) 
+
+ Deleting unnecessary knots ...
+ l1.design2(): ->  Xeq   50 x 3 (nz = 100 =^=  0.67%) 
+                  Xieq    1 x 3 (nz = 3 =^=     1%) 
+ l1.design2(): ->  Xeq   50 x 3 (nz = 100 =^=  0.67%) 
+                  Xieq    1 x 3 (nz = 3 =^=     1%) 
+ l1.design2(): ->  Xeq   50 x 2 (nz = 100 =^=     1%) 
+ l1.design2(): ->  Xeq   50 x 3 (nz = 100 =^=  0.67%) 
+                  Xieq    1 x 3 (nz = 3 =^=     1%) 
+> 
+> plot(c1)
+> lines(predict(c1i), col="forest green")
+> all.equal(fitted(c1), fitted(c1i), tol = 1e-9)# but not 1e-10
+[1] TRUE
+> 
+> ## now gives warning (not error):
+> c1IC <- cobs(x,y, degree = 1, constraint = c("inc", "concave"), trace = 3)
+qbsks2():
+ Performing general knot selection ...
+ l1.design2(): ->  Xeq   50 x 2 (nz = 100 =^=     1%) 
+                  Xieq    1 x 2 (nz = 2 =^=     1%) 
+ l1.design2(): ->  Xeq   50 x 3 (nz = 100 =^=  0.67%) 
+                  Xieq    3 x 3 (nz = 7 =^=  0.78%) 
+ l1.design2(): ->  Xeq   50 x 4 (nz = 100 =^=   0.5%) 
+                  Xieq    5 x 4 (nz = 12 =^=   0.6%) 
+ l1.design2(): ->  Xeq   50 x 5 (nz = 100 =^=   0.4%) 
+                  Xieq    7 x 5 (nz = 17 =^=  0.49%) 
+ l1.design2(): ->  Xeq   50 x 6 (nz = 100 =^=  0.33%) 
+                  Xieq    9 x 6 (nz = 22 =^=  0.41%) 
+
+ Deleting unnecessary knots ...
+ l1.design2(): ->  Xeq   50 x 3 (nz = 100 =^=  0.67%) 
+                  Xieq    3 x 3 (nz = 7 =^=  0.78%) 
+ l1.design2(): ->  Xeq   50 x 3 (nz = 100 =^=  0.67%) 
+                  Xieq    3 x 3 (nz = 7 =^=  0.78%) 
+ l1.design2(): ->  Xeq   50 x 2 (nz = 100 =^=     1%) 
+                  Xieq    1 x 2 (nz = 2 =^=     1%) 
+ l1.design2(): ->  Xeq   50 x 3 (nz = 100 =^=  0.67%) 
+                  Xieq    3 x 3 (nz = 7 =^=  0.78%) 
+Warning messages:
+1: too few knots ==> nk <= 4; could not add constraint 'concave' in: l1.design2(x, w, constraint, ptConstr, knots, pw, nrq = n, nl1,  
+2: too few knots ==> nk <= 4; could not add constraint 'concave' in: l1.design2(x, w, constraint, ptConstr, knots, pw, nrq = n, nl1,  
+> 
+> cp2   <- cobs(x,y,                          pointwise = con, trace = 3)
+qbsks2():
+ Performing general knot selection ...
+loo.design2(): ->  Xeq   50 x 3 (nz = 150 =^=     1%) 
+                  Xieq    2 x 3 (nz = 6 =^=     1%) 
+loo.design2(): ->  Xeq   50 x 4 (nz = 150 =^=  0.75%) 
+                  Xieq    2 x 4 (nz = 6 =^=  0.75%) 
+loo.design2(): ->  Xeq   50 x 5 (nz = 150 =^=   0.6%) 
+                  Xieq    2 x 5 (nz = 6 =^=   0.6%) 
+loo.design2(): ->  Xeq   50 x 6 (nz = 150 =^=   0.5%) 
+                  Xieq    2 x 6 (nz = 6 =^=   0.5%) 
+loo.design2(): ->  Xeq   50 x 7 (nz = 150 =^=  0.43%) 
+                  Xieq    2 x 7 (nz = 6 =^=  0.43%) 
+
+ Deleting unnecessary knots ...
+loo.design2(): ->  Xeq   50 x 4 (nz = 150 =^=  0.75%) 
+                  Xieq    2 x 4 (nz = 6 =^=  0.75%) 
+loo.design2(): ->  Xeq   50 x 4 (nz = 150 =^=  0.75%) 
+                  Xieq    2 x 4 (nz = 6 =^=  0.75%) 
+loo.design2(): ->  Xeq   50 x 5 (nz = 150 =^=   0.6%) 
+                  Xieq    2 x 5 (nz = 6 =^=   0.6%) 
+> cp2i  <- cobs(x,y, constraint = "increase", pointwise = con)# warn: check 'ifl'
+qbsks2():
+ Performing general knot selection ...
+
+ Deleting unnecessary knots ...
+Warning message:
+Check 'ifl' in: cobs(x, y, constraint = "increase", pointwise = con) 
+> ## when plotting it, we see that it gave a trivial constant!!
+> cp2c  <- cobs(x,y, constraint = "concave",  pointwise = con, trace = 3)
+qbsks2():
+ Performing general knot selection ...
+loo.design2(): ->  Xeq   50 x 3 (nz = 150 =^=     1%) 
+                  Xieq    3 x 3 (nz = 9 =^=     1%) 
+loo.design2(): ->  Xeq   50 x 4 (nz = 150 =^=  0.75%) 
+                  Xieq    4 x 4 (nz = 12 =^=  0.75%) 
+loo.design2(): ->  Xeq   50 x 5 (nz = 150 =^=   0.6%) 
+                  Xieq    5 x 5 (nz = 15 =^=   0.6%) 
+loo.design2(): ->  Xeq   50 x 6 (nz = 150 =^=   0.5%) 
+                  Xieq    6 x 6 (nz = 18 =^=   0.5%) 
+loo.design2(): ->  Xeq   50 x 7 (nz = 150 =^=  0.43%) 
+                  Xieq    7 x 7 (nz = 21 =^=  0.43%) 
+
+ Deleting unnecessary knots ...
+loo.design2(): ->  Xeq   50 x 3 (nz = 150 =^=     1%) 
+                  Xieq    3 x 3 (nz = 9 =^=     1%) 
+> 
+> ## now gives warning (not error):
+> cp2IC <- cobs(x,y, constraint = c("inc", "concave"), pointwise = con, trace = 3)
+qbsks2():
+ Performing general knot selection ...
+loo.design2(): ->  Xeq   50 x 3 (nz = 150 =^=     1%) 
+                  Xieq    5 x 3 (nz = 15 =^=     1%) 
+loo.design2(): ->  Xeq   50 x 4 (nz = 150 =^=  0.75%) 
+                  Xieq    7 x 4 (nz = 21 =^=  0.75%) 
+loo.design2(): ->  Xeq   50 x 5 (nz = 150 =^=   0.6%) 
+                  Xieq    9 x 5 (nz = 27 =^=   0.6%) 
+loo.design2(): ->  Xeq   50 x 6 (nz = 150 =^=   0.5%) 
+                  Xieq   11 x 6 (nz = 33 =^=   0.5%) 
+loo.design2(): ->  Xeq   50 x 7 (nz = 150 =^=  0.43%) 
+                  Xieq   13 x 7 (nz = 39 =^=  0.43%) 
+
+ Deleting unnecessary knots ...
+loo.design2(): ->  Xeq   50 x 3 (nz = 150 =^=     1%) 
+                  Xieq    5 x 3 (nz = 15 =^=     1%) 
+Warning message:
+Check 'ifl' in: cobs(x, y, constraint = c("inc", "concave"), pointwise = con,  
+> 
+> cp1   <- cobs(x,y, degree = 1,                            pointwise = con, trace = 3)
+qbsks2():
+ Performing general knot selection ...
+ l1.design2(): ->  Xeq   50 x 2 (nz = 100 =^=     1%) 
+                  Xieq    2 x 2 (nz = 4 =^=     1%) 
+ l1.design2(): ->  Xeq   50 x 3 (nz = 100 =^=  0.67%) 
+                  Xieq    2 x 3 (nz = 4 =^=  0.67%) 
+ l1.design2(): ->  Xeq   50 x 4 (nz = 100 =^=   0.5%) 
+                  Xieq    2 x 4 (nz = 4 =^=   0.5%) 
+ l1.design2(): ->  Xeq   50 x 5 (nz = 100 =^=   0.4%) 
+                  Xieq    2 x 5 (nz = 4 =^=   0.4%) 
+ l1.design2(): ->  Xeq   50 x 6 (nz = 100 =^=  0.33%) 
+                  Xieq    2 x 6 (nz = 4 =^=  0.33%) 
+
+ Deleting unnecessary knots ...
+ l1.design2(): ->  Xeq   50 x 3 (nz = 100 =^=  0.67%) 
+                  Xieq    2 x 3 (nz = 4 =^=  0.67%) 
+ l1.design2(): ->  Xeq   50 x 3 (nz = 100 =^=  0.67%) 
+                  Xieq    2 x 3 (nz = 4 =^=  0.67%) 
+ l1.design2(): ->  Xeq   50 x 4 (nz = 100 =^=   0.5%) 
+                  Xieq    2 x 4 (nz = 4 =^=   0.5%) 
+> cp1i  <- cobs(x,y, degree = 1, constraint = "increase",   pointwise = con, trace = 3)
+qbsks2():
+ Performing general knot selection ...
+ l1.design2(): ->  Xeq   50 x 2 (nz = 100 =^=     1%) 
+                  Xieq    3 x 2 (nz = 6 =^=     1%) 
+ l1.design2(): ->  Xeq   50 x 3 (nz = 100 =^=  0.67%) 
+                  Xieq    4 x 3 (nz = 8 =^=  0.67%) 
+ l1.design2(): ->  Xeq   50 x 4 (nz = 100 =^=   0.5%) 
+                  Xieq    5 x 4 (nz = 10 =^=   0.5%) 
+ l1.design2(): ->  Xeq   50 x 5 (nz = 100 =^=   0.4%) 
+                  Xieq    6 x 5 (nz = 12 =^=   0.4%) 
+ l1.design2(): ->  Xeq   50 x 6 (nz = 100 =^=  0.33%) 
+                  Xieq    7 x 6 (nz = 14 =^=  0.33%) 
+
+ Deleting unnecessary knots ...
+ l1.design2(): ->  Xeq   50 x 3 (nz = 100 =^=  0.67%) 
+                  Xieq    4 x 3 (nz = 8 =^=  0.67%) 
+ l1.design2(): ->  Xeq   50 x 3 (nz = 100 =^=  0.67%) 
+                  Xieq    4 x 3 (nz = 8 =^=  0.67%) 
+ l1.design2(): ->  Xeq   50 x 4 (nz = 100 =^=   0.5%) 
+                  Xieq    5 x 4 (nz = 10 =^=   0.5%) 
+> cp1c  <- cobs(x,y, degree = 1, constraint = "concave",    pointwise = con, trace = 3)
+qbsks2():
+ Performing general knot selection ...
+ l1.design2(): ->  Xeq   50 x 2 (nz = 100 =^=     1%) 
+                  Xieq    2 x 2 (nz = 4 =^=     1%) 
+ l1.design2(): ->  Xeq   50 x 3 (nz = 100 =^=  0.67%) 
+                  Xieq    3 x 3 (nz = 7 =^=  0.78%) 
+ l1.design2(): ->  Xeq   50 x 4 (nz = 100 =^=   0.5%) 
+                  Xieq    4 x 4 (nz = 10 =^=  0.62%) 
+ l1.design2(): ->  Xeq   50 x 5 (nz = 100 =^=   0.4%) 
+                  Xieq    5 x 5 (nz = 13 =^=  0.52%) 
+ l1.design2(): ->  Xeq   50 x 6 (nz = 100 =^=  0.33%) 
+                  Xieq    6 x 6 (nz = 16 =^=  0.44%) 
+
+ Deleting unnecessary knots ...
+ l1.design2(): ->  Xeq   50 x 3 (nz = 100 =^=  0.67%) 
+                  Xieq    3 x 3 (nz = 7 =^=  0.78%) 
+ l1.design2(): ->  Xeq   50 x 3 (nz = 100 =^=  0.67%) 
+                  Xieq    3 x 3 (nz = 7 =^=  0.78%) 
+ l1.design2(): ->  Xeq   50 x 2 (nz = 100 =^=     1%) 
+                  Xieq    2 x 2 (nz = 4 =^=     1%) 
+ l1.design2(): ->  Xeq   50 x 3 (nz = 100 =^=  0.67%) 
+                  Xieq    3 x 3 (nz = 7 =^=  0.78%) 
+> 
+> cp1IC <- cobs(x,y, degree = 1, constraint = c("inc", "concave"), pointwise = con, trace = 3)
+qbsks2():
+ Performing general knot selection ...
+ l1.design2(): ->  Xeq   50 x 2 (nz = 100 =^=     1%) 
+                  Xieq    3 x 2 (nz = 6 =^=     1%) 
+ l1.design2(): ->  Xeq   50 x 3 (nz = 100 =^=  0.67%) 
+                  Xieq    5 x 3 (nz = 11 =^=  0.73%) 
+ l1.design2(): ->  Xeq   50 x 4 (nz = 100 =^=   0.5%) 
+                  Xieq    7 x 4 (nz = 16 =^=  0.57%) 
+ l1.design2(): ->  Xeq   50 x 5 (nz = 100 =^=   0.4%) 
+                  Xieq    9 x 5 (nz = 21 =^=  0.47%) 
+ l1.design2(): ->  Xeq   50 x 6 (nz = 100 =^=  0.33%) 
+                  Xieq   11 x 6 (nz = 26 =^=  0.39%) 
+
+ Deleting unnecessary knots ...
+ l1.design2(): ->  Xeq   50 x 3 (nz = 100 =^=  0.67%) 
+                  Xieq    5 x 3 (nz = 11 =^=  0.73%) 
+ l1.design2(): ->  Xeq   50 x 3 (nz = 100 =^=  0.67%) 
+                  Xieq    5 x 3 (nz = 11 =^=  0.73%) 
+ l1.design2(): ->  Xeq   50 x 2 (nz = 100 =^=     1%) 
+                  Xieq    3 x 2 (nz = 6 =^=     1%) 
+ l1.design2(): ->  Xeq   50 x 3 (nz = 100 =^=  0.67%) 
+                  Xieq    5 x 3 (nz = 11 =^=  0.73%) 
+Warning messages:
+1: too few knots ==> nk <= 4; could not add constraint 'concave' in: l1.design2(x, w, constraint, ptConstr, knots, pw, nrq = n, nl1,  
+2: too few knots ==> nk <= 4; could not add constraint 'concave' in: l1.design2(x, w, constraint, ptConstr, knots, pw, nrq = n, nl1,  
+> 
+> 
+> plot(x,y, main = "cobs(*, degree= 1, constraint = *, pointwise= *)")
+> matlines(x,cbind(fitted(c1),
++                  fitted(c1i),
++                  fitted(c1c),
++                  fitted(cp1),
++                  fitted(cp1i),
++                  fitted(cp1c)),
++         col = 1:6, lty=1)
+> legend("bottomright", inset = .02, col = 1:6, lty=1,
++        legend = c("none", "increase","concave",
++        "pt", "pt + incr.", "pt + conc."))
+> 
+> if(dev.interactive()) x11() # cheap way to get plot in new window, when testing
+> 
+> plot(x,y, main = "cobs(*, degree= 2, constraint = *, pointwise= *)")
+> matlines(x,cbind(fitted(c2),
++                  fitted(c2i),
++                  fitted(c2c),
++                  fitted(cp2),
++                  fitted(cp2i),
++                  fitted(cp2c)),
++         col = 1:6, lty=1)
+> legend("bottomright", inset = .02, col = 1:6, lty=1,
++        legend = c("none", "increase","concave",
++        "pt", "pt + incr.", "pt + conc."))
+> 
+> ##--> "increase + pointwise" gives constant which seems plain wrong  <<<< BUG ???
+> 

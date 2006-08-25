@@ -1,4 +1,9 @@
-COBS -- Constrained B-splines (S-plus Version 1.0)
+The following relates to the older COBS version,
+nowadays in package   "cobs99"
+--------------------------------------------------------
+--------------------------------------------------------
+
+COBS -- Constrained B-splines (Version 1.0)
 
 COBS is a constrained B-splines algorithm that computes constrained
 quantile curves using linear or quadratic splines.
@@ -27,6 +32,7 @@ vox: (928) 523-8726
 fax: (928) 523-7331
 e-mail: Pin.Ng@nau.edu
 url: http://www.cba.nau.edu/pin-ng
+
 
 old affiliations :
 

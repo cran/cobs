@@ -1,3 +1,18 @@
+- predict.cobs() should have a 'deriv = 0' argument {as predict.smooth.spline()}
+  and deriv in {1,2,3} should work.
+
+- cobs() should get an 'keep.data = TRUE' argument as smooth.spline()
+
+- For the case 'lambda < 0' (i.e. search over several lambdas),
+  we can become *much* faster in matrix creation, since alle constraint
+  matrices are *not* dependent on lambda at all!
+
+- allow  constraint = c("increase", "convex")   i.e., *BOTH* constraints!
+
+- When determining optimal lambda (via 'ic'),
+  allow a "+ 1 S.E. - rule" instead of simply taking the arg_min
+- dito for knot selection
+
 - Documentation (and examples!) for the intermediate/ auxiliary functions
   qsbks() and drqssbcs(), i.e.  man/qbsks.Rd & man/drqssbc.Rd
 
@@ -5,15 +20,14 @@
   and several other values of tau
   also extreme cases of interpolation and global linear/quadratic
 
+- want to have examples of all constraints, including "periodic"
+  and even more  'pointwise' !
+
 - src/splines.c is UN-needed in R --- rather use library(splines) !!
   ------------- now have .Call(*) there instead of .C() here.
 
    partly done: now use .splBasis() and .splValue() <<<<-- R/splines.R -->
    --> tests/spline-ex.R  shows how .splBasis() can be done via library(splines)
-
-
-- src/drqssbc.f (originally ratfor): has its own RNG  dunif01() !!
-  ------------- this ensures 100% portability, but...
 
 - lambda < 0; for each pp.lambda, instead of (only) $sic,
   return both components : Log.lik. and p[lambda] ( = k[lambda] ), the dim.

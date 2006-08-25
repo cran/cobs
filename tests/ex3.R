@@ -1,6 +1,6 @@
 library(cobs)
 options(digits = 6)
-postscript("ex3.ps")
+## postscript("ex3.ps")
 
 data(women) # 15 obs.
 attach(women)
@@ -9,3 +9,5 @@ attach(women)
 try( ## gives  "ifl = 5" !!!!!
 cobw <- cobs(weight, height, knots = weight, nknots = length(weight))
 )
+
+cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''

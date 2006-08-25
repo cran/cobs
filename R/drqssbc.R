@@ -1,14 +1,12 @@
-### used to be part of ./cobs.R
+#### $Id: drqssbc.R,v 1.39 2006/08/29 13:50:10 maechler Exp $
 
-drqssbc <- function(x,y, w = rep(1,n), pw, knots, degree,Tlambda, constraint,
-                    n.sub = n1000cut(nrq),
-		    equal,smaller, greater,gradient, coef, maxiter = 20*n,
-		    trace = 1,
-                    n.equal = nrow(equal), n.smaller = nrow(smaller),
-                    n.greater = nrow(greater), n.gradient = nrow(gradient),
-		    nrq = length(x), nl1, neqc,niqc, nvar,nj0,
-		    tau = 0.50, lam, tmin, kmax, lstart, factor = 1,
-                    eps = .Machine$double.eps, print.warn = TRUE)
+drqssbc2 <-
+    function(x,y, w = rep.int(1,n), pw, knots, degree, Tlambda, constraint,
+             ptConstr, maxiter = 100, trace = 0,
+             nrq = length(x), nl1, neqc, niqc, nvar, tau = 0.50,
+             select.lambda = length(Tlambda) > 1, give.pseudo.x = FALSE,
+             rq.tol = 1e-8 * sc.y, tol.0res = 1e-6, print.warn = TRUE,
+             rq.print.warn = FALSE)
 {
     ##=########################################################################
     ##
@@ -17,154 +15,267 @@ drqssbc <- function(x,y, w = rep(1,n), pw, knots, degree,Tlambda, constraint,
     ##		Computational Statistics & Data Analysis, 22, 99-118.
     ##
     ##=########################################################################
-    big	       <- if(is.R()) 3.4028234663852886e+38 else .Machine$single.xmax
-    single.eps <- if(is.R()) 1.1920928955078125e-07 else .Machine$single.eps
-    toler.kn <- 1e-6
-    ## Note   nrq != length(x) , e.g., in case of sub.sampling+ fit full
-    if(lam >= 0)
-        n <- nrq
-    else if((n.old <- nrq) != (n <- as.integer(n.sub))) {
-	##
-	## sub-sampling for smoothing B-splines parametric programming
-        ## select a sub-sample of size n.sub
-	##
-	sub.idx <- seq(1,n.old, length = n)
-	x.old <- x; x <- x[sub.idx]
-	y.old <- y; y <- y[sub.idx]
-	w.old <- w; w <- w[sub.idx]
-    }
-    if(degree == 1) {
-	X <- l1.design(x,w,constraint,equal,smaller,greater,gradient,knots,
-		       pw,n.equal,n.smaller,n.greater,n.gradient,
-		       nrq=n, nl1,neqc,niqc,nvar,Tlambda)
-	niqc1 <- 0
-    }
-    else {
-	X <- loo.design(x,w,constraint,equal,smaller,greater,gradient,knots,
-			pw,n.equal,n.smaller,n.greater,n.gradient,
-			nrq=n, nl1,neqc,niqc,nvar,Tlambda)
-	niqc1 <- if(Tlambda == 0) 0 else 2*(length(knots) - 1)
-    }
-    if(any(ibig <- abs(X) > big)) { ## make sure that drqssbc won't overflow
-	X[ibig] <- X[ibig] / big^0.5
-	warning("re-scaling ", sum(ibig), "values of Lp-design `X'")
-    }
-    Tnobs <- nrow(X)
-    Tequal   <- if(n.equal    > 0)    equal[,3] # else NULL
-    Tsmaller <- if(n.smaller  > 0) -smaller[,3]
-    Tgreater <- if(n.greater  > 0)  greater[,3]
-    Tgradient<- if(n.gradient > 0) gradient[,3]
+    n <- length(x)
+    stopifnot((nj0 <- length(Tlambda)) >= 1, is.numeric(Tlambda),
+              is.numeric(x), is.numeric(y), is.numeric(w),
+              length(y) == n, length(w) == n,
+              is.numeric(tau), length(tau) == 1, 0 <= tau, tau <= 1,
+              maxiter == round(maxiter), maxiter >= 1,
+              is.logical(select.lambda), is.logical(print.warn),
+              is.logical(rq.print.warn))
 
-    Y <- c(y*w, rep(0,nl1), Tequal, Tgradient,
-	   rep(0,Tnobs-n-nl1-n.equal-n.gradient-n.smaller-n.greater),
-	   Tsmaller,Tgreater)
-    ##storage.mode(X) <- "single" # would round to ~ 7 digits in S+, not in R
-    d <- matrix(0.0, Tnobs + 5, nvar + 2) # double
-    sol <- matrix(0.0, nvar + 6, nj0) # double -- to contain "sol"ution
-    z0 <- .Fortran("drqssbc",
-		   as.integer(n),
-		   as.integer(nl1),
-		   as.integer(neqc),
-		   as.integer(niqc),
-		   as.integer(niqc1),
-		   as.integer(nvar),
-		   integer(1),		# nact
-		   ifl = integer(1),
-		   as.integer(maxiter), # mxs
-		   as.integer(trace),
-		   X = as.double(t(X)), # e
-		   as.integer(nvar),	# ner
-		   coef = as.double(coef),# x
-		   as.double(Y),	# f
-		   obj = double(1),	# erql1n
-		   resid = double(Tnobs),
-		   integer(Tnobs),	# indx
-		   double(((3 * nvar + 13) * nvar + 2)/2 + 2 * Tnobs),# w
-		   nt = integer(1),	# nt
-		   as.integer(nj0),	# nsol
-		   sol = sol,
-		   as.double(c(tau, lam)),# == tl[1:2] == (t, lam)
-		   as.double(toler.kn),
-		   as.double(big),
-		   as.double(eps),
-		   icyc = integer(2),
-		   as.double(tmin),
-		   k = integer(1),
-		   as.integer(kmax),	# k0
-		   as.double(lstart),
-		   as.double(factor),
-                   PACKAGE = "cobs")
-    sol <- z0$sol[,1:z0$nt]
-    names(z0$icyc) <- c("icyc", "tot.cyc")
-    if(lam < 0) {
-        ##
-        ## search for optimal lambda
-        ##
-        ifl.idx <-
-            if(maxiter > 20*n) sol[3,] != 3 # trap ifl=3
-            else rep(TRUE, ncol(sol))
-        fidel <- sol[4,ifl.idx]
-        eff.k <- sol[6,ifl.idx]
-        sic <- fidel/n * n^(eff.k/(2*n))
-        mlam.idx <- min((1:ncol(sol[,ifl.idx]))[sic == min(sic)])
-        ##
+    if(nj0 > 1) {
+	if(!select.lambda)
+	    warning("no lambda selection but still length(Tlambda) > 1 -- not fully tested yet")
+	## MM [FIXME]: for that case, we now return *all* lambda results;
+	##	  but this (particularly "cobs"-methods) is completely untested
+
+	Tlambda <- sort(Tlambda)# needed for selection (messages and plots)
+    }
+
+    ## Scale tolerance by the "scale" (y)
+    sc.y <- mean(abs(y - mean(y)))
+    if(sc.y < 1e-12 * (my <- median(abs(y)))) {
+        if(print.warn)
+            cat("Warning: 'y's are almost constant ==> sc.y := scale(y) := 1e-12 median|y|")
+        sc.y <- 1e-12 * my
+    }
+    tol.0res.y <- tol.0res * sc.y
+    ## lambda.cut <- 10/n
+
+    ##* Note: if  nrq != length(x) , e.g., in case of sub.sampling+ fit full
+    ##*  if(select.lambda < 0)
+    ##*      n <- nrq
+    Tequal   <- if(ptConstr$n.equal   > 0)  ptConstr$equal[,3] # else NULL
+    Tsmaller <- if(ptConstr$n.smaller > 0) -ptConstr$smaller[,3]
+    Tgreater <- if(ptConstr$n.greater > 0)  ptConstr$greater[,3]
+    Tgradien <- if(ptConstr$n.gradient> 0)  ptConstr$gradient[,3]
+    Y.ptConstr <- c(Tsmaller, Tgreater, Tequal, -1*Tequal, Tgradien, -1*Tgradien)
+
+    ## double matrix -- to contain "sol"ution :
+    solNms <- c("lambda", "icyc", "ifl", "fidel", "sum|res|_s", "k")
+    sol1 <- matrix(0., length(solNms), nj0, dimnames= list(solNms, NULL))
+    allCoef <- matrix(0., nvar, nj0)
+
+    if(trace >= 2)
+	summSparse <- function(X, namX = deparse(substitute(X))) {
+	    force(namX)
+	    stopifnot(length(d <- dim(X)) == 2)
+	    k <- length(X@ra)
+	    sprintf("%s %4d x %d (nz = %d =^= %5.2g%%)",
+		    namX, d[1], d[2], k, k/prod(d))
+	}
+
+    for(ilam in 1:nj0) { ## for each lambda in Tlambda[] : `` grid search ''
+	XX <-
+	    if(degree == 1)
+		l1.design2(x, w, constraint, ptConstr, knots, pw, nrq = n,
+			   nl1, neqc, niqc, nvar, Tlambda[ilam])
+	    else
+		loo.design2(x, w, constraint,ptConstr, knots, pw, nrq = n,
+			    nl1, neqc, niqc, nvar, Tlambda[ilam])
+	Xeq <- XX$Xeq
+	fieq <- XX$fieq
+	if(fieq)
+	    Xieq <- XX$Xieq
+
+        if(trace >= 2) {
+            if(ilam == 1 || trace >= 3) {
+                ## only for the first lambda: dim() is same!
+                ch1 <- sprintf("%3s.design2(%s): -> ", c("l1","loo")[degree],
+                               if(trace >= 3)
+                               sprintf("lam= %10.4g",Tlambda[ilam]) else '')
+                cat(ch1, summSparse(Xeq), "\n")
+                if(fieq) {
+                    cat(sprintf("%*s", nchar(ch1) - 1, " "),
+                        summSparse(Xieq), "\n")
+                }
+            }
+            else cat(".", if(ilam == nj0) "\n")
+        }
+
+	niqc1 <- {
+	    if (degree == 1 || Tlambda[ilam] == 0)  0
+	    else 2*(length(knots) - 1) }
+	##U   if(any(ibig <- abs(Xeq$ra) > big)) { ## make sure that drqssbc won't overflow
+	##U	Xeq$ra[ibig] <- Xeq$ra[ibig] / big^0.5
+	##U	warning("re-scaling ", sum(ibig), "values of Lp-design `Xeq'")
+	##U   }
+	##U   if(any(ibig <- abs(Xieq$ra) > big)) { ## make sure that drqssbc won't overflow
+	##U	Xieq$ra[ibig] <- Xieq$ra[ibig] / big^0.5
+	##U	warning("re-scaling ", sum(ibig), "values of Lp-design `Xieq'")
+	##U   }
+
+        ## FIXME: (Tnobs, n0) do *not* depend on lambda
+        ##         --> keep outside the for() loop!
+	Tnobs <- nrow(Xeq) + (if(fieq) nrow(Xieq) else 0)
+                                        # Tnobs = number of pseudo-observations
+	n0 <- Tnobs -n - with(ptConstr,
+			      2*n.equal+n.gradient+n.smaller+n.greater)
+	Y <- c(y*w, rep.int(0, n0), Y.ptConstr)
+	##    Yeq <- Y[1:(nrq+nl1+neqc)]
+	Yeq <- Y[1:(nrq+nl1)]
+	##    if(fieq) Yieq <- Y[(nrq+nl1+neqc+1):Tnobs]
+	if(fieq) {
+	    Yieq <- Y[(nrq+nl1+1):Tnobs]
+	    Yeq.. <- c(Yeq, Yieq)
+	    Xeq.. <- rbind(Xeq, Xieq)
+	}
+	## niqc2 <- Tnobs - niqc1
+
+	rhs <- (1-tau)*Xeq[1:nrq, ]
+	rhs <- ## MM: would be nice to have colSums() for "matrix.csr"
+	    colSums(as.matrix(if(nl1 > 0) rbind(rhs,
+						.5*Xeq[(nrq+1):(nrq+nl1),])
+			      else rhs))
+	z0 <-
+	    if(fieq)
+		rq.fit.sfnc(Xeq,Yeq, Xieq,Yieq, tau = tau, rhs = rhs,
+			    maxiter = maxiter, warn.mesg = rq.print.warn, small=rq.tol)
+	    else rq.fit.sfn(Xeq,Yeq,		tau = tau, rhs = rhs,
+			    maxiter = maxiter, warn.mesg = rq.print.warn, small=rq.tol)
+        ## rq.fit.sfn[c] : both in ../../quantreg/R/sfn.R
+        ##  these call .Fortran("srqfn[c]", ..) in
+        ##    -> ../../quantreg/src/srqfn.c and ..../srqfnc.c
+        ##  these both call chlfct() in ../../quantreg/src/chlfct.c   (was *.f)
+        ##  is built on misc.        in ../../quantreg/src/cholesky.c (was *.f)
+	pseudo.resid <- (if(fieq) Yeq.. else Yeq) -
+	    c(as.matrix((if(fieq) Xeq.. else Xeq) %*% as.matrix.csr(z0$coef)))
+        if(any(is.na(pseudo.resid))) ## not really seen this case...
+	    warning(sprintf("pseudo residuals [c(%s)] are NA; (n,Tnobs)= (%d,%d)",
+			    paste(which(is.na(pseudo.resid)), collapse= ","), n,Tnobs))
+	resid <- pseudo.resid[1:n]
+	aRes <- abs(pseudo.resid)
+	k.idx <- c(1:nrq, if((nn <- nrq+nl1+niqc1+1) <= Tnobs) nn:Tnobs)
+###	k.idx <- c(1:nrq) #PN: this makes more sense than the previous def. of effective dimensionality
+        ##was k.idx <- 1:Tnobs ; k.idx <- c(k.idx[k.idx <= nrq], k.idx[k.idx >  nrq+nl1+niqc1])
+        ## or          (1:Tnobs <= nrq) | (1:Tnobs > nrq+nl1+niqc)
+	sol1[,ilam] <- c(Tlambda[ilam],
+			 z0$it,
+			 z0$ierr + 1, # =: ifl, i.e., success <==> ifl == 1 <==> ierr == 0
+			 sum((tau-(resid < 0))* resid), # =: fidel
+			 sum(aRes[(nrq+1):(nrq+nl1)])/Tlambda[ilam],
+			 ## Determination of the "effective dimensionality"  'k' :
+			 ##PN: too stringent: sum(aRes[k.idx] < tol.0res * mean(aRes[k.idx]))
+			 max(degree+1, sum(aRes[k.idx] < tol.0res.y))) # {a kludge ..}
+        allCoef[,ilam] <- z0$coef
+
+    }## end for(ilam ..)
+
+    if(trace == 1) ## only output at all:
+        cat(sprintf("fieq=%s -> Tnobs = %d, n0 = %d, |ptConstr| = %d\n",
+                    format(fieq), Tnobs, n0, length(Y.ptConstr)))
+
+    ## MM: return *sparse* pseudo.x
+    ##     Further: this is X~ of the last, not the best lambda
+    pseudo.x <- if(give.pseudo.x) (if(fieq) rbind(Xeq, Xieq) else Xeq) ## else NULL
+
+    if(select.lambda) {
+	##
+	## search for optimal lambda
+	##
+	is.ifl.1 <- sol1["ifl",] == 1
+        ##PN: Weed out lambdas that give rise to interpolating fit
+	notInt <- sol1["fidel",] > tol.0res.y
+	i.keep <- is.ifl.1 & notInt
+	n.keep <- sum(i.keep)
+        ## <NEW: PN 2006-08-24, 08-28>
+	## k.diff.tol <- 1
+	i.mask <- rep(FALSE,nj0)
+	if(any(sol1["k",i.keep] > sqrt(n)) & min(sol1["k",i.keep]) <= sqrt(n)) {
+            ##PN: Use k0 to guide the lower bound of the lambda grid; the lower bound
+            ##	is set when k0 declines by more than k.diff.tol while lambda decreases among the grid of i.keep lambdas
+            k.up <- min((1:n.keep)[sol1["k",i.keep] <= sqrt(n)])
+            i.k.up <- (1:nj0)[i.keep][k.up]
+            i.cut <- i.k.up - 1
+            i.mask[1:i.cut] <- TRUE
+            if(sol1["k",i.k.up] != sol1["k",nj0]) {
+                ##PN: exclude situations when the horizontal fit through discrete y
+                ## ends up with more zeros than two, hence, a non-monotonically
+                ## decreasing "k" in the right tail
+                i.keep <- i.keep & !i.mask
+                n.keep <- sum(i.keep)
+            }
+	}
+        ## </NEW>
+
+	if(n.keep == 0)
+	    stop("The problem is degenerate for the range of lambda specified.")
+
+        if(any(!is.ifl.1)) { ## had some errors in rq.fit.sfn*()
+	    sol.err <- t(sol1[, !is.ifl.1, drop = FALSE])
+	    if(print.warn) { ## had some errors in rq.fit.sfn*()
+		cat(gettextf("WARNING: Some lambdas had problems in %s():\n",
+			     if(fieq) "rq.fit.sfnc" else "rq.fit.sfn"))
+		print( sol.err )
+	    }
+        } else sol.err <- NULL
+
+	solx <- sol1[, i.keep, drop = FALSE]
+	sicA <- sol1["fidel",]/n * n^(sol1["k",] /(2*n))
+        ## round, so the subsequent selection is "less wavery":
+	sic. <- signif(sicA[i.keep], 6)
+	min.s <- min(sic.)
+	i.min <- (1:n.keep)[sic. == min.s]
+	if(sic.[n.keep] <= min.s && min.s < sic.[1]) { # min. at rightmost, i.e. roughest
+	    i.best <- max(i.min)
+	    wrn.flag <- 1
+	}
+	else if(sic.[1] <= min.s && min.s < sic.[n.keep]) { # min. at leftmost, i.e.smoothest
+	    i.best <- min(i.min)
+	    wrn.flag <- 2
+	}
+	else {
+	    i.best <- ceiling(median(i.min)) # take middle of all minimal values
+	    if(min.s == sic.[1] && min.s == sic.[n.keep])
+		wrn.flag <- 3
+	    else  ## "good" case
+		wrn.flag <- 4
+	}
+	##
         ## trap infeasible solution when lam<0
         ##
-        if(sol[,ifl.idx][3,mlam.idx] == 0)
-            return(list(ifl = 2))
-
-        Tcoef <- sol[,ifl.idx][7:nrow(sol),mlam.idx]
-        if(print.warn && sol[3,mlam.idx] != 3) {
-            if(sol[,ifl.idx][6,mlam.idx] >= length(knots))
-                ## warn(2)
-                cat("\n WARNING! Since the optimal lambda chosen by SIC corresponds to the",
-                    "   roughest possible fit, you might want to consider doing one of",
-                    "   the following:",
-                    "   (1) plot the components $sic against $pp.lambda of cobs to see",
-                    "   if a bigger lambda value at another local minimum of $sic will",
-                    "   yield a more reasonable fit;",
-                    "   (2) increase the number of knots.\n", sep="\n ")
-            else if(abs(sic[mlam.idx]-sic[length(sic)]) < single.eps * sic[length(sic)])
-                ## warn(3)
-                cat("\n WARNING! Since the optimal lambda chosen by SIC corresponds to the",
-                    "   roughest possible fit, you might want to plot the components",
-                    "   $sic against $pp.lambda of cobs to see if a bigger lambda value",
-                    "   at another local minimum of $sic will yield a more reasonable fit.\n",
-                    sep="\n ")
-
-            if(sol[,ifl.idx][2,mlam.idx] == lstart)
-                ## warn(4)
-                cat("\n WARNING!  Since the optimal lambda chosen by SIC reached the smoothest",
-                    "   possible fit allowed by `lstart', you might want to rerun cobs with",
-                    "   a larger `lstart' value to see if it makes a difference if you haven't",
-                    "   done so.\n", sep="\n ")
+        if(print.warn) {
+	    wrn1 <- "\n WARNING!  Since the optimal lambda chosen by SIC "
+	    wrnPlot <- paste("plot() the returned object",
+			     "(which plots 'sic' against 'lambda')")
+	    wrn3 <- "and possibly consider doing one of the following:"
+	    wrn4 <- "(1) reduce 'lambda.lo', increase 'lambda.hi', increase 'lambda.length' or all of the above;"
+	    ns <- "\n   "
+	    switch(wrn.flag,
+		   cat(wrn1, "reached the smoothest possible fit at `lambda.hi', you should",
+		       wrnPlot, wrn3, wrn4,
+		       "(2) decrease the number of knots.\n", sep = ns),
+		   cat(wrn1, "corresponds to the roughest possible fit, you should",
+		       wrnPlot, wrn3, wrn4,
+		       ## typically "increase"; sometimes decreasing is appropriate:
+		       "(2) modify the number of knots.\n", sep = ns),
+		   cat(wrn1, "rests on a flat portion, you might", wrnPlot,
+		       "to see if you want to reduce 'lambda.lo' and/or increase 'lambda.ho'\n",
+		       sep = ns),
+		   cat('', "The algorithm has converged.  You might", wrnPlot,
+			"to see if you have found the global minimum of the information criterion",
+			"so that you can determine if you need to adjust any or all of",
+			"'lambda.lo', 'lambda.hi' and 'lambda.length' and refit the model.\n",
+		       sep = ns))
+            ## if(solx["lambda",,i.best] == (Tlambda[i.keep])[length(Tlambda[i.keep])]
+            ## && solx["k",i.best] > max(2,niqc2))
         }
-        if(n.old != n) { ## was sub sampling; refit full sample for one Tlambda
-            Tlambda <- sol[,ifl.idx][2,mlam.idx]
-	    rqss <- drqssbc(x.old,y.old,w.old, pw,knots,degree, Tlambda,
-			    constraint, n.sub,
-			    equal,smaller,greater,gradient,
-			    Tcoef,maxiter,trace,
-			    n.equal,n.smaller,n.greater,n.gradient,
-			    nrq = n.old, nl1,neqc,niqc,nvar, nj0 = 1,
-			    tau,lam = 1, tmin,kmax,lstart,
-			    factor, eps, print.warn)
-	    list(coef = rqss$coef, ifl = sol[,ifl.idx][3,mlam.idx],
-		 icyc = rqss$icyc, nvar = nvar, lambda = Tlambda,
-		 pp.lambda = sol[,ifl.idx][2,], sic = sic,
-		 k = min(rqss$k, length(knots)-2+degree+1), pseudo.x = X)
-	}
-	else
-	    list(coef = Tcoef, ifl = sol[,ifl.idx][3,mlam.idx],
-		 icyc = z0$icyc, nvar = nvar,
-		 lambda	   = sol[,ifl.idx][2,mlam.idx],
-		 pp.lambda = sol[,ifl.idx][2,], sic = sic,
-		 k = min(sol[,ifl.idx][6,mlam.idx], length(knots)-2+degree+1),
-		 pseudo.x = X)
+	list(coef = allCoef[, i.keep, drop = FALSE][, i.best],
+	     fidel = solx["fidel",],
+	     k = as.integer(sol1["k",notInt]), #PN was min(solx["k",i.best], length(knots)-2+degree+1),
+	     kk= as.integer(solx["k",i.best]),
+	     ifl = as.integer(sol1["ifl",notInt]),
+	     icyc = as.integer(sol1["icyc",notInt]), nvar = nvar,
+	     lambda = solx["lambda",i.best],
+	     pp.lambda = sol1["lambda",notInt], sic = log(sicA[notInt]),
+	     sol.err = sol.err, flag = wrn.flag,
+	     pseudo.x = pseudo.x, i.mask = i.mask[notInt])
     }
-    else # `lam >= 0'
-	list(coef = z0$coef,
-	     fidel = sum((tau-(-z0$resid[1:n] < 0))*(-z0$resid[1:n]))*2,
-	     k = min(z0$k, length(knots)-2+degree+1), ifl = z0$ifl,
-	     icyc = z0$icyc, nvar = nvar, lambda = Tlambda, pseudo.x = X)
-}## drqssbc
+    else { ## not 'select.lambda' ---
+	l2 <- as.list(as.data.frame(t(sol1)))
+	for(nn in c("k", "ifl", "icyc")) l2[[nn]] <- as.integer(l2[[nn]])
+	c(list(coef = drop(allCoef), nvar = nvar, pseudo.x = pseudo.x),
+	  l2)
+    }
+} ## drqssbc2

@@ -43,12 +43,20 @@
 \examples{
 data(DublinWind)
 str(DublinWind)
-plot(speed ~ day, data = DublinWind, type = "l")
-attach(DublinWind)
-plot(wSpeed <- ts(speed))
+plot(speed ~ day, data = DublinWind)# not so nice; want time series:
+wSpeed <- ts(DublinWind$speed)
+plot(wSpeed)
 %%## FIXME: use correct time axis!--> need leap year correctness
-%%##wSpeed <- ts(speed, start = 1961, end = 1978.999, periodicity= (365 + 1/4))
+%%## wSpeed <- ts(speed, start = 1961, end = 1978.999, frequency= (365 + 1/4))
 
-%% currently He & Ng "Example 3" is --> ../tests/wind.R
+##--- ~ He & Ng "Example 3" %% much more is in ../tests/wind.R
+co.o50 <-
+ with(DublinWind, ## use nknots > (default) 6 :
+  cobs(day, speed, knots.add = TRUE, constraint= "periodic", nknots = 10,
+       tau = .5, method = "uniform"))
+summary(co.o50)
+lines(c(time(wSpeed)), fitted(co.o50), col=2)
+## the periodic "smooth" function
+plot(predict(co.o50), type = "b", col=2)
 }
 \keyword{datasets}

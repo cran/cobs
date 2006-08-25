@@ -1,24 +1,9 @@
 ####
 library(cobs)
-options(digits = 6)
+options(digits = 5)
 postscript("ex2.ps")
 
-summaryCobs <- function(x, level = 0.90, ...)
-{
-    ## Purpose: something like print(summary( cobs.result ))
-    ## ----------------------------------------------------------------------
-    ## Arguments: x: result of cobs(); level : to be compatible to old alpha=0.1
-    ## ----------------------------------------------------------------------
-    ## Author: Martin Maechler, Date: 15 Feb 2002, 16:55
-    str(x, ...)
-    px <- predict(x, interval = "both", level = level)
-    print(as.data.frame(px[, c("cb.lo", "ci.lo", "fit", "ci.up", "cb.up")]),...)
-    cat("knots :\n"); print(x$knots, ...)
-    cat("coef  :\n"); print(x$coef, ...)
-    if(!is.null(x$sic)) {
-        print(cbind(lambda = x$pp.lambda, SIC = x$sic), ...)
-    }
-}
+source(system.file("util.R", package = "cobs"))
 
 set.seed(821)
 x <- round(sort(rnorm(200)), 3) # rounding -> multiple values
@@ -28,7 +13,7 @@ summaryCobs(cxy  <- cobs(x,y, "decrease"))
 1 - sum(cxy $ resid ^ 2) / sum((y - mean(y))^2) # R^2 = 97.6%
 
 ## Interpolation
-system.time(cxyI  <- cobs(x,y, "decrease", knots = unique(x)))[1]
+cpuTime(cxyI  <- cobs(x,y, "decrease", knots = unique(x)))
 ## takes quite long : 63 sec. (Pent. III, 700 MHz) --- this is because
 ## each knot is added sequentially...  {{improve!}}
 summaryCobs(cxyI)# only 7 knots remaining!
@@ -42,10 +27,10 @@ summaryCobs(cxy2 <- cobs(x,y, "decrease", lambda = 1e-2))
 summaryCobs(cxy3 <- cobs(x,y, "decrease", lambda = 1e-6, nknots = 60))
 1 - sum(cxy3 $ resid ^ 2) / sum((y - mean(y))^2) # R^2 = 98.36%
 
-system.time(cxy4 <- cobs(x,y, "decrease", lambda = 1e-6, nknots = 100))[1]# ~ 3 sec.
+cpuTime(cxy4 <- cobs(x,y, "decrease", lambda = 1e-6, nknots = 100))# ~ 3 sec.
 1 - sum(cxy4 $ resid ^ 2) / sum((y - mean(y))^2) # R^2 = 98.443%
 
-system.time(cxy5 <- cobs(x,y, "decrease", lambda = 1e-6, nknots = 150))[1]# ~ 8.7 sec.
+cpuTime(cxy5 <- cobs(x,y, "decrease", lambda = 1e-6, nknots = 150))# ~ 8.7 sec.
 1 - sum(cxy5 $ resid ^ 2) / sum((y - mean(y))^2) # R^2 = 98.4396%
 
 ## regularly spaced x :
@@ -69,7 +54,7 @@ lines(predict(cXy.01, xx), col = 4)
 lines(predict(cXy.99, xx), col = 4)
 
 ## Interpolation
-system.time(cXyI  <- cobs(X,y, "decrease", knots = unique(X)))[1]
+cpuTime(cXyI  <- cobs(X,y, "decrease", knots = unique(X)))
 ## takes ~ 47 sec. (Pent. III, 700 MHz)
 summaryCobs(cXyI)# only 7 knots remaining!
 
@@ -82,11 +67,11 @@ summaryCobs(cXy2 <- cobs(X,y, "decrease", lambda= 1e-2))
 summaryCobs(cXy3 <- cobs(X,y, "decrease", lambda= 1e-6, nknots = 60))
 1 - sum(cXy3 $ resid ^ 2) / sum((y - mean(y))^2) # R^2 = 80.424%
 
-system.time(cXy4 <- cobs(X,y, "decrease", lambda= 1e-6, nknots = 100))[1]#~16.5"
+cpuTime(cXy4 <- cobs(X,y, "decrease", lambda= 1e-6, nknots = 100))#~16.5"
 ## not converged (in 4020 iter.)
 1 - sum(cXy4 $ resid ^ 2) / sum((y - mean(y))^2) # R^2 = 80.517%
 
-system.time(cXy5 <- cobs(X,y, "decrease", lambda= 1e-6, nknots = 150))[1]#~12.8"
+cpuTime(cXy5 <- cobs(X,y, "decrease", lambda= 1e-6, nknots = 150))#~12.8"
 1 - sum(cXy5 $ resid ^ 2) / sum((y - mean(y))^2) # R^2 = 81.329%
 
 

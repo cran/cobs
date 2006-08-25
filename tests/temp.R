@@ -1,8 +1,8 @@
+library(cobs)
+
 #### Example 1 of   He and Ng (1999) :
 #### -------------------------------
 if(!interactive()) postscript("temp.ps", horizontal = TRUE)
-
-library(cobs)
 
 data(globtemp)
 str(globtemp)## time series T=113,  1880:1992
@@ -76,3 +76,5 @@ points(year[!normal.idx],temp[!normal.idx],pch = 3)
 text(year[hot.idx], temp[hot.idx]  + .03, labels = year[hot.idx])
 text(year[cold.idx],temp[cold.idx] - .03, labels = year[cold.idx])
 
+
+cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''

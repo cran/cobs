@@ -1,0 +1,44 @@
+Notes on "scobs" as received from Pin Ng
+----------------------------------------
+
+7) The new (2006-07-28) behavior:
+
+    > cobs(x,y, "decrease", knots = ux, nknots = length(ux))
+    Warning message:
+    The number of knots can't be equal to the number of unique x for degree=2.
+    'cobs' has automatically deleted the middle knot. in: cobs(x, y,
+    "decrease", knots = ux, nknots = length(ux))
+
+   seems wrong to me:  Smoothing.splines are degree =2 and have
+   knots == unique(x).  It really depends on the boundary conditions (or
+    knot multiplicity at x[1] or x[length(x)].
+
+6) weights 'w'  are *NOT* used in l1.design2() and loo.design2()
+    ----   ==>
+       1) non constant-weights should give a warning for the moment
+       2) FIXME !!!
+
+--------------------------------------------------------------------
+
+OLD
+----
+
+0) added ./Rbuildignore (as for 'cobs' package)
+1)
+  src/Makevars		uses
+  libs/cholesky.a		which is completely inappropriate! The pkg  MUST
+			  contain source code only!
+
+  --> fixed src/Makevars; removed libs/
+
+1b) ./ReadMe removed and merged to ./README
+
+2)  tests/  was completely missing in 'scobs' --> take the one from 'cobs'
+
+3)  data/   contained much less data sets than  ~/R/Pkgs/cobs99/data/
+	    --> filled up
+
+4)  src/New/ and  src/Orig/  also removed
+
+5)  rm CONTENTS INDEX .R-porting
+
