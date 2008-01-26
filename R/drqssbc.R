@@ -1,4 +1,4 @@
-#### $Id: drqssbc.R,v 1.39 2006/08/29 13:50:10 maechler Exp $
+#### $Id: drqssbc.R,v 1.40 2007/04/10 08:15:15 maechler Exp $
 
 drqssbc2 <-
     function(x,y, w = rep.int(1,n), pw, knots, degree, Tlambda, constraint,
@@ -168,7 +168,7 @@ drqssbc2 <-
 
     ## MM: return *sparse* pseudo.x
     ##     Further: this is X~ of the last, not the best lambda
-    pseudo.x <- if(give.pseudo.x) (if(fieq) rbind(Xeq, Xieq) else Xeq) ## else NULL
+    pseudo.x <- if(give.pseudo.x) (if(fieq) Xeq.. else Xeq) ## else NULL
 
     if(select.lambda) {
 	##

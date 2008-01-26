@@ -1,6 +1,6 @@
 
-R version 2.4.0 beta (2006-09-25 r39513)
-Copyright (C) 2006 The R Foundation for Statistical Computing
+R version 2.6.1 (2007-11-26)
+Copyright (C) 2007 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -15,10 +15,8 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 'help.start()' for an HTML browser interface to help.
 Type 'q()' to quit R.
 
-> library(cobs)
-Loading required package: SparseM
-Package SparseM (0.71) loaded.  To cite, see citation("SparseM")
-Loading required package: quantreg
+> suppressMessages(library(cobs))
+Package SparseM (0.74) loaded.  To cite, see citation("SparseM")
 > 
 > source(system.file("util.R", package = "cobs"))
 > 
@@ -30,8 +28,10 @@ Loading required package: quantreg
 > 
 > stopifnot(identical(day,c(rep(c(rep(1:365,3),1:366),4),
 +                           rep(1:365,2))))
-> co50.1 <- cobs(day, speed, constraint= "periodic", tau= .5, lambda= 2.2, degree = 1)
-> co50.2 <- cobs(day, speed, constraint= "periodic", tau= .5, lambda= 2.2, degree = 2)
+> co50.1 <- cobs(day, speed, constraint= "periodic", tau= .5, lambda= 2.2,
++                degree = 1)
+> co50.2 <- cobs(day, speed, constraint= "periodic", tau= .5, lambda= 2.2,
++                degree = 2)
 > 
 > plot(day,speed)
 > lines(day[iday], fitted(co50.1)[iday], col="orange", lwd = 2)
@@ -60,8 +60,9 @@ Loading required package: quantreg
    'lambda.lo', 'lambda.hi' and 'lambda.length' and refit the model.
 
 Warning message:
-The use of argument ‘factor’ is deprecated.
-  It is now unused and will be removed in the future. in: cobs(day, speed, knots.add = TRUE, constraint = "periodic", nknots = nknots,  
+In cobs(day, speed, knots.add = TRUE, constraint = "periodic", nknots = nknots,  :
+  The use of argument ‘factor’ is deprecated.
+  It is now unused and will be removed in the future.
 > summary(co.o50)
 COBS smoothing spline (degree = 2) from call:
 	 cobs(x = day, y = speed, constraint = "periodic", nknots = nknots,     method = "uniform", tau = 0.5, lambda = -1, knots.add = TRUE,     factor = 3)
@@ -72,7 +73,8 @@ coef[1:15]: 1.110119e+01, 1.125520e+01, 1.112968e+01, 1.057061e+01, 9.577983e+00
 R^2 = 8.16% ;  empirical tau (over all): 3287/6574 = 0.5 (target tau= 0.5)
 > 
 > op <- par(mfrow = c(3,1), mgp = c(1.5, 0.6,0), mar=.1 + c(3,3:1))
-> with(co.o50, plot(pp.sic ~ pp.lambda, type ="o", col=2, log = "x", main = "co.o50: periodic"))
+> with(co.o50, plot(pp.sic ~ pp.lambda, type ="o",
++                   col=2, log = "x", main = "co.o50: periodic"))
 > with(co.o50, plot(pp.sic ~ pp.lambda, type ="o", ylim = robrng(pp.sic),
 +                   col=2, log = "x", main = "co.o50: periodic"))
 > of <- 0.64430538125795
@@ -110,7 +112,7 @@ COBS smoothing spline (degree = 2) from call:
 x$knots[1:10]:   0.999635,  41.000000,  82.000000, ... , 366.000365
 lambda = 101002.6, selected via SIC, out of 25 ones.
 coef[1:12]: 1.121550e+01, 1.139573e+01, 1.089025e+01, 9.954427e+00, 8.148158e+00, ... , 5.373106e-04
-R^2 = 8.22% ;  empirical tau (over all): 3286/6574 = 0.4998479 (target tau= 0.5)
+R^2 = 8.22% ;  empirical tau (over all): 3288/6574 = 0.5001521 (target tau= 0.5)
 > (pc.5 <- predict(co.o50., interval = "both"))
                  z       fit     cb.lo     cb.up     ci.lo     ci.up
   [1,]   0.9996351 11.215499  9.125242 13.305757 10.122990 12.308009
@@ -244,9 +246,6 @@ R^2 = 8.22% ;  empirical tau (over all): 3286/6574 = 0.4998479 (target tau= 0.5)
        (b) Set lambda==0 to exclude the penalty term;
        (c) Use a coarser grid by reducing the argument
  	   'lambda.length' from the default value of 25.
-WARNING: Some lambdas had problems in rq.fit.sfnc():
-       lambda icyc ifl    fidel   sum|res|_s k
-[1,] 757412.8   51  18 6063.802 0.0005255533 5
 
    The algorithm has converged.  You might
    plot() the returned object (which plots 'sic' against 'lambda')
@@ -254,16 +253,10 @@ WARNING: Some lambdas had problems in rq.fit.sfnc():
    so that you can determine if you need to adjust any or all of
    'lambda.lo', 'lambda.hi' and 'lambda.length' and refit the model.
 
-Warning in cobs(day, speed, knots.add = TRUE, constraint = "periodic", nknots = 10,  : 
-	 The algorithm has not converged after 100 iterations for at least one lambda
-Warning message:
-Check 'ifl' in: cobs(day, speed, knots.add = TRUE, constraint = "periodic", nknots = 10,  
 > summary(co.o9)
 COBS smoothing spline (degree = 2) from call:
 	 cobs(x = day, y = speed, constraint = "periodic", nknots = 10,     method = "uniform", tau = 0.9, lambda = -1, knots.add = TRUE)
- * Warning in algorithm: some ifl != 1
-
-{tau=0.9}-quantile;  dimensionality of fit: 12 from {13,12,10,9,7,5,14}
+{tau=0.9}-quantile;  dimensionality of fit: 12 from {13,12,10,9,7,14}
 x$knots[1:10]:   0.999635,  41.555556,  82.111111, ... , 366.000365
 lambda = 917.6266, selected via SIC, out of 25 ones.
 coef[1:12]: 19.086315329, 19.279281013, 17.836625110, 18.717880961, 12.753410510, ... ,  0.004162160

@@ -1,6 +1,6 @@
 
-R version 2.4.0 beta (2006-09-25 r39513)
-Copyright (C) 2006 The R Foundation for Statistical Computing
+R version 2.6.2 alpha (2008-01-23 r44129)
+Copyright (C) 2008 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -15,10 +15,9 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 'help.start()' for an HTML browser interface to help.
 Type 'q()' to quit R.
 
-> library(cobs)
-Loading required package: SparseM
-Package SparseM (0.71) loaded.  To cite, see citation("SparseM")
-Loading required package: quantreg
+> suppressMessages(library(cobs))
+Package SparseM (0.74) loaded.  To cite, see citation("SparseM")
+> 
 > data(USArmyRoofs)
 > attach(USArmyRoofs)#-> "age" and "fci"
 > 
@@ -590,5 +589,5 @@ lambda = 5.030829, selected via SIC, out of 25 ones.
 > lines(pa75, col = 3)
 > 
 > cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''
-Time elapsed:  6.18 0.111 7.168 0 0 
+Time elapsed:  4.442 0.135 4.988 0 0 
 > 

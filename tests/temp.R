@@ -1,4 +1,4 @@
-library(cobs)
+suppressMessages(library(cobs))
 
 #### Example 1 of   He and Ng (1999) :
 #### -------------------------------

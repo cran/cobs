@@ -1,0 +1,45 @@
+useDynLib(cobs, spline_basis, spline_value)
+##        ----  TODO: replace the above by calling into splines' package!!
+
+import("SparseM") # need at least as.matrix()
+## Import non-base functions we need explicitly,
+## notably for which we define methods (here, only S3 ones):
+importFrom("grDevices", xy.coords)
+importFrom("graphics", plot, lines)
+importFrom("stats",    knots, fitted, residuals)
+
+export(cobs,
+       conreg,
+       drqssbc2,
+       qbsks2,
+       mk.pt.constr,
+       ## "internal" but hopefully documented properly eventually:
+       l1.design2,
+       loo.design2,
+       shat,
+
+       ## Don't hide the plot methods on purpose (many surprising args):
+       plot.cobs,
+       plot.conreg
+       )
+
+S3method(fitted, cobs)
+S3method(fitted, conreg)
+S3method(residuals, cobs)
+S3method(residuals, conreg)
+S3method(knots, cobs)
+S3method(knots, conreg)
+
+S3method(print, cobs)
+S3method(print, conreg)
+S3method(predict, cobs)
+S3method(predict, conreg)
+
+## Don't hide the plot methods on purpose (many surprising args):
+## S3method(plot, cobs)
+## S3method(plot, conreg)
+S3method(lines, conreg)
+#TODO: S3method(lines, cobs)
+
+S3method(summary, cobs)
+#TODO: S3method(summary, conreg)

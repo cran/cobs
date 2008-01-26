@@ -1,6 +1,6 @@
 
-R version 2.4.0 beta (2006-09-25 r39513)
-Copyright (C) 2006 The R Foundation for Statistical Computing
+R version 2.6.1 (2007-11-26)
+Copyright (C) 2007 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -15,10 +15,9 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 'help.start()' for an HTML browser interface to help.
 Type 'q()' to quit R.
 
-> library(cobs)
-Loading required package: SparseM
-Package SparseM (0.71) loaded.  To cite, see citation("SparseM")
-Loading required package: quantreg
+> suppressMessages(library(cobs))
+Package SparseM (0.74) loaded.  To cite, see citation("SparseM")
+> 
 > options(digits = 6)
 > ## postscript("ex3.ps")
 > 
@@ -30,9 +29,10 @@ Loading required package: quantreg
 + cobw <- cobs(weight, height, knots = weight, nknots = length(weight))
 + )
 Warning message:
-The number of knots can't be equal to the number of unique x for degree = 2.
-'cobs' has automatically deleted the middle knot. in: cobs(weight, height, knots = weight, nknots = length(weight)) 
+In cobs(weight, height, knots = weight, nknots = length(weight)) :
+  The number of knots can't be equal to the number of unique x for degree = 2.
+'cobs' has automatically deleted the middle knot.
 > 
 > cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''
-Time elapsed:  1.018 0.122 2.063 0 0 
+Time elapsed:  0.787 0.102 1.178 0 0 
 > 

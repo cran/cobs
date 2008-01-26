@@ -1,12 +1,13 @@
-#### $Id: scobs.R,v 1.40 2006/09/27 15:42:17 maechler Exp maechler $
+#### $Id: scobs.R,v 1.43 2008/01/26 11:01:13 maechler Exp $
 
-".First.lib" <- function(lib, pkg) {
-    require(SparseM) ## -> "methods"
-    require(quantreg)
-    library.dynam("cobs", pkg, lib)
+.onLoad <- function(lib, pkg) {
+
+    ##now have NAMESPACE library.dynam("cobs", pkg, lib)
+
+    MSG <- if(getRversion() >= "2.5") packageStartupMessage else message
     if(interactive() || getOption("verbose")) # not in test scripts
-	cat(sprintf("Package %s (%s) loaded.  To cite, see citation(\"%s\")\n",
-		    pkg, packageDescription(pkg)$Version, pkg))
+	MSG(sprintf("Package %s (%s) loaded.  To cite, see citation(\"%s\")\n",
+		    pkg, utils::packageDescription(pkg)$Version, pkg))
 }
 
 ## S+ does not allow "cut(*, labels = FALSE)" -- use cut00() for compatibility:
@@ -362,6 +363,7 @@ predict.cobs <-
 
     ##DBG cat("pr..cobs(): (ord, nknots, nvar) =",ord, nknots, nvar, "\n")
 
+    backOrder <- function(m) m
     ##
     ## compute fitted value at z
     ##
@@ -369,24 +371,32 @@ predict.cobs <-
     if(missing(z)) {
 	if(minz >= maxz) stop("minz >= maxz")
 	##NOT YET (for "R CMD check" compatibility):
-	## zo <- seq(minz, maxz, len = nz)
-	zo <- seq(max(minz,knots[1]	+ single.eps),
-		  min(maxz,knots[nknots]- single.eps), len = nz)
+	## z <- seq(minz, maxz, len = nz)
+	z <- seq(max(minz,knots[1]     + single.eps),
+                 min(maxz,knots[nknots]- single.eps), len = nz)
     }
     else {
-	zo <- sort(z)
-	##IN zo <- zo[zo > knots[1] & zo < knots[nknots]]
-	nz <- length(zo)
+        ## Careful:  predict(*, x) should predict at 'x', not sort(x) !!
+        ## Note this is needed, since .splValue() requires *increasing* z
+        notOrd <- is.unsorted(z)
+        if (notOrd) {
+            iz.ord <- order(z)
+            z <- z[iz.ord]
+            i.rev <- order(iz.ord)
+            backOrder <- function(m) m[ i.rev , , drop = FALSE]
+        }
+	##IN z <- z[z > knots[1] & z < knots[nknots]]
+	nz <- length(z)
     }
 
-    fit <- .splValue(degree, knots, coef, zo)
+    fit <- .splValue(degree, knots, coef, z)
 
     if(interval != "none") {
 	##
 	## compute confidence bands
 	## both (pointwise and simultaneous : as cheap as only one !
 	##
-	z3 <- .splBasis(ord = ord, knots, ncoef = nknots + degree - 1, xo = zo)
+	z3 <- .splBasis(ord = ord, knots, ncoef = nknots + degree - 1, xo = z)
 	idx <- cbind(rep(1:nz, rep(ord, nz)),
 		     c(outer(1:ord, z3$offsets, "+")))
 	X <- matrix(0, nz, nvar)
@@ -399,7 +409,7 @@ predict.cobs <-
 	}
 
         if(is.null(object$x.ps))
-            stop("no 'x.ps' pseudo.x component; must use cobs(*, give.x.ps = TRUE)")
+	    stop("no 'x.ps' pseudo.x component; must use cobs(*, keep.x.ps = TRUE)")
         ##MM: We should have crossprod() and qr() working for sparse matrices,
         ## 	at least '%*%' and t() work; [hmm, but there is  slm() in 'SparseM' !]
 	## Tqr <- qr(crossprod(object$x.ps))
@@ -419,12 +429,12 @@ predict.cobs <-
 	an <- sqrt(qchisq(level, object$k))   * sde
 	bn <- qt((1 + level)/2, n - object$k) * sde
 
-	cbind(z = zo, fit = fit,
-	      cb.lo = fit - an, cb.up = fit + an,
-	      ci.lo = fit - bn, ci.up = fit + bn)
+	backOrder(cbind(z = z, fit = fit,
+                        cb.lo = fit - an, cb.up = fit + an,
+                        ci.lo = fit - bn, ci.up = fit + bn))
     }# interval
     else
-	cbind(z = zo, fit = fit)
+	backOrder(cbind(z = z, fit = fit))
 } # predict
 
 

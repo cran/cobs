@@ -1,6 +1,5 @@
 \name{DublinWind}
 \alias{DublinWind}
-\non_function{}
 \title{Daily Wind Speeds in Dublin}
 \usage{data(DublinWind)}
 \description{
@@ -13,7 +12,7 @@
   \describe{
     \item{speed}{numeric vector of average daily wind speed in knots}
     \item{day}{an integer vector giving the day number of the year,
-      i.e., 1:366.}
+      i.e., one of 1:366.}
   }
 }
 \details{
@@ -43,11 +42,14 @@
 \examples{
 data(DublinWind)
 str(DublinWind)
-plot(speed ~ day, data = DublinWind)# not so nice; want time series:
-wSpeed <- ts(DublinWind$speed)
-plot(wSpeed)
-%%## FIXME: use correct time axis!--> need leap year correctness
-%%## wSpeed <- ts(speed, start = 1961, end = 1978.999, frequency= (365 + 1/4))
+plot(speed ~ day, data = DublinWind)# not so nice; want time scale
+
+## transform 'day' to correct "Date" object; and then plot
+Dday <- seq(from = as.Date("1961-01-01"), by = 1,
+            length = nrow(DublinWind))
+plot(speed ~ Dday, data = DublinWind, type = "l",
+     main = paste("DublinWind speed daily data, n=",
+                  nrow(DublinWind)))
 
 ##--- ~ He & Ng "Example 3" %% much more is in ../tests/wind.R
 co.o50 <-
@@ -55,8 +57,11 @@ co.o50 <-
   cobs(day, speed, knots.add = TRUE, constraint= "periodic", nknots = 10,
        tau = .5, method = "uniform"))
 summary(co.o50)
-lines(c(time(wSpeed)), fitted(co.o50), col=2)
-## the periodic "smooth" function
-plot(predict(co.o50), type = "b", col=2)
+lines(Dday, fitted(co.o50), col=2, lwd = 2)
+
+## the periodic "smooth" function - in one period
+plot(predict(co.o50), type = "o", cex = 0.2, col=2,
+     xlab = "day", ylim = c(0,20))
+points(speed ~ day, data = DublinWind, pch = ".")
 }
 \keyword{datasets}

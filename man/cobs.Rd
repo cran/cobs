@@ -1,6 +1,5 @@
 \name{cobs}
 \alias{cobs}
-\alias{cut00}
 \title{COnstrained B-Splines Nonparametric Regression Quantiles}
 \description{
   Computes constrained quantile curves using linear or
@@ -50,8 +49,10 @@ cobs(x, y, constraint = c("none", "increase", "decrease",
     \code{nknots} number of \code{knots} when \code{knots} is not provided;
     either \code{"quantile"} (equally spaced in percentile levels)
     or \code{"uniform"} (equally spaced knots); defaults to "quantile".}
-  \item{degree}{degree of the splines; 1 for linear spline and 2 for quadratic
-    spline; defaults to 2.}
+  \item{degree}{degree of the splines; 1 for linear spline (equivalent
+    to \eqn{L_1}-roughness) and 2 for quadratic
+    spline (corresponding to \eqn{L_{\infty}}{L_infinity ('L_oo')}
+    roughness); defaults to 2.}
   \item{tau}{desired quantile level; defaults to 0.5 (median).}
   \item{lambda}{penalty parameter \eqn{\lambda}\cr
     \eqn{\lambda = 0}: no penalty (regression B-spline);\cr

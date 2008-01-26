@@ -1,6 +1,6 @@
 #### Experiment with spline code --- want to use
 library(splines) ## for the splines
-library(cobs)##-> ../R/splines.R
+suppressMessages(library(cobs))
 
 options(digits = 9)
 
@@ -22,14 +22,14 @@ all.equal(pIspl, p2Ispl, tol = 1e-15)# TRUE
 ### ========
 ### ---> done (in principle; not yet implemented!),  Feb.2002
 
-str(.splBasis(4, bIspl$knots, length(bIspl$coef) + 6, x = .5 + 57:72))# outside!
+str(cobs:::.splBasis(4, bIspl$knots, length(bIspl$coef) + 6, x = .5 + 57:72))# outside!
 xo <- 0.5 + 59:70 # should work up to ord = 5
 
 ## ord <- 4 # cubic splines
 ## ord <- 3 # quadratic splines
 for(ord in 5:1) {
     cat("\n\nord = ",ord,"\n========\n")
-    print(spB <- .splBasis(ord, bIspl$knots,
+    print(spB <- cobs:::.splBasis(ord, bIspl$knots,
                            length(bIspl$coef) + ord + 2, x = xo))
     ## Gives error for ord = 5:4 --- data must be INSIDE :
     try(       splineDesign(bIspl$knots, x = 0.5 + 57:72, ord = ord))
@@ -46,7 +46,7 @@ for(ord in 5:1) {
 
 ## This (comments dropped) checks the same but gives no output (iff OK)
 for(ord in 5:1) {
-    spB <- .splBasis(ord, bIspl$knots, length(bIspl$coef) + ord + 2, x = xo)
+    spB <- cobs:::.splBasis(ord, bIspl$knots, length(bIspl$coef) + ord + 2, x = xo)
     tmp <- .Call("spline_basis", bIspl$knots, ord=ord, x= xo,
                  derivs = integer(length(xo)), PACKAGE = "splines")
     offs.tmp <- attr(tmp, "Offsets")
@@ -55,7 +55,7 @@ for(ord in 5:1) {
               all(spB$offsets - offs.tmp == ord - 1))
 }
 
-### -- 3) --- substituting our .splValue() by splines package predict.bSpline
+### -- 3) --- substituting our cobs:::.splValue() by splines package predict.bSpline
 ### ========
 ### ----------- STILL TODO !! ------------
 
@@ -86,5 +86,5 @@ predict(bIspl, xo)
 ## attr(,"class")
 ## [1] "xyVector"
 
-.splValue(deg = 3, knots = bIspl$knots, coef = bIspl$coef, xo = xo)
+cobs:::.splValue(deg = 3, knots = bIspl$knots, coef = bIspl$coef, xo = xo)
 ## hmm, not the same as $ y above ...

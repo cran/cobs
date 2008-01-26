@@ -1,4 +1,4 @@
-library(cobs)
+suppressMessages(library(cobs))
 
 source(system.file("util.R", package = "cobs"))
 
@@ -10,8 +10,10 @@ if(!interactive()) postscript("wind.ps", horizontal = TRUE)
 
 stopifnot(identical(day,c(rep(c(rep(1:365,3),1:366),4),
                           rep(1:365,2))))
-co50.1 <- cobs(day, speed, constraint= "periodic", tau= .5, lambda= 2.2, degree = 1)
-co50.2 <- cobs(day, speed, constraint= "periodic", tau= .5, lambda= 2.2, degree = 2)
+co50.1 <- cobs(day, speed, constraint= "periodic", tau= .5, lambda= 2.2,
+               degree = 1)
+co50.2 <- cobs(day, speed, constraint= "periodic", tau= .5, lambda= 2.2,
+               degree = 2)
 
 plot(day,speed)
 lines(day[iday], fitted(co50.1)[iday], col="orange", lwd = 2)
@@ -27,7 +29,8 @@ co.o50 <-
 summary(co.o50)
 
 op <- par(mfrow = c(3,1), mgp = c(1.5, 0.6,0), mar=.1 + c(3,3:1))
-with(co.o50, plot(pp.sic ~ pp.lambda, type ="o", col=2, log = "x", main = "co.o50: periodic"))
+with(co.o50, plot(pp.sic ~ pp.lambda, type ="o",
+                  col=2, log = "x", main = "co.o50: periodic"))
 with(co.o50, plot(pp.sic ~ pp.lambda, type ="o", ylim = robrng(pp.sic),
                   col=2, log = "x", main = "co.o50: periodic"))
 of <- 0.64430538125795

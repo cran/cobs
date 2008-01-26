@@ -1,4 +1,5 @@
-library(cobs)
+suppressMessages(library(cobs))
+
 options(digits = 6)
 
 x <- c(1:3, 5,6,9,12)

@@ -1,5 +1,6 @@
 ####
-library(cobs)
+suppressMessages(library(cobs))
+
 options(digits = 5)
 postscript("ex2.ps")
 

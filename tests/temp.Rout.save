@@ -1,6 +1,6 @@
 
-R version 2.4.0 beta (2006-09-25 r39513)
-Copyright (C) 2006 The R Foundation for Statistical Computing
+R version 2.6.2 alpha (2008-01-23 r44129)
+Copyright (C) 2008 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -15,10 +15,8 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 'help.start()' for an HTML browser interface to help.
 Type 'q()' to quit R.
 
-> library(cobs)
-Loading required package: SparseM
-Package SparseM (0.71) loaded.  To cite, see citation("SparseM")
-Loading required package: quantreg
+> suppressMessages(library(cobs))
+Package SparseM (0.74) loaded.  To cite, see citation("SparseM")
 > 
 > #### Example 1 of   He and Ng (1999) :
 > #### -------------------------------
@@ -509,5 +507,5 @@ x$knots[1:5]: 1880.000, 1908.000, 1936.000, 1964.000, 1992.000
 > 
 > 
 > cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''
-Time elapsed:  5.096 0.243 6.22 0 0 
+Time elapsed:  2.712 0.134 3.264 0 0 
 > 

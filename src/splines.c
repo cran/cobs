@@ -79,6 +79,7 @@ static double evaluate(double *ti, double x, double *a, int nder)
 void spline_value(double *knots, double *coeff, Sint *ncoeff, Sint *order,
 		  double *x, Sint *nx, Sint *deriv, double *y)
 {
+  /* Note: here we require *x = x[] to be sorted, i.e., *non-decreasing* ! */
   Sint n = *nx;
   double *a, *last = knots + *ncoeff;
 

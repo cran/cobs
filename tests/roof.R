@@ -1,4 +1,5 @@
-library(cobs)
+suppressMessages(library(cobs))
+
 data(USArmyRoofs)
 attach(USArmyRoofs)#-> "age" and "fci"
 

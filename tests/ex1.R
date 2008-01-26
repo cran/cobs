@@ -2,7 +2,7 @@
 #### ===== gives a wrong result (at the end) than when run a 2nd time
 ####-- problem disappears with introduction of   if (psw) call ... in Fortran
 
-library(cobs)
+suppressMessages(library(cobs))
 options(digits = 6)
 postscript("ex1.ps")
 

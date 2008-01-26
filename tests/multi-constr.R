@@ -1,6 +1,7 @@
 #### Examples which use the new feature of more than one 'constraint'.
 
-library(cobs)
+suppressMessages(library(cobs))
+
 options(digits = 6)
 postscript("multi-constr.ps")
 

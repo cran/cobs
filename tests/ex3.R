@@ -1,4 +1,5 @@
-library(cobs)
+suppressMessages(library(cobs))
+
 options(digits = 6)
 ## postscript("ex3.ps")
 

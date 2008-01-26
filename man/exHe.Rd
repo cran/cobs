@@ -1,6 +1,5 @@
 \name{exHe}
 \alias{exHe}
-\non_function{}
 \title{Small Dataset Example of He}
 \usage{data(exHe)}
 \description{

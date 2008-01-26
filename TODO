@@ -1,3 +1,8 @@
+-  allow  ic = <number> ==> something between AIC & BIC, or (ic = 1 :more
+       overfitting than AIC)
+
+- For knot selection: allow setting final number of knots (after knot selection)
+
 - predict.cobs() should have a 'deriv = 0' argument {as predict.smooth.spline()}
   and deriv in {1,2,3} should work.
 
@@ -13,8 +18,8 @@
   allow a "+ 1 S.E. - rule" instead of simply taking the arg_min
 - dito for knot selection
 
-- Documentation (and examples!) for the intermediate/ auxiliary functions
-  qsbks() and drqssbcs(), i.e.  man/qbsks.Rd & man/drqssbc.Rd
+- Add details and examples (!) for the intermediate/ auxiliary functions
+  qsbks() and drqssbcs(), in  man/qbsks.Rd & man/drqssbc.Rd
 
 - need examples with degree = 1
   and several other values of tau
@@ -52,3 +57,4 @@ Old `TODOs' which are done (here for reference only):
   be designed!
 	---> this is now done  { --> old & original code in ./R/cobsOld.R }
 
+- added some documentation for qsbks() and drqssbcs(): man/qbsks.Rd & man/drqssbc.Rd

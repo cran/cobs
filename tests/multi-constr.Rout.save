@@ -1,6 +1,6 @@
 
-R version 2.4.0 beta (2006-09-25 r39513)
-Copyright (C) 2006 The R Foundation for Statistical Computing
+R version 2.7.0 Under development (unstable) (2008-01-22 r44105)
+Copyright (C) 2008 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -17,10 +17,9 @@ Type 'q()' to quit R.
 
 > #### Examples which use the new feature of more than one 'constraint'.
 > 
-> library(cobs)
-Loading required package: SparseM
-Package SparseM (0.71) loaded.  To cite, see citation("SparseM")
-Loading required package: quantreg
+> suppressMessages(library(cobs))
+Package SparseM (0.75) loaded.  To cite, see citation("SparseM")
+> 
 > options(digits = 6)
 > postscript("multi-constr.ps")
 > 
@@ -199,8 +198,10 @@ qbsks2():
  l1.design2(): ->  Xeq   50 x 3 (nz = 100 =^=  0.67%) 
                   Xieq    3 x 3 (nz = 7 =^=  0.78%) 
 Warning messages:
-1: too few knots ==> nk <= 4; could not add constraint 'concave' in: l1.design2(x, w, constraint, ptConstr, knots, pw, nrq = n, nl1,  
-2: too few knots ==> nk <= 4; could not add constraint 'concave' in: l1.design2(x, w, constraint, ptConstr, knots, pw, nrq = n, nl1,  
+1: In l1.design2(x, w, constraint, ptConstr, knots, pw, nrq = n, nl1,  :
+  too few knots ==> nk <= 4; could not add constraint 'concave'
+2: In l1.design2(x, w, constraint, ptConstr, knots, pw, nrq = n, nl1,  :
+  too few knots ==> nk <= 4; could not add constraint 'concave'
 > 
 > cp2   <- cobs(x,y,                          pointwise = con, trace = 3)
 qbsks2():
@@ -229,7 +230,7 @@ qbsks2():
 
  Deleting unnecessary knots ...
 Warning message:
-Check 'ifl' in: cobs(x, y, constraint = "increase", pointwise = con) 
+In cobs(x, y, constraint = "increase", pointwise = con) : Check 'ifl'
 > ## when plotting it, we see that it gave a trivial constant!!
 > cp2c  <- cobs(x,y, constraint = "concave",  pointwise = con, trace = 3)
 qbsks2():
@@ -268,7 +269,8 @@ loo.design2(): ->  Xeq   50 x 7 (nz = 150 =^=  0.43%)
 loo.design2(): ->  Xeq   50 x 3 (nz = 150 =^=     1%) 
                   Xieq    5 x 3 (nz = 15 =^=     1%) 
 Warning message:
-Check 'ifl' in: cobs(x, y, constraint = c("inc", "concave"), pointwise = con,  
+In cobs(x, y, constraint = c("inc", "concave"), pointwise = con,  :
+  Check 'ifl'
 > 
 > cp1   <- cobs(x,y, degree = 1,                            pointwise = con, trace = 3)
 qbsks2():
@@ -360,8 +362,10 @@ qbsks2():
  l1.design2(): ->  Xeq   50 x 3 (nz = 100 =^=  0.67%) 
                   Xieq    5 x 3 (nz = 11 =^=  0.73%) 
 Warning messages:
-1: too few knots ==> nk <= 4; could not add constraint 'concave' in: l1.design2(x, w, constraint, ptConstr, knots, pw, nrq = n, nl1,  
-2: too few knots ==> nk <= 4; could not add constraint 'concave' in: l1.design2(x, w, constraint, ptConstr, knots, pw, nrq = n, nl1,  
+1: In l1.design2(x, w, constraint, ptConstr, knots, pw, nrq = n, nl1,  :
+  too few knots ==> nk <= 4; could not add constraint 'concave'
+2: In l1.design2(x, w, constraint, ptConstr, knots, pw, nrq = n, nl1,  :
+  too few knots ==> nk <= 4; could not add constraint 'concave'
 > 
 > 
 > plot(x,y, main = "cobs(*, degree= 1, constraint = *, pointwise= *)")

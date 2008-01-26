@@ -1,6 +1,5 @@
 \name{globtemp}
 \alias{globtemp}
-\non_function{}
 \title{Annual Average Global Surface Temperature}
 \usage{data(globtemp)}
 \description{

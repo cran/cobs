@@ -1,6 +1,5 @@
 \name{USArmyRoofs}
 \alias{USArmyRoofs}
-\non_function{}
 \title{Roof Quality in US Army Bases}
 \usage{data(USArmyRoofs)}
 \description{

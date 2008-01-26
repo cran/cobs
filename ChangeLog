@@ -1,3 +1,38 @@
+2008-01-26  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* NAMESPACE: some more imports are needed for loading the namespace
+	after R_DEFAULT_PACKAGES=NULL
+
+2008-01-24  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 1.1-5
+
+	* R/splines.R (.splBasis, .splValue): .C(): variable, not string;
+		no PACKAGE needed anymore with
+	* NAMESPACE: added NAMESPACE
+	* R/scobs.R (.onLoad): instead of .First.lib()
+
+2007-05-02  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* tests/*.Rout.save: new outputs because 'SparseM' stuff.. (arrg!)
+
+	* man/DublinWind.Rd: do plot 'day' as "Date" object
+
+2007-04-30  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 1.1-4 - not released
+
+	* R/scobs.R (predict.cobs): make sure predict(<cobs>, x)
+		returns result "along x", and not along sort(x).
+	(".First.lib"): use packageStartupMessage in R >= 2.5.0
+
+2007-04-27  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/concaveRegr.R (concaveRegr): Duembgen's matlab implementation
+	of active set algorithm, ported to R.
+
+	* DESCRIPTION (Depends): splines, for interpSpline()
+
 2006-09-27  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* man/cobs.Rd: a small note about "quality" of pp.sic

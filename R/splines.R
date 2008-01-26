@@ -24,7 +24,7 @@
 
     n <- length(xo <- as.double(xo))
 
-    .C("spline_basis",
+    .C(spline_basis,
        as.double(new.knots),
        as.integer(ncoef),
        ord, # "order"
@@ -32,8 +32,7 @@
        derivs = as.integer(derivs),
        n,
        design = array(0, c(ord, n)),# "basis"
-       offsets = integer(n),
-       PACKAGE = "cobs")[c("design","offsets")]
+       offsets = integer(n))[c("design","offsets")]
 }
 
 .splValue <- function(degree, knots, coef, xo)
@@ -51,7 +50,7 @@
                    rep.int(knots[length(knots)], degree))
     derivs <- as.integer(0)
     n <- length(xo)
-    .C("spline_value",
+    .C(spline_value,
        as.double(new.knots),
        as.double(coef),
        length(coef),
@@ -59,5 +58,5 @@
        as.double(xo),
        as.integer(n),
        derivs,
-       y = double(n), PACKAGE = "cobs")$y
+       y = double(n))$y
 } ## .splValue
