@@ -10,16 +10,31 @@
 mk.pt.constr(pointwise)
 }
 \arguments{
-  \item{pointwise}{numeric 3-column matrix, see \code{\link{cobs}}.}
+  \item{pointwise}{numeric 3-column matrix, see \code{pointwise} in \code{\link{cobs}}.}
 }
 \value{
   A list with components
-%% FIXME
-  \item{comp1 }{Description of 'comp1'}
+  \item{n.equal}{number of equality constraints}
+  \item{n.greater}{number of ``greater'' constraints}
+  \item{n.smaller}{number of ``smaller'' constraints}
+  \item{n.gradient}{number of gradient constraints}
 
+  Unless the input \code{pointwise} was \code{NULL}, the result also
+  has corresponding components:
+  \item{equal}{3-column matrix ofequality constraints}
+  \item{greater}{3-column matrix of``greater'' constraints}
+  \item{smaller}{3-column matrix of``smaller'' constraints}
+  \item{gradient}{3-column matrix ofgradient constraints}
 }
 \author{Martin Maechler}
 \examples{
+ ## from  ?cobs:
+ x <- seq(-1,3,,150)
+ con <- rbind(c( 1,min(x),0), # f(min(x)) >= 0
+              c(-1,max(x),1), # f(max(x)) <= 1
+              c(0,  0,   0.5))# f(0)      = 0.5
+ r <- mk.pt.constr(con)
+ str(r)
 }
 \keyword{misc}
 

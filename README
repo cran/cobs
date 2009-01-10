@@ -56,8 +56,7 @@ name		       content
 --------	       ------------------------------------------------
 ./TODO		       Martin's "to do" list (he has also ./00-FIXME)
 ./ChangeLog	       Martin's ``log book'' on changes done.
-./R/README	       calling tree of R functions, ..
-./src/README	       calling tree of Fortran subroutine/functions, ..
+./R_README	       calling tree of R functions, ..
 ./inst/scripts/README  about Ng&He (1994)'s 3 examples
 ./tests/README	       explaining a bit about current "instability" problem
 

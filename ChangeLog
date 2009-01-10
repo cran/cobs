@@ -1,11 +1,25 @@
+2009-01-10  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Date): updated.
+
+	* man/cobs.Rd, man/DublinWind.Rd: Rd_parse fixes
+
+2008-11-17  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 1.1-6 -- but not released
+
+	* man/mk.pt.constr.Rd: add example from help(cobs)
+
+	* tests/*.Rout.save: some output updates
+
 2008-01-26  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 1.1-5  released to CRAN
 
 	* NAMESPACE: some more imports are needed for loading the namespace
 	after R_DEFAULT_PACKAGES=NULL
 
 2008-01-24  Martin Maechler  <maechler@stat.math.ethz.ch>
-
-	* DESCRIPTION (Version): 1.1-5
 
 	* R/splines.R (.splBasis, .splValue): .C(): variable, not string;
 		no PACKAGE needed anymore with

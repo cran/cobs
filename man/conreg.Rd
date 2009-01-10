@@ -49,9 +49,9 @@ conreg(x, y = NULL, w = NULL, convex = FALSE,
   an object of class \code{conreg} which is basically a list with components
   \item{x}{sorted (and possibly aggregated) abscissa values \code{x}.}
   \item{y}{corresponding y values.}
-  \item{yf}{correspondingfitted values.}
+  \item{yf}{corresponding fitted values.}
   \item{iKnots}{integer vector giving indices of the \emph{knots},
-    i.e. locations  where the fitted curve has kinks.
+    i.e. locations where the fitted curve has kinks.
     Formally, these are exactly those indices where the constraint is
     fulfilled strictly, i.e., those \eqn{i} where
     \deqn{(m_i - m_{i-1})/(x_i-x_{i-1}) > (m_{i+1} - m_i)/(x_{i+1}-x_i).}{%

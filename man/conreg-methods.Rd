@@ -49,12 +49,12 @@
   \item{digits}{number of significant digits for printing.}
   \item{\dots}{further arguments, potentially passed to methods.}
 }
-\details{
-
-}
-\value{
-
-}
+% \details{
+%% FIXME
+% }
+% \value{
+%% FIXME really
+% }
 \author{Martin Maechler}
 \seealso{\code{\link{conreg}}, ....
 }

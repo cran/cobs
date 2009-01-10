@@ -181,7 +181,7 @@ cobs(x, y, constraint = c("none", "increase", "decrease",
   \emph{ACM Transaction on Mathematical Software} \bold{6}, 594--608.
 
   A postscript version of the paper that describes the details of COBS
-  can be downloaded from \url{http://www.cba.nau.edu/pin-ng/cobs.html}
+  can be downloaded from \url{http://www.cba.nau.edu/pin-ng/cobs.html}.
 }
 % \section{Warning}{
 %   This is still a beta version, and we do appreciate comments and
@@ -189,7 +189,7 @@ cobs(x, y, constraint = c("none", "increase", "decrease",
 % }
 \seealso{\code{\link{smooth.spline}} for unconstrained smoothing
     splines; \code{\link[splines]{bs}} for unconstrained (regression)
-    B-splines.}
+    B-splines.
 }
 \examples{
 x <- seq(-1,3,,150)
@@ -219,10 +219,10 @@ plot(Sb1)
 
 plot(Sb1, which = 2) # only the  data + smooth
 rug(Sb1$knots, col = 4, lwd = 1.6)# (too many knots)
-mtext(" + pointwise and simultaneous 95\% - confidence intervals")
 xx <- seq(min(x) - .2, max(x)+ .2, len = 201)
 pxx <- predict(Sb1, xx, interval = "both")
 lines(pxx, col = 2)
+mtext(" + pointwise and simultaneous 95\% - confidence intervals")
 matlines(pxx[,1], pxx[,-(1:2)], col= rep(c("green3","blue"), c(2,2)), lty=2)
 }
 \keyword{smooth}

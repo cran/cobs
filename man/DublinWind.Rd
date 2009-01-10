@@ -27,8 +27,8 @@
 }
 \references{
   Haslett, J. and Raftery, A. (1989)
-  Space-Time Modelling with Long-Memory Dependence: {A}ssessing
-  {I}reland's Wind Power Resource.
+  Space-Time Modelling with Long-Memory Dependence: Assessing
+  Ireland's Wind Power Resource.
   .......... % FIXME -- no journal !
   \bold{38}, 1--21.
 
