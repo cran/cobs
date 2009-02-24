@@ -11,7 +11,7 @@ qbsks2(x,y,w,pw, knots,nknots, degree,Tlambda, constraint, ptConstr,
       maxiter, trace, nrq,nl1, neqc, tau, select.lambda,
       ks, do.select, knots.add, repeat.delete.add, ic, print.mesg,
       give.pseudo.x = TRUE,
-      rq.tol = 1e-8, tol.kn = 1e-6, tol.0res = 1e-6, print.warn)
+      rq.tol = 1e-8, tol.kn = 1e-6, tol.0res = 1e-6, print.warn, nk.start)
 }
 \arguments{
   \item{x}{numeric vector, sorted increasingly, the abscissa values}
@@ -19,20 +19,20 @@ qbsks2(x,y,w,pw, knots,nknots, degree,Tlambda, constraint, ptConstr,
   \item{w}{numeric vector of weights, same length as \code{x}, as in
     \code{\link{cobs}}.}
   \item{pw}{penalty weights vector ... ...}%% << FIXME, currently unused
-  \item{knots}{ ~~Describe \code{knots} here~~ }
-  \item{nknots}{ ~~Describe \code{nknots} here~~ }
+  \item{knots}{numeric vector of knots of which \code{nknots} will be used.}
+  \item{nknots}{number of \code{knots} to be used.}% FIXME: Say more in \details
   \item{degree}{integer specifying polynomial degree; must be 1 or 2.}
   \item{Tlambda}{ ~~Describe \code{Tlambda} here~~ }
-  \item{constraint}{ ~~Describe \code{constraint} here~~ }
+  \item{constraint}{string (or empty) specifying the global constraints;
+    see \code{\link{cobs}}.}
   \item{ptConstr}{\code{\link{list}} of \bold{p}oin\bold{t}wise constraints.}
   \item{maxiter}{ ~~Describe \code{maxiter} here~~ }
   \item{trace}{integer or logical indicating the tracing level of the
     \emph{underlying} algorithms; not implemented (due to lack of trace
     in quantreg ...)}
-  \item{nrq}{ ~~Describe \code{nrq} here~~ }
-  \item{nl1}{ ~~Describe \code{nl1} here~~ }
-  \item{neqc}{ ~~Describe \code{neqc} here~~ }
-  \item{tau}{ ~~Describe \code{tau} here~~ }
+  \item{nrq,nl1,neqc}{integers specifying dimensionalities, directly
+    passed to \code{\link{drqssbc2}}, see there.}
+  \item{tau}{desired quantile level (in interval \eqn{(0,1)}).}
   \item{select.lambda}{ ~~Describe \code{lam} here~~ }
   \item{ks}{number used as offset in SIC/AIC/BIC.}
   \item{do.select}{logical indicating if knots shall be selected
@@ -46,11 +46,12 @@ qbsks2(x,y,w,pw, knots,nknots, degree,Tlambda, constraint, ptConstr,
   \item{rq.tol}{numeric convergence tolerance for the interior point
     algorithm called from \code{\link[quantreg]{rq.fit.sfnc}()} or
     \code{\link[quantreg]{rq.fit.sfn}()}.}
-  \item{tol.kn}{``tolerance'' for shifting the outer knots.}
+  \item{tol.kn}{\dQuote{tolerance} for shifting the outer knots.}
   \item{tol.0res}{tolerance passed to \code{\link{drqssbc2}}.}
   \item{print.warn}{flag indicating if and how much warnings and
     information is to be printed; currently just passed to
     \code{\link{drqssbc2}}.}
+  \item{nk.start}{number of starting knots used in automatic knot selection.}
 }
 \details{
   This is an auxiliary function for \code{\link{cobs}(*, lambda = 0)},

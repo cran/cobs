@@ -12,14 +12,14 @@ cobs(x, y, constraint = c("none", "increase", "decrease",
      w = rep(1,n),
      knots, nknots = if(lambda == 0) 6 else 20,
      method = "quantile", degree = 2, tau = 0.5,
-     lambda = 0, ic = c("sic", "aic", "bic", "SIC", "AIC", "BIC"),
+     lambda = 0, ic = c("AIC", "SIC", "BIC", "aic", "sic", "bic"),
      knots.add = FALSE, repeat.delete.add = FALSE, pointwise = NULL,
      keep.data = TRUE, keep.x.ps = TRUE,
      print.warn = TRUE, print.mesg = TRUE, trace = print.mesg,
      lambdaSet = exp(seq(log(lambda.lo), log(lambda.hi), length = lambda.length)),
      lambda.lo = f.lambda*1e-4, lambda.hi = f.lambda*1e3, lambda.length = 25,
      maxiter = 100,
-     rq.tol = 1e-8, toler.kn = 1e-6, tol.0res = 1e-6,
+     rq.tol = 1e-8, toler.kn = 1e-6, tol.0res = 1e-6, nk.start = 2,
      eps, n.sub, coef, lstart, factor)
 }
 \arguments{
@@ -60,11 +60,14 @@ cobs(x, y, constraint = c("none", "increase", "decrease",
     \eqn{\lambda < 0}: smoothing B-spline with \eqn{\lambda} chosen by a
     Schwarz-type information criterion.}
   \item{ic}{string indicating the information  criterion used in knot
-    deletion and addition for regression B-spline method when
+    deletion and addition for the regression B-spline method, i.e., when
     \code{lambda == 0};\cr
-    \code{"aic"} (Akaike-type, equivalently \code{"AIC"}) or\cr
-    \code{"sic"} (Schwarz-type, equivalently \code{"BIC"}, \code{"SIC"}
-    or \code{"bic"}).  Defaults to \code{"sic"}.}
+    \code{"AIC"} (Akaike-type, equivalently \code{"aic"}) or\cr
+    \code{"SIC"} (Schwarz-type, equivalently \code{"BIC"}, \code{"sic"}
+    or \code{"bic"}).  Defaults to \code{"AIC"}.
+
+    \emph{Note that the default was \code{"SIC"} up to \pkg{cobs} version 1.1-6
+      (dec.2008).}}
   \item{knots.add}{logical indicating if an additional step of stepwise
     knot addition should be performed for regression B-splines.}
   \item{repeat.delete.add}{logical indicating if an additional step of stepwise
@@ -118,6 +121,8 @@ cobs(x, y, constraint = c("none", "increase", "decrease",
     outside; defaults to \eqn{10^{-6}}{10^(-6)}.}
   \item{tol.0res}{tolerance for testing \eqn{|r_i| = 0},  passed to
     \code{\link{qbsks2}} and \code{\link{drqssbc2}}.}
+  \item{nk.start}{number of starting knots used in automatic knot
+    selection. Defaults to the minimum of 2 knots.}
   \item{eps, n.sub, coef, lstart, factor}{unused argument of the 1999/2002 version
     of \code{cobs()}, currently still allowed (with a
     \code{\link{warning}}) for back compatibility reasons.}
@@ -126,12 +131,15 @@ cobs(x, y, constraint = c("none", "increase", "decrease",
   an object of class \code{cobs}, a list with components
 %%% FIXME: needs to be updated!
   \item{call}{the \code{cobs(..)} call used for creation.}
-  \item{tau, degree}{as input}
+  \item{tau, degree}{same as input}
   \item{constraint}{as input (but no more abbreviated).}
   \item{pointwise}{as input.}
   \item{coef}{B-spline coefficients.}
   \item{knots}{the final set of knots used in the computation.}
-  \item{ifl}{exit codes: see \code{\link[quantreg]{rq.fit.sfnc}}.}
+  \item{ifl}{exit code := \code{1 + ierr} and \code{ierr} is the error
+    from \code{\link[quantreg]{rq.fit.sfnc}} (package \pkg{quantreg});
+    consequently, \code{ifl = 1} means \dQuote{success}; all other
+    values point to algorithmic problems or failures.}
   \item{icyc}{length 2: number of cycles taken to achieve convergence
     for final lambda, and total number of cycles for all lambdas.}
   \item{k}{the effective dimensionality of the final fit.}
@@ -160,6 +168,10 @@ cobs(x, y, constraint = c("none", "increase", "decrease",
   Schwarz information criterion.
 }
 \references{
+  Ng, P. and Maechler, M. (2007)
+  A Fast and Efficient Implementation of Qualitatively Constrained Quantile Smoothing Splines,
+  \emph{Statistical Modelling} \bold{7(4)}, 315-328.
+
   Koenker, R. and Ng, P. (2005)
   Inequality Constrained Quantile Regression,
   \emph{Sankhya, The Indian Journal of Statistics} \bold{67}, 418--440.

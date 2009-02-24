@@ -1,4 +1,4 @@
-#### $Id: qbsks.R,v 1.21 2006/08/16 19:23:27 maechler Exp maechler $
+#### $Id: qbsks.R,v 1.22 2009/02/24 13:47:41 maechler Exp $
 
 qbsks2 <-
     function(x,y,w,pw, knots,nknots, degree, Tlambda,
@@ -6,7 +6,7 @@ qbsks2 <-
              nrq,nl1, neqc, tau, select.lambda,
              ks, do.select, knots.add, repeat.delete.add, ic, print.mesg,
              give.pseudo.x = TRUE,
-             rq.tol = 1e-8, tol.kn = 1e-6, tol.0res = 1e-6, print.warn)
+             rq.tol = 1e-8, tol.kn = 1e-6, tol.0res = 1e-6, print.warn, nk.start)
 {
     ##=########################################################################
     ##
@@ -29,6 +29,7 @@ qbsks2 <-
 		   "AIC" = 2,
 		   "BIC" =, "SIC" = logn,
 		   stop("in qbsks2(): invalid 'ic' = ", ic, call. = FALSE))
+    stopifnot(nk.start >= 2)
     constraint.orig <- constraint
 
     n.gr.sm <- with(ptConstr, n.greater + n.smaller)
@@ -38,7 +39,7 @@ qbsks2 <-
 	    stop("you cannot select knots for more than one lambda simultaneously")
         if(print.mesg) cat("qbsks2():\n Performing general knot selection ...\n")#4
         Tic <- Tifl <- double(nknots-1)
-        for(i in 1:(nknots-1)) {
+        for(i in (nk.start-1):(nknots-1)) {
             Tknots <- knots[seq(1,nknots, len = i+1)]
             n.Tknts <- length(Tknots)
             if(n.Tknts == 2 && degree == 1 && constraint %in% c("convex", "concave"))

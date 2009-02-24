@@ -1,4 +1,4 @@
-#### $Id: drqssbc.R,v 1.40 2007/04/10 08:15:15 maechler Exp $
+#### $Id: drqssbc.R,v 1.41 2009/02/24 13:51:20 maechler Exp maechler $
 
 drqssbc2 <-
     function(x,y, w = rep.int(1,n), pw, knots, degree, Tlambda, constraint,
@@ -46,10 +46,13 @@ drqssbc2 <-
     ##* Note: if  nrq != length(x) , e.g., in case of sub.sampling+ fit full
     ##*  if(select.lambda < 0)
     ##*      n <- nrq
-    Tequal   <- if(ptConstr$n.equal   > 0)  ptConstr$equal[,3] # else NULL
-    Tsmaller <- if(ptConstr$n.smaller > 0) -ptConstr$smaller[,3]
-    Tgreater <- if(ptConstr$n.greater > 0)  ptConstr$greater[,3]
-    Tgradien <- if(ptConstr$n.gradient> 0)  ptConstr$gradient[,3]
+
+    ## Y values of pointwise constraints in ptConstr need
+    ## to be sorted according to the X values (consistent with those (l1|loo).design2):
+    Tequal   <- if(ptConstr$n.equal   > 0)  ptConstr$equal[order(ptConstr$equal [,2]),3] # else NULL
+    Tsmaller <- if(ptConstr$n.smaller > 0) -ptConstr$smaller [order(ptConstr$smaller [,2]),3]
+    Tgreater <- if(ptConstr$n.greater > 0)  ptConstr$greater [order(ptConstr$greater [,2]),3]
+    Tgradien <- if(ptConstr$n.gradient> 0)  ptConstr$gradient[order(ptConstr$gradient[,2]),3]
     Y.ptConstr <- c(Tsmaller, Tgreater, Tequal, -1*Tequal, Tgradien, -1*Tgradien)
 
     ## double matrix -- to contain "sol"ution :
@@ -111,7 +114,8 @@ drqssbc2 <-
 	Tnobs <- nrow(Xeq) + (if(fieq) nrow(Xieq) else 0)
                                         # Tnobs = number of pseudo-observations
 	n0 <- Tnobs -n - with(ptConstr,
-			      2*n.equal+n.gradient+n.smaller+n.greater)
+			      2*(n.equal + n.gradient) + n.smaller + n.greater)
+        ## There are 2 inequality constraints for each equality one ==> '2 * (...)'
 	Y <- c(y*w, rep.int(0, n0), Y.ptConstr)
 	##    Yeq <- Y[1:(nrq+nl1+neqc)]
 	Yeq <- Y[1:(nrq+nl1)]
@@ -139,6 +143,14 @@ drqssbc2 <-
         ##    -> ../../quantreg/src/srqfn.c and ..../srqfnc.c
         ##  these both call chlfct() in ../../quantreg/src/chlfct.c   (was *.f)
         ##  is built on misc.        in ../../quantreg/src/cholesky.c (was *.f)
+	if(any(is.na(z0$coef)))
+	    stop("The combination of 'constraint' and 'pointwise' is causing problems\n",
+		 "for the algorithm with the current knot selection,\n knots : ",
+		 capture.output(str(knots, vec.len = 10)),"\n",
+		 "Check the feasibility of your 'constraint' and 'pointwise'\n",
+		 "or use a different knot selection.\n\n If you are using automatic ",
+		 "knot selection, try increasing 'nk.start' from its default value of 2.")
+
 	pseudo.resid <- (if(fieq) Yeq.. else Yeq) -
 	    c(as.matrix((if(fieq) Xeq.. else Xeq) %*% as.matrix.csr(z0$coef)))
         if(any(is.na(pseudo.resid))) ## not really seen this case...
@@ -233,7 +245,7 @@ drqssbc2 <-
 		wrn.flag <- 4
 	}
 	##
-        ## trap infeasible solution when lam<0
+        ## trap infeasible solution when lam < 0
         ##
         if(print.warn) {
 	    wrn1 <- "\n WARNING!  Since the optimal lambda chosen by SIC "

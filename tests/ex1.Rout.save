@@ -1,6 +1,6 @@
 
-R version 2.8.0 Patched (2008-11-16 r46960)
-Copyright (C) 2008 The R Foundation for Statistical Computing
+R version 2.8.1 Patched (2009-02-23 r47990)
+Copyright (C) 2009 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -20,7 +20,7 @@ Type 'q()' to quit R.
 > ####-- problem disappears with introduction of   if (psw) call ... in Fortran
 > 
 > suppressMessages(library(cobs))
-Package SparseM (0.78) loaded.  To cite, see citation("SparseM")
+Package SparseM (0.79) loaded.  To cite, see citation("SparseM")
 > options(digits = 6)
 > postscript("ex1.ps")
 > 
@@ -47,7 +47,7 @@ List of 24
  $ tau          : num 0.5
  $ degree       : num 2
  $ constraint   : chr "increase"
- $ ic           : chr "SIC"
+ $ ic           : chr "AIC"
  $ pointwise    : num [1:3, 1:3] 1 -1 0 -1 1 0 0 1 0.5
  $ select.knots : logi TRUE
  $ select.lambda: logi FALSE
@@ -244,7 +244,7 @@ List of 24
  $ tau          : num 0.5
  $ degree       : num 2
  $ constraint   : chr "increase"
- $ ic           : chr "SIC"
+ $ ic           : NULL
  $ pointwise    : num [1:3, 1:3] 1 -1 0 -1 1 0 0 1 0.5
  $ select.knots : logi TRUE
  $ select.lambda: logi TRUE
@@ -438,7 +438,7 @@ List of 24
  $ tau          : num 0.5
  $ degree       : num 2
  $ constraint   : chr "increase"
- $ ic           : chr "SIC"
+ $ ic           : NULL
  $ pointwise    : NULL
  $ select.knots : logi TRUE
  $ select.lambda: logi TRUE
@@ -460,19 +460,19 @@ List of 24
  $ pp.sic       : num [1:25] 2.23 2.23 2.23 2.23 2.23 ...
  $ i.mask       : logi [1:25] TRUE TRUE TRUE TRUE TRUE TRUE ...
           cb.lo     ci.lo      fit   ci.up    cb.up
-1   -18.0106902 -9.829675  6.86289 23.5554  31.7365
-2   -15.9869427 -8.308682  7.35806 23.0248  30.7031
-3   -14.7253903 -7.299595  7.85201 23.0036  30.4294
-4   -14.0304377 -6.671152  8.34475 23.3607  30.7199
+1   -18.0106901 -9.829675  6.86289 23.5554  31.7365
+2   -15.9869426 -8.308682  7.35806 23.0248  30.7031
+3   -14.7253902 -7.299595  7.85201 23.0036  30.4294
+4   -14.0304376 -6.671152  8.34475 23.3607  30.7199
 5   -13.6842238 -6.277147  8.83627 23.9497  31.3568
 6   -13.4881973 -5.984332  9.32657 24.6375  32.1413
 7   -13.2846859 -5.686895  9.81565 25.3182  32.9160
 8   -12.9604500 -5.308840 10.30352 25.9159  33.5675
 9   -12.4418513 -4.800750 10.79017 26.3811  34.0222
 10  -11.6889866 -4.135844 11.27560 26.6871  34.2402
-11  -10.6923973 -3.307777 11.75982 26.8274  34.2120
+11  -10.6923972 -3.307777 11.75982 26.8274  34.2120
 12   -9.4739641 -2.331232 12.24282 26.8169  33.9596
-13   -8.0930597 -1.246053 12.72459 26.6952  33.5422
+13   -8.0930597 -1.246053 12.72460 26.6952  33.5422
 14   -6.6587120 -0.125409 13.20516 26.5357  33.0690
 15   -5.3461743  0.913089 13.68450 26.4559  32.7152
 16   -4.3525007  1.737247 14.16278 26.5883  32.6781
@@ -581,12 +581,9 @@ coef  :
        (c) Use a coarser grid by reducing the argument
  	   'lambda.length' from the default value of 25.
 WARNING: Some lambdas had problems in rq.fit.sfnc():
-         lambda icyc ifl   fidel sum|res|_s  k
-[1,] 0.00279592   15  18 263.500    4.00000 18
-[2,] 0.00547257   15  18 263.500    4.00000 18
-[3,] 0.30774511   12  18 263.500    4.00000 18
-[4,] 1.17902900   15  18 263.944    1.77778 16
-[5,] 2.30776272   16  18 264.750    1.00000 15
+         lambda icyc ifl fidel sum|res|_s  k
+[1,] 0.00547257   15  18 263.5          4 18
+[2,] 0.30774511   12  18 263.5          4 18
 
  WARNING!  Since the optimal lambda chosen by SIC 
    corresponds to the roughest possible fit, you should
@@ -603,7 +600,7 @@ List of 24
  $ tau          : num 0.5
  $ degree       : num 2
  $ constraint   : chr "convex"
- $ ic           : chr "SIC"
+ $ ic           : NULL
  $ pointwise    : NULL
  $ select.knots : logi TRUE
  $ select.lambda: logi TRUE
@@ -620,7 +617,7 @@ List of 24
  $ lambda       : Named num 66.3
   ..- attr(*, "names")= chr "lambda"
  $ icyc         : int [1:25] 15 15 16 13 13 12 12 12 14 15 ...
- $ ifl          : int [1:25] 18 18 1 1 1 1 1 18 1 18 ...
+ $ ifl          : int [1:25] 1 18 1 1 1 1 1 18 1 1 ...
  $ pp.lambda    : num [1:25] 0 0.01 0.01 0.02 0.04 0.08 0.16 0.31 0.6 1.18 ...
  $ pp.sic       : num [1:25] 2.37 2.37 2.37 2.37 2.37 ...
  $ i.mask       : logi [1:25] TRUE TRUE TRUE TRUE TRUE TRUE ...
@@ -761,7 +758,7 @@ List of 24
  $ tau          : num 0.5
  $ degree       : num 2
  $ constraint   : chr "decrease"
- $ ic           : chr "SIC"
+ $ ic           : chr "AIC"
  $ pointwise    : NULL
  $ select.knots : logi TRUE
  $ select.lambda: logi FALSE
@@ -899,7 +896,7 @@ coef  :
 > dx <- diff(range(ux <- unique(x)))
 > rx <- range(xx <- seq(ux[1] - dx/20, ux[length(ux)] + dx/20, len = 201))
 > cpuTime(cxyI  <- cobs(x,y, "decrease", knots = ux, nknots = length(ux)))
-Time elapsed: 0.26 
+Time elapsed: 0.229 
 Warning message:
 In cobs(x, y, "decrease", knots = ux, nknots = length(ux)) :
   The number of knots can't be equal to the number of unique x for degree = 2.
@@ -921,7 +918,7 @@ R^2 = 95.93% ;  empirical tau (over all): 246/500 = 0.492 (target tau= 0.5)
 > 
 > ## Deg = 1
 > cpuTime(cI1 <- cobs(x,y, "decrease", knots= ux, nknots= length(ux), degree = 1))
-Time elapsed: 0.155 
+Time elapsed: 0.218 
 > summary(cI1)
 COBS regression spline (degree = 1) from call:
 	 cobs(x = x, y = y, constraint = "decrease", knots = ux, nknots = length(ux),     degree = 1)
@@ -953,7 +950,7 @@ R^2 = 96.02% ;  empirical tau (over all): 249/500 = 0.498 (target tau= 0.5)
    so that you can determine if you need to adjust any or all of
    'lambda.lo', 'lambda.hi' and 'lambda.length' and refit the model.
 
-Time elapsed: 1.413 
+Time elapsed: 1.429 
 > ## somewhat <  2 sec. (Pent. III, 700 MHz)
 > pxx <- predict(cxyS, xx)
 > pxx[xx > max(x) , ]# those outside to the right -- currently all = Inf !
@@ -974,7 +971,7 @@ List of 24
  $ tau          : num 0.5
  $ degree       : num 2
  $ constraint   : chr "decrease"
- $ ic           : chr "SIC"
+ $ ic           : NULL
  $ pointwise    : NULL
  $ select.knots : logi TRUE
  $ select.lambda: logi TRUE
@@ -1178,7 +1175,7 @@ List of 24
  $ tau          : num 0.5
  $ degree       : num 2
  $ constraint   : chr "concave"
- $ ic           : chr "SIC"
+ $ ic           : NULL
  $ pointwise    : NULL
  $ select.knots : logi TRUE
  $ select.lambda: logi TRUE
@@ -1309,7 +1306,7 @@ coef  :
  [6]  2.23561e+00  2.04531e+00  1.86770e+00  1.71424e+00  1.56563e+00
 [11]  1.41157e+00  1.21704e+00  1.03882e+00  8.72683e-01  7.05337e-01
 [16]  5.19867e-01  2.74588e-01 -5.12686e-03 -3.68213e-01 -1.20011e+00
-[21] -1.82479e+00  3.65434e-11
+[21] -1.82479e+00  3.65453e-11
 > 
 > 
 > dev.off()

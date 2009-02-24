@@ -9,7 +9,7 @@
 \method{plot}{cobs}(x, which = if(x$select.lambda) 1:2 else 2,
      show.k = TRUE,
      col = par("col"), l.col = c("red","pink"), k.col = gray(c(0.6, 0.8)),
-     lwd = 2, cex = 0.4,
+     lwd = 2, cex = 0.4, ylim = NULL,
      xlab = deparse(x$call[[2]]),
      ylab = deparse(x$call[[3]]),
      main = paste(deparse(x$call, width.cut = 100), collapse="\n"),
@@ -29,6 +29,7 @@
     the 2nd plot (\code{which == 2}).}
   \item{lwd, cex}{line width and point size for the 2nd plot
     (i.e. \code{which == 2}).}
+  \item{ylim}{y-axis limits, see \code{\link{axis}}, with a smart default.}
   \item{xlab, ylab, main}{axis annotation; see also \code{\link{axis}}.}
   \item{subtit}{a vector of length 2, specifying a sub title for each
     plot (according to \code{which}).}

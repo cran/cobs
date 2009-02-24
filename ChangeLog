@@ -1,6 +1,45 @@
+2009-02-24  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version,Date): 1.2-0, to be released
+
+	* tests/multi-constr.R: add test example which failed in earlier versions.
+
+	* R/scobs.R (cobs): 'ic' is only used and hence returned,
+	when lambda == 0.
+
+2009-02-24 Pin Ng  <pin.ng@nau.edu>
+
+	* R/scobs.R (cobs): Change default ic from "SIC" to "AIC": Since
+	"SIC" performs better in quantile smoothing spline while "AIC"
+	usually is better for knots selection in quantile regression spline.
+
+	New optional 'nk.start = 2' argument, allowing to start with more than 2.
+
+	* R/drqssbc.R (drqssbc2): sort y-values of ptConstr;
+	 - fix n0: "2*n.gradient";
+	 - stop() when some coef[]s are NA.
+
+	* R/qbsks.R (qbsks2): add 'nk.start' argument
+
+2009-02-18  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	(Depends): 2.5.1 so we can better work with package startup messages.
+
+	* tests/*.R: trying to suppressPackageStartupMessages(..) was a
+	"fiasco"; (messages from SparseM, quantreg) ==> not done
+
+	* TODO: updated
+
+2009-02-14  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/scobs.R (plot.cobs): new arg. ylim with better default  for
+	cases where curve is *outside* data, e.g., when algorithm failed.
+
+	* man/cobs.Rd: a bit more about 'ifl'.
+
 2009-01-10  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* DESCRIPTION (Date): updated.
+	* DESCRIPTION (Date): updated. --> 1.1-6 released to CRAN
 
 	* man/cobs.Rd, man/DublinWind.Rd: Rd_parse fixes
 

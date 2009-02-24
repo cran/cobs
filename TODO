@@ -4,9 +4,8 @@
 - For knot selection: allow setting final number of knots (after knot selection)
 
 - predict.cobs() should have a 'deriv = 0' argument {as predict.smooth.spline()}
-  and deriv in {1,2,3} should work.
-
-- cobs() should get an 'keep.data = TRUE' argument as smooth.spline()
+  and deriv in {1,2,3} should work.  This is closely related .splValue()
+  etc, see below.
 
 - For the case 'lambda < 0' (i.e. search over several lambdas),
   we can become *much* faster in matrix creation, since alle constraint
@@ -16,7 +15,7 @@
 
 - When determining optimal lambda (via 'ic'),
   allow a "+ 1 S.E. - rule" instead of simply taking the arg_min
-- dito for knot selection
+- ditto for knot selection
 
 - Add details and examples (!) for the intermediate/ auxiliary functions
   qsbks() and drqssbcs(), in  man/qbsks.Rd & man/drqssbc.Rd
@@ -26,7 +25,7 @@
   also extreme cases of interpolation and global linear/quadratic
 
 - want to have examples of all constraints, including "periodic"
-  and even more  'pointwise' !
+  and 'pointwise' (now done) and (periodic + pointwise) etc
 
 - src/splines.c is UN-needed in R --- rather use library(splines) !!
   ------------- now have .Call(*) there instead of .C() here.
@@ -37,10 +36,12 @@
 - lambda < 0; for each pp.lambda, instead of (only) $sic,
   return both components : Log.lik. and p[lambda] ( = k[lambda] ), the dim.
 
------------------------------
 
-Old `TODOs' which are done (here for reference only):
+
+------------------------------------------------------
+Old 'TODOs' which are done (here for reference only):
 ==========            ====
+------------------------------------------------------
 
 - add the three interesting real data examples from the COBS "paper".
   in the paper, they say that S-plus code for these examples is available
@@ -58,3 +59,6 @@ Old `TODOs' which are done (here for reference only):
 	---> this is now done  { --> old & original code in ./R/cobsOld.R }
 
 - added some documentation for qsbks() and drqssbcs(): man/qbsks.Rd & man/drqssbc.Rd
+
+- cobs() should get an 'keep.data = TRUE' argument as smooth.spline()
+

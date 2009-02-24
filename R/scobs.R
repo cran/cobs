@@ -1,13 +1,11 @@
-#### $Id: scobs.R,v 1.43 2008/01/26 11:01:13 maechler Exp $
+#### $Id: scobs.R,v 1.45 2009/02/24 17:19:24 maechler Exp $
 
 .onLoad <- function(lib, pkg) {
-
-    ##now have NAMESPACE library.dynam("cobs", pkg, lib)
-
-    MSG <- if(getRversion() >= "2.5") packageStartupMessage else message
+    ## now have NAMESPACE library.dynam("cobs", pkg, lib)
     if(interactive() || getOption("verbose")) # not in test scripts
-	MSG(sprintf("Package %s (%s) loaded.  To cite, see citation(\"%s\")\n",
-		    pkg, utils::packageDescription(pkg)$Version, pkg))
+	packageStartupMessage(sprintf(
+		"Package %s (%s) loaded.  To cite, see citation(\"%s\")\n",
+		pkg, utils::packageDescription(pkg)$Version, pkg))
 }
 
 ## S+ does not allow "cut(*, labels = FALSE)" -- use cut00() for compatibility:
@@ -53,13 +51,13 @@ function(x, y,
 	 w = rep(1,n),
 	 knots, nknots = if(lambda == 0) 6 else 20,
          method = "quantile", degree = 2, tau = 0.5, lambda = 0,
-         ic = c("sic", "aic", "bic", "SIC", "AIC", "BIC"),
+         ic = c("AIC", "SIC", "BIC", "aic", "sic", "bic"),
 	 knots.add = FALSE, repeat.delete.add = FALSE, pointwise = NULL,
          keep.data = TRUE, keep.x.ps = TRUE,
 	 print.warn = TRUE, print.mesg = TRUE, trace = print.mesg,
          lambdaSet = exp(seq(log(lambda.lo), log(lambda.hi), length= lambda.length)),
 	 lambda.lo = f.lambda*1e-4, lambda.hi = f.lambda*1e3, lambda.length = 25,
-	 maxiter = 100, rq.tol = 1e-8, toler.kn = 1e-6, tol.0res = 1e-6,
+	 maxiter = 100, rq.tol = 1e-8, toler.kn = 1e-6, tol.0res = 1e-6, nk.start = 2,
 ### old "back-compatibility-only" arguments:
 	 eps, n.sub, coef, lstart, factor)
 
@@ -70,7 +68,6 @@ function(x, y,
     constraint <- match.arg(constraint, several.ok = TRUE)
     if(length(constraint) == 0 || any(constraint == "none"))
 	constraint <- "none"
-    ic <- toupper(match.arg(ic))
 
     if(any(oldN <- names(cl) %in% c("eps", "n.sub", "coef", "lstart", "factor"))) {
 	n <- sum(oldN)
@@ -179,6 +176,7 @@ function(x, y,
 	## compute B-spline coefficients for quantile *regression* B-spline with
 	## stepwise knots selection or with fixed knots
 	##
+        ic <- toupper(match.arg(ic))
 	rr <- qbsks2(x, y, w, pw = 0, knots, nknots, degree, Tlambda = lambda,
 		     constraint, ptConstr, maxiter, trace,
 		     nrq, nl1 = 0, neqc, tau, select.lambda = select.lambda,
@@ -186,7 +184,7 @@ function(x, y,
 		     print.mesg = print.mesg,
                      give.pseudo.x = keep.x.ps,
 		     rq.tol = rq.tol, tol.kn = toler.kn, tol.0res = tol.0res,
-		     print.warn = print.warn)
+		     print.warn = print.warn, nk.start = nk.start)
 	knots <- rr$knots
 	nknots <- rr$nknots
     }
@@ -204,7 +202,7 @@ function(x, y,
         pw <- rep(1, nknots + degree-3)
 
         ## => lambda is chosen by ic (SIC / AIC )
-        ## and lambdaSet := grid of lambdas in log scale [ == sfsmisc::lseq()
+        ## and lambdaSet := grid of lambdas in log scale [ == sfsmisc::lseq() ]
 
 	##
 	## compute B-spline coefficients for quantile smoothing B-spline
@@ -235,7 +233,9 @@ function(x, y,
     }
     if(any(rr$icyc >= maxiter))
 	warning("The algorithm has not converged after ", maxiter, " iterations",
-		if(select.lambda) " for at least one lambda", immediate. = TRUE)
+		if(select.lambda) " for at least one lambda", if(!is.null(pointwise)|
+		constraint!="none") "\nCheck to make sure that your constraint is feasible",
+		immediate. = TRUE)
     if(!all(rr$ifl == 1)) ## had problem
 	warning("Check 'ifl'")
 
@@ -250,7 +250,7 @@ function(x, y,
 
     r <- list(call = cl,
 	      tau = tau, degree = degree, constraint = constraint,
-	      ic = if(select.knots) ic, pointwise = pointwise,
+	      ic = if(lambda == 0) ic, pointwise = pointwise,
 	      select.knots = select.knots, select.lambda = select.lambda,
 	      x = if(keep.data) x,
 	      y = if(keep.data) y,
@@ -521,7 +521,7 @@ dn <- function(p, n, hs = FALSE, alpha)
 plot.cobs <-
     function(x, which = if(x$select.lambda) 1:2 else 2, show.k = TRUE,
 	     col = par("col"), l.col = c("red","pink"), k.col = gray(c(0.6, 0.8)),
-             lwd = 2, cex = 0.4,
+             lwd = 2, cex = 0.4, ylim = NULL,
 	     xlab = deparse(x$call[[2]]),
 	     ylab = deparse(x$call[[3]]),
 	     main = paste(deparse(x$call, width.cut = 100), collapse="\n"),
@@ -531,7 +531,7 @@ plot.cobs <-
     both.plots <- all(which == 1:2)
 
     if(any(which == 1)) { ## --- SIC ~ lambda --------------
-	stopifnot(x$select.lambda) # have no $pp.lambda ...
+	stopifnot(x$select.lambda) # have no $pp.lambda . . .
 
 	if(both.plots) {
 	    op <- par(mfcol = 1:2, mgp = c(1.6, 0.5, 0),
@@ -590,7 +590,8 @@ plot.cobs <-
                   las = 2, col = k.col[1])
             if(any(i.bad)) {
                 points(x$pp.lambda[i.bad], x$k0[i.bad], col = gray(.9), pch = 1)
-                points(x$pp.lambda[i.bad & i.show], x$k0[i.bad & i.show], col = gray(.8), pch = 1)
+                points(x$pp.lambda[i.bad & i.show], x$k0[i.bad & i.show],
+                       col = gray(.8), pch = 1)
             }
 	}
     }
@@ -600,15 +601,17 @@ plot.cobs <-
     ## FIXME -- do something (?) for 'lambda = 0', i.e. select.knots
 
     if(any(which == 2)) { ## ---------- (x,y) + smooth cobs curve ----
-
 	if(is.null(x$x)) {
 	    ## MM: "works"	only if original (x,y) objects are still "there":
 	    x$x <- eval.parent(x$call[[2]])
 	    x$y <- eval.parent(x$call[[3]])
 	}
-	plot(x$x, x$y, xlab = xlab, ylab = ylab,
-	     main = if(!both.plots) main, col = col, cex = cex, ...)
-	lines(predict(x), col = l.col[1], lwd = lwd, ...)
+        px <- predict(x)
+	if(is.null(ylim)) # make sure ylim fits (y & predict(.)):
+            ylim <- range(x$y, px[,"fit"], finite=TRUE)
+        plot(x$x, x$y, xlab = xlab, ylab = ylab, ylim= ylim,
+             main = if(!both.plots) main, col = col, cex = cex, ...)
+	lines(px, col = l.col[1], lwd = lwd, ...)
 	if(both.plots) {
 	    mtext(subtit[2], side = 3, font = par("font.main"))
 	    par(op)		# <- back to 1x1 figure (we assume ..)

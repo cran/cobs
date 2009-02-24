@@ -1,6 +1,6 @@
 
-R version 2.8.0 Patched (2008-11-16 r46960)
-Copyright (C) 2008 The R Foundation for Statistical Computing
+R version 2.8.1 Patched (2009-02-23 r47990)
+Copyright (C) 2009 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -18,7 +18,7 @@ Type 'q()' to quit R.
 > #### Experiment with spline code --- want to use
 > library(splines) ## for the splines
 > suppressMessages(library(cobs))
-Package SparseM (0.78) loaded.  To cite, see citation("SparseM")
+Package SparseM (0.79) loaded.  To cite, see citation("SparseM")
 > 
 > options(digits = 9)
 > 
@@ -34,7 +34,7 @@ List of 3
  $ coefficients: num [1:17] 114 115 117 120 123 ...
  $ order       : num 4
  - attr(*, "formula")=Class 'formula' length 3 yw ~ xh
-  .. ..- attr(*, ".Environment")=<environment: 0xdc9bd98> 
+  .. ..- attr(*, ".Environment")=<environment: 0x916271c> 
  - attr(*, "class")= chr [1:3] "nbSpline" "bSpline" "spline"
 > print.default(bIspl[1:3])
 $knots
@@ -54,7 +54,7 @@ List of 2
  $ knots       : num [1:15] 58 59.2 60.2 61.2 62.2 ...
  $ coefficients: num [1:15, 1:4] 115 117 120 123 126 129 132 135 139 142 ...
  - attr(*, "formula")=Class 'formula' length 3 yw ~ xh
-  .. ..- attr(*, ".Environment")=<environment: 0xd606480> 
+  .. ..- attr(*, ".Environment")=<environment: 0x9b69b7c> 
  - attr(*, "class")= chr [1:3] "npolySpline" "polySpline" "spline"
 > p2Ispl <- polySpline(bIspl)
 > all.equal(pIspl, p2Ispl, tol = 1e-15)# TRUE
@@ -242,7 +242,7 @@ List of 3
  $ coefficients: num [1:17] 114 115 117 120 123 ...
  $ order       : num 4
  - attr(*, "formula")=Class 'formula' length 3 yw ~ xh
-  .. ..- attr(*, ".Environment")=<environment: 0xdc9bd98> 
+  .. ..- attr(*, ".Environment")=<environment: 0x916271c> 
  - attr(*, "class")= chr [1:3] "nbSpline" "bSpline" "spline"
 > ## List of 3
 > ##  $ knots       : num [1:21] 54.8 56.0 57.0 58.0 59.2 ...

@@ -1,6 +1,6 @@
 
-R version 2.6.2 alpha (2008-01-23 r44129)
-Copyright (C) 2008 The R Foundation for Statistical Computing
+R version 2.8.1 Patched (2009-02-23 r47990)
+Copyright (C) 2009 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -16,7 +16,7 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > suppressMessages(library(cobs))
-Package SparseM (0.74) loaded.  To cite, see citation("SparseM")
+Package SparseM (0.79) loaded.  To cite, see citation("SparseM")
 > 
 > #### Example 1 of   He and Ng (1999) :
 > #### -------------------------------
@@ -34,7 +34,8 @@ Package SparseM (0.74) loaded.  To cite, see citation("SparseM")
  num [1:113] -0.32 -0.32 -0.4 -0.39 -0.65 -0.43 -0.4 -0.52 -0.3 -0.12 ...
 > 
 > ## Codes for Figure 1a
-> a50 <- cobs(year, temp, knots.add = TRUE, degree = 1, constraint = "increase")
+> a50 <- cobs(year, temp, knots.add = TRUE, degree = 1, constraint = "increase",
++             ic = "SIC") # = previous default 'ic'
 qbsks2():
  Performing general knot selection ...
 
@@ -43,14 +44,14 @@ qbsks2():
  Searching for missing knots ...
 > summary(a50)
 COBS regression spline (degree = 1) from call:
-	 cobs(x = year, y = temp, constraint = "increase", degree = 1,     knots.add = TRUE)
+	 cobs(x = year, y = temp, constraint = "increase", degree = 1,     ic = "SIC", knots.add = TRUE)
 {tau=0.5}-quantile;  dimensionality of fit: 4 from {4}
 x$knots[1:4]: 1880, 1936, 1964, 1992
 coef[1:4]: -0.47054145, -0.01648649, -0.01648649,  0.27562279
 R^2 = 70.37% ;  empirical tau (over all): 56/113 = 0.4955752 (target tau= 0.5)
 > ## As suggested in the warning message, we increase the number of knots to 9
 > a50 <- cobs(year, temp, nknots = 9, knots.add = TRUE, degree = 1,
-+             constraint = "increase")
++             constraint = "increase", ic = "SIC") # = previous default 'ic'
 qbsks2():
  Performing general knot selection ...
 
@@ -59,26 +60,26 @@ qbsks2():
  Searching for missing knots ...
 > summary(a50)
 COBS regression spline (degree = 1) from call:
-	 cobs(x = year, y = temp, constraint = "increase", nknots = 9,     degree = 1, knots.add = TRUE)
+	 cobs(x = year, y = temp, constraint = "increase", nknots = 9,     degree = 1, ic = "SIC", knots.add = TRUE)
 {tau=0.5}-quantile;  dimensionality of fit: 4 from {4}
 x$knots[1:4]: 1880, 1936, 1964, 1992
 coef[1:4]: -0.47054145, -0.01648649, -0.01648649,  0.27562279
 R^2 = 70.37% ;  empirical tau (over all): 56/113 = 0.4955752 (target tau= 0.5)
 > ## Here, we use the same knots sequence chosen for the 50th percentile
 > a10 <- cobs(year, temp, nknots = length(a50$knots), knots = a50$knot,
-+             degree = 1, tau = 0.1, constraint = "increase")
++             degree = 1, tau = 0.1, constraint = "increase", ic = "SIC")
 > summary(a10)
 COBS regression spline (degree = 1) from call:
-	 cobs(x = year, y = temp, constraint = "increase", knots = a50$knot,     nknots = length(a50$knots), degree = 1, tau = 0.1)
+	 cobs(x = year, y = temp, constraint = "increase", knots = a50$knot,     nknots = length(a50$knots), degree = 1, tau = 0.1, ic = "SIC")
 {tau=0.1}-quantile;  dimensionality of fit: 4 from {4}
 x$knots[1:4]: 1880.000, 1936.000, 1964.000, 1992.000
 coef[1:4]: -0.5700016, -0.1700000, -0.1700000,  0.1300024
 empirical tau (over all): 12/113 = 0.1061947 (target tau= 0.1)
 > a90 <- cobs(year, temp, nknots = length(a50$knots), knots = a50$knot,
-+             degree = 1, tau = 0.9, constraint = "increase")
++             degree = 1, tau = 0.9, constraint = "increase", ic = "SIC")
 > summary(a90)
 COBS regression spline (degree = 1) from call:
-	 cobs(x = year, y = temp, constraint = "increase", knots = a50$knot,     nknots = length(a50$knots), degree = 1, tau = 0.9)
+	 cobs(x = year, y = temp, constraint = "increase", knots = a50$knot,     nknots = length(a50$knots), degree = 1, tau = 0.9, ic = "SIC")
 {tau=0.9}-quantile;  dimensionality of fit: 4 from {4}
 x$knots[1:4]: 1880.000, 1936.000, 1964.000, 1992.000
 coef[1:4]: -0.2576939,  0.1300000,  0.1300000,  0.4961568
@@ -449,7 +450,8 @@ empirical tau (over all): 104/113 = 0.920354 (target tau= 0.9)
 > 
 > ## (Pin Ng. had these commented out)
 > 
-> a50 <- cobs(year, temp, knots.add = TRUE, degree = 1, constraint = "none")
+> a50 <- cobs(year, temp, knots.add = TRUE, degree = 1, constraint = "none",
++             ic = "SIC")
 qbsks2():
  Performing general knot selection ...
 
@@ -458,7 +460,7 @@ qbsks2():
  Searching for missing knots ...
 > ## As suggested in the warning message, we increase the number of knots to 9
 > a50 <- cobs(year, temp, nknots = 9, knots.add = TRUE, degree = 1,
-+             constraint = "none")
++             constraint = "none", ic = "SIC")
 qbsks2():
  Performing general knot selection ...
 
@@ -467,22 +469,22 @@ qbsks2():
  Searching for missing knots ...
 > summary(a50)
 COBS regression spline (degree = 1) from call:
-	 cobs(x = year, y = temp, constraint = "none", nknots = 9, degree = 1,     knots.add = TRUE)
+	 cobs(x = year, y = temp, constraint = "none", nknots = 9, degree = 1,     ic = "SIC", knots.add = TRUE)
 {tau=0.5}-quantile;  dimensionality of fit: 5 from {5}
 x$knots[1:5]: 1880, 1908, 1936, 1964, 1992
 coef[1:5]: -0.40655906, -0.31473700,  0.05651823, -0.05681818,  0.28681956
 R^2 = 72.56% ;  empirical tau (over all): 54/113 = 0.4778761 (target tau= 0.5)
 > ## Here, we use the same knots sequence chosen for the 50th percentile
 > (a10 <- cobs(year, temp, nknots = length(a50$knots), knots = a50$knot,
-+              degree = 1, tau = 0.1, constraint = "none"))
++              degree = 1, tau = 0.1, constraint = "none", ic = "SIC"))
 COBS regression spline (degree = 1) from call:
-	 cobs(x = year, y = temp, constraint = "none", knots = a50$knot,     nknots = length(a50$knots), degree = 1, tau = 0.1)
+	 cobs(x = year, y = temp, constraint = "none", knots = a50$knot,     nknots = length(a50$knots), degree = 1, tau = 0.1, ic = "SIC")
 {tau=0.1}-quantile;  dimensionality of fit: 5 from {5}
 x$knots[1:5]: 1880.000, 1908.000, 1936.000, 1964.000, 1992.000
 > (a90 <- cobs(year, temp, nknots = length(a50$knots), knots = a50$knot,
-+              degree = 1, tau = 0.9, constraint = "none"))
++              degree = 1, tau = 0.9, constraint = "none", ic = "SIC"))
 COBS regression spline (degree = 1) from call:
-	 cobs(x = year, y = temp, constraint = "none", knots = a50$knot,     nknots = length(a50$knots), degree = 1, tau = 0.9)
+	 cobs(x = year, y = temp, constraint = "none", knots = a50$knot,     nknots = length(a50$knots), degree = 1, tau = 0.9, ic = "SIC")
 {tau=0.9}-quantile;  dimensionality of fit: 5 from {5}
 x$knots[1:5]: 1880.000, 1908.000, 1936.000, 1964.000, 1992.000
 > which(hot.idx  <- temp >= a90$fit)
@@ -507,5 +509,5 @@ x$knots[1:5]: 1880.000, 1908.000, 1936.000, 1964.000, 1992.000
 > 
 > 
 > cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''
-Time elapsed:  2.712 0.134 3.264 0 0 
+Time elapsed:  2.494 0.145 2.857 0 0 
 > 

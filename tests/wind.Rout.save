@@ -1,6 +1,6 @@
 
-R version 2.6.2 alpha (2008-01-23 r44129)
-Copyright (C) 2008 The R Foundation for Statistical Computing
+R version 2.8.1 Patched (2009-02-23 r47990)
+Copyright (C) 2009 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -16,7 +16,7 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > suppressMessages(library(cobs))
-Package SparseM (0.75) loaded.  To cite, see citation("SparseM")
+Package SparseM (0.79) loaded.  To cite, see citation("SparseM")
 > 
 > source(system.file("util.R", package = "cobs"))
 > 
@@ -112,7 +112,7 @@ COBS smoothing spline (degree = 2) from call:
 x$knots[1:10]:   0.999635,  41.000000,  82.000000, ... , 366.000365
 lambda = 101002.6, selected via SIC, out of 25 ones.
 coef[1:12]: 1.121550e+01, 1.139573e+01, 1.089025e+01, 9.954427e+00, 8.148158e+00, ... , 5.373106e-04
-R^2 = 8.22% ;  empirical tau (over all): 3287/6574 = 0.5 (target tau= 0.5)
+R^2 = 8.22% ;  empirical tau (over all): 3288/6574 = 0.5001521 (target tau= 0.5)
 > (pc.5 <- predict(co.o50., interval = "both"))
                  z       fit     cb.lo     cb.up     ci.lo     ci.up
   [1,]   0.9996351 11.215499  9.125242 13.305757 10.122990 12.308009

@@ -1,6 +1,6 @@
 
-R version 2.5.0 Patched (2007-05-01 r41405)
-Copyright (C) 2007 The R Foundation for Statistical Computing
+R version 2.8.1 Patched (2009-02-23 r47990)
+Copyright (C) 2009 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -16,7 +16,7 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > suppressMessages(library(cobs))
-Package SparseM (0.72) loaded.  To cite, see citation("SparseM")
+Package SparseM (0.79) loaded.  To cite, see citation("SparseM")
 > 
 > options(digits = 6)
 > 
@@ -27,13 +27,13 @@ Package SparseM (0.72) loaded.  To cite, see citation("SparseM")
 qbsks2():
  Performing general knot selection ...
 
- WARNING! Since the number of  6  knots selected by  SIC  reached the
+ WARNING! Since the number of  6  knots selected by  AIC  reached the
    upper bound during general knot selection, you might want to rerun
    cobs with a larger number of knots. 
 
  Deleting unnecessary knots ...
 
- WARNING! Since the number of  6  knots selected by  SIC  reached the
+ WARNING! Since the number of  6  knots selected by  AIC  reached the
    upper bound during general knot selection, you might want to rerun
    cobs with a larger number of knots. 
 [1] TRUE
@@ -276,5 +276,5 @@ R^2 = 99.84% ;  empirical tau (over all): 3/7 = 0.428571 (target tau= 0.5)
 [100,] 12.00001 96.00008 91.45160 100.5486 91.48257 100.5176
 > 
 > cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''
-Time elapsed:  1.375 0.128 2.455 0 0 
+Time elapsed:  1.285 0.128 1.626 0 0 
 > 
