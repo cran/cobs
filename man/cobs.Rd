@@ -30,10 +30,8 @@ cobs(x, y, constraint = c("none", "increase", "decrease",
     constraint; must be one of the values in the default list above;
     may be abbreviated.  More flexible constraints can be specified via
     the \code{pointwise} argument (below).}
-  \item{w}{
-    vector of weights the same length as \code{x} (y) assigned to both x and y;
-    default to uniform weights adding up to one; using normalized weights
-    that add up to one will speed up computation.
+  \item{w}{vector of weights the same length as \code{x} (y) assigned to
+    both \code{x} and \code{y};  default to all weights being one.
   }
   \item{knots}{vector of locations of the knot mesh; if missing,
     \code{nknots} number of \code{knots} will be created using the
@@ -123,7 +121,7 @@ cobs(x, y, constraint = c("none", "increase", "decrease",
     \code{\link{qbsks2}} and \code{\link{drqssbc2}}.}
   \item{nk.start}{number of starting knots used in automatic knot
     selection. Defaults to the minimum of 2 knots.}
-  \item{eps, n.sub, coef, lstart, factor}{unused argument of the 1999/2002 version
+  \item{eps, n.sub, coef, lstart, factor}{unused arguments of the 1999/2002 version
     of \code{cobs()}, currently still allowed (with a
     \code{\link{warning}}) for back compatibility reasons.}
 }

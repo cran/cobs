@@ -1,6 +1,6 @@
 
-R version 2.8.1 Patched (2009-02-23 r47990)
-Copyright (C) 2009 The R Foundation for Statistical Computing
+R version 2.11.1 Patched (2010-08-09 r52698)
+Copyright (C) 2010 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -18,7 +18,6 @@ Type 'q()' to quit R.
 > #### Experiment with spline code --- want to use
 > library(splines) ## for the splines
 > suppressMessages(library(cobs))
-Package SparseM (0.79) loaded.  To cite, see citation("SparseM")
 > 
 > options(digits = 9)
 > 
@@ -28,14 +27,14 @@ Package SparseM (0.79) loaded.  To cite, see citation("SparseM")
 > xh <- women$height# == 58:72; too trivial; modify a bit:
 > ii <- c(2,5,9,11); xh[ii] <- xh[ii]+ 0.2
 > ii <- c(3:4,8,13); xh[ii] <- xh[ii]+ 0.25
-> str(bIspl <- interpSpline( xh, yw, bSpl = TRUE))
-List of 3
- $ knots       : num [1:21] 54.8 56 57 58 59.2 ...
- $ coefficients: num [1:17] 114 115 117 120 123 ...
- $ order       : num 4
- - attr(*, "formula")=Class 'formula' length 3 yw ~ xh
-  .. ..- attr(*, ".Environment")=<environment: 0x916271c> 
- - attr(*, "class")= chr [1:3] "nbSpline" "bSpline" "spline"
+> (bIspl <- interpSpline( xh, yw, bSpl = TRUE))
+bSpline representation of spline for yw ~ xh
+     54.75      55.95      57.00      58.00      59.20      60.25      61.25 
+        NA         NA         NA         NA 113.638072 115.089307 116.540542 
+     62.20      63.00      64.00      65.25      66.20      67.00      68.20 
+119.984831 122.953207 125.659847 129.393071 132.490763 134.035450 138.946156 
+     69.00      70.25      71.00      72.00      73.25      74.00      75.00 
+142.678498 144.712402 151.573711 151.891329 160.111134 164.353533 168.595932 
 > print.default(bIspl[1:3])
 $knots
  [1] 54.75 55.95 57.00 58.00 59.20 60.25 61.25 62.20 63.00 64.00 65.25 66.20
@@ -49,13 +48,24 @@ $coefficients
 $order
 [1] 4
 
-> str(pIspl <- interpSpline( xh, yw, bSpl = FALSE))
-List of 2
- $ knots       : num [1:15] 58 59.2 60.2 61.2 62.2 ...
- $ coefficients: num [1:15, 1:4] 115 117 120 123 126 129 132 135 139 142 ...
- - attr(*, "formula")=Class 'formula' length 3 yw ~ xh
-  .. ..- attr(*, ".Environment")=<environment: 0x9b69b7c> 
- - attr(*, "class")= chr [1:3] "npolySpline" "polySpline" "spline"
+> (pIspl <- interpSpline( xh, yw, bSpl = FALSE))
+polynomial representation of spline for yw ~ xh
+      constant     linear      quadratic         cubic
+58.00      115 1.33960132  0.00000000000  0.2271287121
+59.20      117 2.32079736  0.81766336374 -0.2922458344
+60.25      120 3.07128732 -0.10291101466  0.0316236905
+61.25      123 2.96033637 -0.00803994325  0.2273643398
+62.20      126 3.56064942  0.63994842511 -0.5040752565
+63.00      129 3.61674241 -0.56983219041 -0.0469102214
+64.00      132 2.33634737 -0.71056285462  0.6091879690
+65.25      135 3.41550883  1.57389202895 -0.7758226553
+66.20      139 4.30536385 -0.63720253866 -0.0712528430
+67.00      142 3.14903433 -0.80820936194  0.8014932206
+68.20      146 4.67178257  2.07716623225 -2.0836180627
+69.00      150 3.99470187 -2.92351711832  1.8302045007
+70.25      154 5.26499267  3.93974975945 -2.7611347908
+71.00      159 6.51520235 -2.27280351988  0.7576011733
+72.00      164 4.24239883  0.00000000000  0.0000000000
 > p2Ispl <- polySpline(bIspl)
 > all.equal(pIspl, p2Ispl, tol = 1e-15)# TRUE
 [1] TRUE
@@ -236,21 +246,7 @@ $offsets
 > ##    predict.npolySpline
 > ##    predict.ppolySpline
 > 
-> str(bIspl) # the interpolating B-spline from above
-List of 3
- $ knots       : num [1:21] 54.8 56 57 58 59.2 ...
- $ coefficients: num [1:17] 114 115 117 120 123 ...
- $ order       : num 4
- - attr(*, "formula")=Class 'formula' length 3 yw ~ xh
-  .. ..- attr(*, ".Environment")=<environment: 0x916271c> 
- - attr(*, "class")= chr [1:3] "nbSpline" "bSpline" "spline"
-> ## List of 3
-> ##  $ knots       : num [1:21] 54.8 56.0 57.0 58.0 59.2 ...
-> ##  $ coefficients: num [1:17] 114 115 117 120 123 ...
-> ##  $ order       : num 4
-> ##  - attr(*, "formula")=Class 'formula' length 3 yw ~ xh
-> ##   .. ..- attr(*, ".Environment")=length 17 <environment>
-> ##  - attr(*, "class")= chr [1:3] "nbSpline" "bSpline" "spline"
+> ## Using  bIspl ,  the interpolating B-spline from above
 > predict(bIspl, xo)
 $x
  [1] 59.5 60.5 61.5 62.5 63.5 64.5 65.5 66.5 67.5 68.5 69.5 70.5

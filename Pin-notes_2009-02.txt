@@ -1,0 +1,18 @@
+Change log <2/18/09>:
+(1) Change default ic from "SIC" to "AIC" in scobs.R: Since "SIC" performs 
+better in quantile smoothing spline while "AIC" usually is better for knots 
+selection in quantile regression spline.
+(2) Change ptConstr$equal, $smaller, etc. on drqssbc.R line 52-55: Since
+".splineBasis" in both l1.design2 and loo.design2 expects "x" to be sorted 
+according to the order of x, so we need to sort "y" according to the order
+of "x" as well in the pseudo "Y" observation.
+(3) Change the number of gradient constraint to two times n.gradient in
+drqssbc.R line 118: There should be two inequality constraints passed to 
+'rq.fit.sfn' or 'rq.fit.sfnc' for each specified equality constraint.
+(4) Add an additional argument "nk.start" to cobs, qbsks2 to 
+allow the possibility of having the minimum number of starting knots to be
+different from the default value of 2:  This is to avoid scenario where
+there are too many 'pointwise' constraints that requires more knots than
+the default number of 2. Otherwise, rq.fit.sfnc will retunr NaN in coefficients
+(5) Updated cobs.Rd and qbsks.Rd to include description of nk.start
+(6) Update cobs.Rd to include the reference to Ng and Maechler (2007).

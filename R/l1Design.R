@@ -38,7 +38,8 @@ l1.design2 <- function(x, w, constraint, ptConstr, knots,
     i1 <- rep.int(ox, rep.int(ks, nrq))
     j1 <- c(outer(1:ks, z1$offsets, "+"))
     Xeq <- as.matrix.csr(new("matrix.coo",
-                             ra = c(z1$design), ia = i1, ja = j1,
+			     ra = c(t(t(z1$design)*rep(w[ox],ks))),
+			     ia = i1, ja = j1,
 			     dimension = as.integer(c(nrq, nvar))))
     nkm3 <- nk - 3
     nkm4 <- nk - 4
@@ -53,6 +54,7 @@ l1.design2 <- function(x, w, constraint, ptConstr, knots,
 	if(lambda != 0) {
 	    ##
 	    ## assign different weight to roughness penalty --- use 'pw' - FIXME!
+            ## 'pw' is not used
 	    ##
 	    ra <- vector("numeric",(ks+1)*nl1)
 	    if(nk > 4) { ## <==> nkm3 >= 2, nkm4 >= 1 :

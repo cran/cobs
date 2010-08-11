@@ -22,18 +22,20 @@ qbsks2(x,y,w,pw, knots,nknots, degree,Tlambda, constraint, ptConstr,
   \item{knots}{numeric vector of knots of which \code{nknots} will be used.}
   \item{nknots}{number of \code{knots} to be used.}% FIXME: Say more in \details
   \item{degree}{integer specifying polynomial degree; must be 1 or 2.}
-  \item{Tlambda}{ ~~Describe \code{Tlambda} here~~ }
+  \item{Tlambda}{(vector of) smoothing parameter(s) \eqn{\lambda}, see
+    \code{\link{drqssbc2}}.}
   \item{constraint}{string (or empty) specifying the global constraints;
     see \code{\link{cobs}}.}
   \item{ptConstr}{\code{\link{list}} of \bold{p}oin\bold{t}wise constraints.}
-  \item{maxiter}{ ~~Describe \code{maxiter} here~~ }
+  \item{maxiter}{non-negative integer: maximal number of iterations,
+    passed to \code{\link{drqssbc2}}.}
   \item{trace}{integer or logical indicating the tracing level of the
     \emph{underlying} algorithms; not implemented (due to lack of trace
     in quantreg ...)}
   \item{nrq,nl1,neqc}{integers specifying dimensionalities, directly
     passed to \code{\link{drqssbc2}}, see there.}
   \item{tau}{desired quantile level (in interval \eqn{(0,1)}).}
-  \item{select.lambda}{ ~~Describe \code{lam} here~~ }
+  \item{select.lambda}{passed to \code{\link{drqssbc2}}, see there.}
   \item{ks}{number used as offset in SIC/AIC/BIC.}
   \item{do.select}{logical indicating if knots shall be selected
     (instead of used as specified).}

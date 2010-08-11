@@ -10,9 +10,9 @@ yw <- women$weight
 xh <- women$height# == 58:72; too trivial; modify a bit:
 ii <- c(2,5,9,11); xh[ii] <- xh[ii]+ 0.2
 ii <- c(3:4,8,13); xh[ii] <- xh[ii]+ 0.25
-str(bIspl <- interpSpline( xh, yw, bSpl = TRUE))
+(bIspl <- interpSpline( xh, yw, bSpl = TRUE))
 print.default(bIspl[1:3])
-str(pIspl <- interpSpline( xh, yw, bSpl = FALSE))
+(pIspl <- interpSpline( xh, yw, bSpl = FALSE))
 p2Ispl <- polySpline(bIspl)
 all.equal(pIspl, p2Ispl, tol = 1e-15)# TRUE
 ##--> could use polySpline() at end of interpSpline(.)
@@ -67,14 +67,7 @@ for(ord in 5:1) {
 ##    predict.npolySpline
 ##    predict.ppolySpline
 
-str(bIspl) # the interpolating B-spline from above
-## List of 3
-##  $ knots       : num [1:21] 54.8 56.0 57.0 58.0 59.2 ...
-##  $ coefficients: num [1:17] 114 115 117 120 123 ...
-##  $ order       : num 4
-##  - attr(*, "formula")=Class 'formula' length 3 yw ~ xh
-##   .. ..- attr(*, ".Environment")=length 17 <environment>
-##  - attr(*, "class")= chr [1:3] "nbSpline" "bSpline" "spline"
+## Using  bIspl ,  the interpolating B-spline from above
 predict(bIspl, xo)
 ## $x
 ##  [1] 59.5 60.5 61.5 62.5 63.5 64.5 65.5 66.5 67.5 68.5 69.5 70.5

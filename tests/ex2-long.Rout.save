@@ -1,6 +1,6 @@
 
-R version 2.8.1 Patched (2009-02-23 r47990)
-Copyright (C) 2009 The R Foundation for Statistical Computing
+R version 2.11.1 Patched (2010-08-09 r52698)
+Copyright (C) 2010 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -17,7 +17,6 @@ Type 'q()' to quit R.
 
 > ####
 > suppressMessages(library(cobs))
-Package SparseM (0.79) loaded.  To cite, see citation("SparseM")
 > 
 > options(digits = 5)
 > postscript("ex2.ps")
@@ -173,7 +172,7 @@ qbsks2():
  Performing general knot selection ...
 
  Deleting unnecessary knots ...
-Time elapsed: 8.671 
+Time elapsed: 7.334 
 Warning message:
 In cobs(x, y, "decrease", knots = unique(x)) :
   The number of knots can't be equal to the number of unique x for degree = 2.
@@ -733,17 +732,17 @@ coef  :
 [43]   0.5261553   0.5261553   0.5261553   0.5261553   0.5261553   0.5261553
 [49]   0.5261553   0.5261553   0.4273578   0.3741431   0.2060752   0.1780468
 [55]   0.1780468   0.1780468   0.1780468   0.1780468   0.1780468   0.1780468
-[61]  -0.0094285 432.6957876
+[61]  -0.0094285 432.6957859
 > 1 - sum(cxy3 $ resid ^ 2) / sum((y - mean(y))^2) # R^2 = 98.36%
 [1] 0.96502
 > 
 > cpuTime(cxy4 <- cobs(x,y, "decrease", lambda = 1e-6, nknots = 100))# ~ 3 sec.
-Time elapsed: 0.082 
+Time elapsed: 0.066 
 > 1 - sum(cxy4 $ resid ^ 2) / sum((y - mean(y))^2) # R^2 = 98.443%
 [1] 0.96603
 > 
 > cpuTime(cxy5 <- cobs(x,y, "decrease", lambda = 1e-6, nknots = 150))# ~ 8.7 sec.
-Time elapsed: 0.098 
+Time elapsed: 0.082 
 > 1 - sum(cxy5 $ resid ^ 2) / sum((y - mean(y))^2) # R^2 = 98.4396%
 [1] 0.96835
 > 
@@ -940,7 +939,7 @@ qbsks2():
  Performing general knot selection ...
 
  Deleting unnecessary knots ...
-Time elapsed: 8.189 
+Time elapsed: 7.109 
 Warning message:
 In cobs(X, y, "decrease", knots = unique(X)) :
   The number of knots can't be equal to the number of unique x for degree = 2.
@@ -1494,22 +1493,20 @@ coef  :
 [36]   0.82371   0.82371   0.82371   0.82371   0.82371   0.82371   0.66014
 [43]   0.62593   0.62593   0.62593   0.62593   0.62593   0.62593   0.62593
 [50]   0.62593   0.48756   0.48756   0.48756   0.48756   0.48756   0.48756
-[57]   0.40976   0.40976   0.40976   0.40976   0.38342 386.84278
+[57]   0.40976   0.40976   0.40976   0.40976   0.38342 386.84235
 > 1 - sum(cXy3 $ resid ^ 2) / sum((y - mean(y))^2) # R^2 = 80.424%
 [1] 0.81133
 > 
 > cpuTime(cXy4 <- cobs(X,y, "decrease", lambda= 1e-6, nknots = 100))#~16.5"
-Time elapsed: 0.068 
+Time elapsed: 0.063 
 > ## not converged (in 4020 iter.)
 > 1 - sum(cXy4 $ resid ^ 2) / sum((y - mean(y))^2) # R^2 = 80.517%
-[1] 0.81525
+[1] 0.8153
 > 
 > cpuTime(cXy5 <- cobs(X,y, "decrease", lambda= 1e-6, nknots = 150))#~12.8"
-Time elapsed: 0.079 
-Warning message:
-In cobs(X, y, "decrease", lambda = 1e-06, nknots = 150) : Check 'ifl'
+Time elapsed: 0.072 
 > 1 - sum(cXy5 $ resid ^ 2) / sum((y - mean(y))^2) # R^2 = 81.329%
-[1] 0.81886
+[1] 0.81881
 > 
 > 
 > 

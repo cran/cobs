@@ -38,9 +38,9 @@ loo.design2 <- function(x, w, constraint, ptConstr, knots,
     i1 <- rep.int(ox, rep.int(ks, nrq))
     j1 <- c(outer(1:ks, z1$offsets, "+"))
     Xeq <- as.matrix.csr(new("matrix.coo",
-                             ra = c(z1$design), ia = i1, ja = j1,
+			     ra = c(t(t(z1$design) * rep(w[ox], ks))),
+			     ia = i1, ja = j1,
 			     dimension = as.integer(c(nrq, nvar))))
-
     nd <- nk - 5
     nrql1 <- nrq + nl1
     nrleq <- nrql1 + neqc
@@ -62,6 +62,7 @@ loo.design2 <- function(x, w, constraint, ptConstr, knots,
 		    dimension = as.integer(c(niqc1, nvar-1)))
 
         ## assign different weight to roughness penalty --- use 'pw' - FIXME!
+	## 'pw' is not used
 	Xeq <- rbind(Xeq, Xl1)
 	Xieq <- cbind(Xieq, as.matrix.csr(rep.int(1, niqc1)))
 	fieq <- TRUE

@@ -1,6 +1,19 @@
+2010-08-11  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* man/qbsks.Rd: make 'R CMD check' happy (again)
+
+2009-12-10  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 1.2-1, CRAN-released
+
+2009-12-10  Pin Ng  <pin.ng@nau.edu>
+
+	* R/looDesign.R (loo.design2): weights w[.] must be used in 'Xeq'
+	* R/l1Design.R (l1.design2): ditto
+
 2009-02-24  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* DESCRIPTION (Version,Date): 1.2-0, to be released
+	* DESCRIPTION (Version,Date): 1.2-0, CRAN-released 2009-02-25
 
 	* tests/multi-constr.R: add test example which failed in earlier versions.
 

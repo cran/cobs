@@ -1,0 +1,1409 @@
+# To unbundle, sh this file
+echo NotesMM.txt 1>&2
+cat >NotesMM.txt <<'End of NotesMM.txt'
+Change log <2/18/09>:
+(1) Change default ic from "SIC" to "AIC" in scobs.R: Since "SIC" performs 
+better in quantile smoothing spline while "AIC" usually is better for knots 
+selection in quantile regression spline.
+(2) Change ptConstr$equal, $smaller, etc. on drqssbc.R line 52-55: Since
+".splineBasis" in both l1.design2 and loo.design2 expects "x" to be sorted 
+according to the order of x, so we need to sort "y" according to the order
+of "x" as well in the pseudo "Y" observation.
+(3) Change the number of gradient constraint to two times n.gradient in
+drqssbc.R line 118: There should be two inequality constraints passed to 
+'rq.fit.sfn' or 'rq.fit.sfnc' for each specified equality constraint.
+(4) Add an additional argument "nk.start" to cobs, qbsks2 to 
+allow the possibility of having the minimum number of starting knots to be
+different from the default value of 2:  This is to avoid scenario where
+there are too many 'pointwise' constraints that requires more knots than
+the default number of 2. Otherwise, rq.fit.sfnc will retunr NaN in coefficients
+(5) Updated cobs.Rd and qbsks.Rd to include description of nk.start
+(6) Update cobs.Rd to include the reference to Ng and Maechler (2007).
+End of NotesMM.txt
+echo cobs.Rd 1>&2
+cat >cobs.Rd <<'End of cobs.Rd'
+\name{cobs}
+\alias{cobs}
+\title{COnstrained B-Splines Nonparametric Regression Quantiles}
+\description{
+  Computes constrained quantile curves using linear or
+  quadratic splines.  The median spline (\eqn{L_1} loss) is a robust
+  (constrained) smoother.
+}
+\usage{
+cobs(x, y, constraint = c("none", "increase", "decrease",
+                          "convex", "concave", "periodic"),
+     w = rep(1,n),
+     knots, nknots = if(lambda == 0) 6 else 20,
+     method = "quantile", degree = 2, tau = 0.5,
+     lambda = 0, ic = c("sic", "aic", "bic", "SIC", "AIC", "BIC"),
+     knots.add = FALSE, repeat.delete.add = FALSE, pointwise = NULL,
+     keep.data = TRUE, keep.x.ps = TRUE,
+     print.warn = TRUE, print.mesg = TRUE, trace = print.mesg,
+     lambdaSet = exp(seq(log(lambda.lo), log(lambda.hi), length = lambda.length)),
+     lambda.lo = f.lambda*1e-4, lambda.hi = f.lambda*1e3, lambda.length = 25,
+     maxiter = 100,
+     rq.tol = 1e-8, toler.kn = 1e-6, tol.0res = 1e-6, nk.start = 2
+     eps, n.sub, coef, lstart, factor)
+}
+\arguments{
+  \item{x}{vector of covariate; missing values are omitted.}
+  \item{y}{vector of response variable.  It must have the same length as
+    \code{x}.}
+  \item{constraint}{character (string) specifying the kind of
+    constraint; must be one of the values in the default list above;
+    may be abbreviated.  More flexible constraints can be specified via
+    the \code{pointwise} argument (below).}
+  \item{w}{
+    vector of weights the same length as \code{x} (y) assigned to both x and y;
+    default to uniform weights adding up to one; using normalized weights
+    that add up to one will speed up computation.
+  }
+  \item{knots}{vector of locations of the knot mesh; if missing,
+    \code{nknots} number of \code{knots} will be created using the
+    specified \code{method} and automatic knot selection will be carried
+    out for regression B-spline (\code{lambda=0}); if not missing and
+    \code{length(knots)==nknots}, the provided knot mesh will be used in
+    the fit and no automatic knot selection will be performed;
+    otherwise, automatic knots selection will be performed on the
+    provided \code{knots}.}
+  \item{nknots}{maximum number of knots; defaults to 6 for regression
+    B-splines, 20 for smoothing B-splines.}
+  \item{method}{character string specifying the method for generating
+    \code{nknots} number of \code{knots} when \code{knots} is not provided;
+    either \code{"quantile"} (equally spaced in percentile levels)
+    or \code{"uniform"} (equally spaced knots); defaults to "quantile".}
+  \item{degree}{degree of the splines; 1 for linear spline (equivalent
+    to \eqn{L_1}-roughness) and 2 for quadratic
+    spline (corresponding to \eqn{L_{\infty}}{L_infinity ('L_oo')}
+    roughness); defaults to 2.}
+  \item{tau}{desired quantile level; defaults to 0.5 (median).}
+  \item{lambda}{penalty parameter \eqn{\lambda}\cr
+    \eqn{\lambda = 0}: no penalty (regression B-spline);\cr
+    \eqn{\lambda > 0}: smoothing B-spline with the given \eqn{\lambda};\cr
+    \eqn{\lambda < 0}: smoothing B-spline with \eqn{\lambda} chosen by a
+    Schwarz-type information criterion.}
+  \item{ic}{string indicating the information  criterion used in knot
+    deletion and addition for regression B-spline method when
+    \code{lambda == 0};\cr
+    \code{"aic"} (Akaike-type, equivalently \code{"AIC"}) or\cr
+    \code{"sic"} (Schwarz-type, equivalently \code{"BIC"}, \code{"SIC"}
+    or \code{"bic"}).  Defaults to \code{"sic"}.}
+  \item{knots.add}{logical indicating if an additional step of stepwise
+    knot addition should be performed for regression B-splines.}
+  \item{repeat.delete.add}{logical indicating if an additional step of stepwise
+    knot deletion should be performed for regression B-splines.}
+  \item{pointwise}{an optional three-column matrix with each row
+    specifies one of the following constraints:
+    \describe{
+      \item{\code{( 1,xi,yi)}:}{fitted value at xi will be \eqn{\ge}{>=} yi;}
+      \item{\code{(-1,xi,yi)}:}{fitted value at xi will be \eqn{\le}{<=} yi;}
+      \item{\code{( 0,xi,yi)}:}{fitted value at xi will be \eqn{=} yi;}
+      \item{\code{( 2,xi,yi)}:}{derivative of the fitted function at xi
+	will be yi.}
+      }
+  }
+  \item{keep.data}{logical indicating if the \code{x} and \code{y} input
+    vectors \bold{after} removing \code{\link{NA}}s should be kept in
+    the result.}
+  \item{keep.x.ps}{logical indicating if the pseudo design matrix
+    \eqn{\tilde{X}}{X\~} should be returned (as \emph{sparse} matrix).
+    That is needed for interval prediction, \code{\link{predict.cobs}(*,
+      interval=..)}.}
+  \item{print.warn}{flag for printing of interactive warning messages;
+    true by default; set to \code{FALSE} if performing simulation.}
+  \item{print.mesg}{
+    logical flag or integer for printing of intermediate messages; true
+    by default.  Probably needs to be set to \code{FALSE} in simulations.}
+  \item{trace}{integer \eqn{\ge 0}{>= 0} indicating how much diagnostics
+    the low-level code in \code{\link{drqssbc2}} should print;  defaults
+    to \code{print.mesg}.}
+  \item{lambdaSet}{numeric vector of lambda values to use for grid search;
+    in that case, defaults to a geometric sequence (a \dQuote{grid in
+      log scale}) from \code{lambda.lo} to \code{lambda.hi} of length
+    \code{lambda.length}.}
+  \item{lambda.lo, lambda.hi}{lower and upper bound of the grid search
+    for lambda (when \code{lambda < 0}).  The defaults are meant to keep
+    everything scale-equivariant and are hence using the factor
+%%    \eqn{f = \sigma_y\cdot\sigma_x^d}{f = s[y] * s[x]^d}, i.e.,
+%%    \code{f.lambda <- sd(y) * sd(x)^degree}.
+    \eqn{f = \sigma_x^d}{f = s[x]^d}, i.e.,
+    \code{f.lambda <- sd(x)^degree}.
+    %%% FIXME ?!? in quantreg
+    Note however that currently the underlying algorithms in package
+    \pkg{quantreg} are \emph{not} scale equivariant yet.}
+  \item{lambda.length}{number of grid points in the grid search for
+    optimal lambda.}
+  \item{maxiter}{upper bound of the number of iterations; defaults to 100.}
+  \item{rq.tol}{numeric convergence tolerance for the interior point
+    algorithm called from \code{\link[quantreg]{rq.fit.sfnc}()} or
+    \code{\link[quantreg]{rq.fit.sfn}()}.}
+  \item{toler.kn}{numeric tolerance for shifting the boundary knots
+    outside; defaults to \eqn{10^{-6}}{10^(-6)}.}
+  \item{tol.0res}{tolerance for testing \eqn{|r_i| = 0},  passed to
+    \code{\link{qbsks2}} and \code{\link{drqssbc2}}.}
+  \item{nk.start}{number of starting knots used in automatic knot selection. Default to the minimum of 2 knots.}
+  \item{eps, n.sub, coef, lstart, factor}{unused argument of the 1999/2002 version
+    of \code{cobs()}, currently still allowed (with a
+    \code{\link{warning}}) for back compatibility reasons.}
+}
+\value{
+  an object of class \code{cobs}, a list with components
+%%% FIXME: needs to be updated!
+  \item{call}{the \code{cobs(..)} call used for creation.}
+  \item{tau, degree}{as input}
+  \item{constraint}{as input (but no more abbreviated).}
+  \item{pointwise}{as input.}
+  \item{coef}{B-spline coefficients.}
+  \item{knots}{the final set of knots used in the computation.}
+  \item{ifl}{exit code := \code{1 + ierr} and \code{ierr} is the error
+    from \code{\link[quantreg]{rq.fit.sfnc}} (package \pkg{quantreg});
+    consequently, \code{ifl = 1} means \dQuote{success}; all other
+    values point to algorithmic problems or failures.}
+  \item{icyc}{length 2: number of cycles taken to achieve convergence
+    for final lambda, and total number of cycles for all lambdas.}
+  \item{k}{the effective dimensionality of the final fit.}
+  \item{k0}{(usually the same)}
+  \item{x.ps}{the pseudo design matrix \eqn{X} (as returned by
+    \code{\link{qbsks2}}).}
+  \item{resid}{vector of residuals from the fit.}
+  \item{fitted}{vector of fitted values from the fit.}
+  \item{SSy}{the sum of squares around centered \code{y} (e.g. for
+    computation of \eqn{R^2}.)}
+  \item{lambda}{the penalty parameter used in the final fit.}
+  \item{pp.lambda}{vector of all lambdas used for
+    lambda search when \code{lambda} < 0 on input.}
+  \item{pp.sic}{vector of Schwarz information criteria evaluated at
+    \code{pp.lambda}; note that it is not quite sure how good these are
+    for determining an optimal \code{lambda}.}
+}%end{value}
+\details{
+  \code{cobs()} computes the constraint quantile smoothing B-spline with
+  penalty when lambda is not zero.\cr
+  If lambda < 0, an optimal lambda will be chosen using Schwarz type
+  information criterion. \cr
+  If lambda > 0, the supplied lambda will be used.\cr
+  If lambda = 0, cobs computes the constraint quantile regression B-spline
+  with no penalty using the provided knots or those selected by Akaike or
+  Schwarz information criterion.
+}
+\references{
+  Ng, P. and Maechler, M. (2007)
+  A Fast and Efficient Implementation of Qualitatively Constrained Quantile Smoothing Splines,
+  \emph{Statistical Modelling} \bold{7(4)}, 315-328.
+
+  Koenker, R. and Ng, P. (2005)
+  Inequality Constrained Quantile Regression,
+  \emph{Sankhya, The Indian Journal of Statistics} \bold{67}, 418--440.
+
+  He, X. and Ng, P. (1999)
+  COBS: Qualitatively Constrained Smoothing via Linear Programming;
+  \emph{Computational Statistics} \bold{14}, 315--337.
+
+  Koenker, R. and Ng, P. (1996)
+  A Remark on Bartels and Conn's Linearly Constrained L1 Algorithm,
+  \emph{ACM Transaction on Mathematical Software} \bold{22}, 493--495.
+
+  Ng, P. (1996)
+  An Algorithm for Quantile Smoothing Splines,
+  \emph{Computational Statistics & Data Analysis} \bold{22}, 99--118.
+
+  Bartels, R. and Conn A. (1980)
+  Linearly Constrained Discrete \eqn{L_1} Problems,
+  \emph{ACM Transaction on Mathematical Software} \bold{6}, 594--608.
+
+  A postscript version of the paper that describes the details of COBS
+  can be downloaded from \url{http://www.cba.nau.edu/pin-ng/cobs.html}.
+}
+% \section{Warning}{
+%   This is still a beta version, and we do appreciate comments and
+%   suggestions; \code{library(help = cobs)} shows the authors.
+% }
+\seealso{\code{\link{smooth.spline}} for unconstrained smoothing
+    splines; \code{\link[splines]{bs}} for unconstrained (regression)
+    B-splines.
+}
+\examples{
+x <- seq(-1,3,,150)
+y <- (f.true <- pnorm(2*x)) + rnorm(150)/10
+## specify pointwise constraints (boundary conditions)
+con <- rbind(c( 1,min(x),0), # f(min(x)) >= 0
+             c(-1,max(x),1), # f(max(x)) <= 1
+             c(0,  0,   0.5))# f(0)      = 0.5
+
+## obtain the median  REGRESSION  B-spline using automatically selected knots
+Rbs <- cobs(x,y, constraint= "increase", pointwise = con)
+Rbs
+plot(Rbs, lwd = 2.5)
+lines(spline(x, f.true), col = "gray40")
+lines(predict(cobs(x,y)), col = "blue")
+mtext("cobs(x,y)   # completely unconstrained", 3, col= "blue")
+
+## compute the median  SMOOTHING  B-spline using automatically chosen lambda
+Sbs <- cobs(x,y, constraint="increase", pointwise= con, lambda= -1)
+summary(Sbs)
+plot(Sbs) ## by default  includes  SIC ~ lambda
+
+Sb1 <- cobs(x,y, constraint="increase", pointwise= con, lambda= -1,
+            degree = 1)
+summary(Sb1)
+plot(Sb1)
+
+plot(Sb1, which = 2) # only the  data + smooth
+rug(Sb1$knots, col = 4, lwd = 1.6)# (too many knots)
+xx <- seq(min(x) - .2, max(x)+ .2, len = 201)
+pxx <- predict(Sb1, xx, interval = "both")
+lines(pxx, col = 2)
+mtext(" + pointwise and simultaneous 95\% - confidence intervals")
+matlines(pxx[,1], pxx[,-(1:2)], col= rep(c("green3","blue"), c(2,2)), lty=2)
+}
+\keyword{smooth}
+\keyword{regression}
+End of cobs.Rd
+echo drqssbc.R 1>&2
+cat >drqssbc.R <<'End of drqssbc.R'
+#### $Id: drqssbc.R,v 1.40 2007/04/10 08:15:15 maechler Exp $
+
+drqssbc2 <-
+    function(x,y, w = rep.int(1,n), pw, knots, degree, Tlambda, constraint,
+             ptConstr, maxiter = 100, trace = 0,
+             nrq = length(x), nl1, neqc, niqc, nvar, tau = 0.50,
+             select.lambda = length(Tlambda) > 1, give.pseudo.x = FALSE,
+             rq.tol = 1e-8 * sc.y, tol.0res = 1e-6, print.warn = TRUE,
+             rq.print.warn = FALSE)
+{
+    ##=########################################################################
+    ##
+    ## Estimate the B-spline coefficients for quantile *smoothing* spline, using
+    ##		Ng (1996)  `An Algorithm for Quantile Smoothing Splines',
+    ##		Computational Statistics & Data Analysis, 22, 99-118.
+    ##
+    ##=########################################################################
+    n <- length(x)
+    stopifnot((nj0 <- length(Tlambda)) >= 1, is.numeric(Tlambda),
+              is.numeric(x), is.numeric(y), is.numeric(w),
+              length(y) == n, length(w) == n,
+              is.numeric(tau), length(tau) == 1, 0 <= tau, tau <= 1,
+              maxiter == round(maxiter), maxiter >= 1,
+              is.logical(select.lambda), is.logical(print.warn),
+              is.logical(rq.print.warn))
+
+    if(nj0 > 1) {
+	if(!select.lambda)
+	    warning("no lambda selection but still length(Tlambda) > 1 -- not fully tested yet")
+	## MM [FIXME]: for that case, we now return *all* lambda results;
+	##	  but this (particularly "cobs"-methods) is completely untested
+
+	Tlambda <- sort(Tlambda)# needed for selection (messages and plots)
+    }
+
+    ## Scale tolerance by the "scale" (y)
+    sc.y <- mean(abs(y - mean(y)))
+    if(sc.y < 1e-12 * (my <- median(abs(y)))) {
+        if(print.warn)
+            cat("Warning: 'y's are almost constant ==> sc.y := scale(y) := 1e-12 median|y|")
+        sc.y <- 1e-12 * my
+    }
+    tol.0res.y <- tol.0res * sc.y
+    ## lambda.cut <- 10/n
+
+    ##* Note: if  nrq != length(x) , e.g., in case of sub.sampling+ fit full
+    ##*  if(select.lambda < 0)
+    ##*      n <- nrq
+    # <2-18-09> PN: The Y values of pointwise constraints in ptConstr need
+    # to be sorted according to the X values to be consistent with those
+    # in l1.design2 and loo.design2
+    Tequal   <- if(ptConstr$n.equal   > 0)  ptConstr$equal[order(ptConstr$equal[,2]),3] # else NULL
+    Tsmaller <- if(ptConstr$n.smaller > 0) -ptConstr$smaller[order(ptConstr$smaller[,2]),3]
+    Tgreater <- if(ptConstr$n.greater > 0)  ptConstr$greater[order(ptConstr$greater[,2]),3]
+    Tgradien <- if(ptConstr$n.gradient> 0)  ptConstr$gradient[order(ptConstr$gradient[,2]),3]
+    Y.ptConstr <- c(Tsmaller, Tgreater, Tequal, -1*Tequal, Tgradien, -1*Tgradien)
+
+    ## double matrix -- to contain "sol"ution :
+    solNms <- c("lambda", "icyc", "ifl", "fidel", "sum|res|_s", "k")
+    sol1 <- matrix(0., length(solNms), nj0, dimnames= list(solNms, NULL))
+    allCoef <- matrix(0., nvar, nj0)
+
+    if(trace >= 2)
+	summSparse <- function(X, namX = deparse(substitute(X))) {
+	    force(namX)
+	    stopifnot(length(d <- dim(X)) == 2)
+	    k <- length(X@ra)
+	    sprintf("%s %4d x %d (nz = %d =^= %5.2g%%)",
+		    namX, d[1], d[2], k, k/prod(d))
+	}
+
+    for(ilam in 1:nj0) { ## for each lambda in Tlambda[] : `` grid search ''
+	XX <-
+	    if(degree == 1)
+		l1.design2(x, w, constraint, ptConstr, knots, pw, nrq = n,
+			   nl1, neqc, niqc, nvar, Tlambda[ilam])
+	    else
+		loo.design2(x, w, constraint,ptConstr, knots, pw, nrq = n,
+			    nl1, neqc, niqc, nvar, Tlambda[ilam])
+	Xeq <- XX$Xeq
+	fieq <- XX$fieq
+	if(fieq)
+	    Xieq <- XX$Xieq
+
+        if(trace >= 2) {
+            if(ilam == 1 || trace >= 3) {
+                ## only for the first lambda: dim() is same!
+                ch1 <- sprintf("%3s.design2(%s): -> ", c("l1","loo")[degree],
+                               if(trace >= 3)
+                               sprintf("lam= %10.4g",Tlambda[ilam]) else '')
+                cat(ch1, summSparse(Xeq), "\n")
+                if(fieq) {
+                    cat(sprintf("%*s", nchar(ch1) - 1, " "),
+                        summSparse(Xieq), "\n")
+                }
+            }
+            else cat(".", if(ilam == nj0) "\n")
+        }
+
+	niqc1 <- {
+	    if (degree == 1 || Tlambda[ilam] == 0)  0
+	    else 2*(length(knots) - 1) }
+	##U   if(any(ibig <- abs(Xeq$ra) > big)) { ## make sure that drqssbc won't overflow
+	##U	Xeq$ra[ibig] <- Xeq$ra[ibig] / big^0.5
+	##U	warning("re-scaling ", sum(ibig), "values of Lp-design `Xeq'")
+	##U   }
+	##U   if(any(ibig <- abs(Xieq$ra) > big)) { ## make sure that drqssbc won't overflow
+	##U	Xieq$ra[ibig] <- Xieq$ra[ibig] / big^0.5
+	##U	warning("re-scaling ", sum(ibig), "values of Lp-design `Xieq'")
+	##U   }
+
+        ## FIXME: (Tnobs, n0) do *not* depend on lambda
+        ##         --> keep outside the for() loop!
+	Tnobs <- nrow(Xeq) + (if(fieq) nrow(Xieq) else 0)
+                                        # Tnobs = number of pseudo-observations
+	n0 <- Tnobs -n - with(ptConstr,
+			      2*n.equal+2*n.gradient+n.smaller+n.greater)
+	## <2-18-09> PN: There are 2 inequality constraints for each equality 
+	##  constraints; hence n.gradient needs to be multiplied by 2
+	Y <- c(y*w, rep.int(0, n0), Y.ptConstr)
+	##    Yeq <- Y[1:(nrq+nl1+neqc)]
+	Yeq <- Y[1:(nrq+nl1)]
+	##    if(fieq) Yieq <- Y[(nrq+nl1+neqc+1):Tnobs]
+	if(fieq) {
+	    Yieq <- Y[(nrq+nl1+1):Tnobs]
+	    Yeq.. <- c(Yeq, Yieq)
+	    Xeq.. <- rbind(Xeq, Xieq)
+	}
+	## niqc2 <- Tnobs - niqc1
+
+	rhs <- (1-tau)*Xeq[1:nrq, ]
+	rhs <- ## MM: would be nice to have colSums() for "matrix.csr"
+	    colSums(as.matrix(if(nl1 > 0) rbind(rhs,
+						.5*Xeq[(nrq+1):(nrq+nl1),])
+			      else rhs))
+	z0 <-
+	    if(fieq)
+		rq.fit.sfnc(Xeq,Yeq, Xieq,Yieq, tau = tau, rhs = rhs,
+			    maxiter = maxiter, warn.mesg = rq.print.warn, small=rq.tol)
+	    else rq.fit.sfn(Xeq,Yeq,		tau = tau, rhs = rhs,
+			    maxiter = maxiter, warn.mesg = rq.print.warn, small=rq.tol)
+        ## rq.fit.sfn[c] : both in ../../quantreg/R/sfn.R
+        ##  these call .Fortran("srqfn[c]", ..) in
+        ##    -> ../../quantreg/src/srqfn.c and ..../srqfnc.c
+        ##  these both call chlfct() in ../../quantreg/src/chlfct.c   (was *.f)
+        ##  is built on misc.        in ../../quantreg/src/cholesky.c (was *.f)
+	if(any(is.na(z0$coef))) stop(cat(" The combination of 'constraint' and 'pointwise' is causing problems for the algorithm with the following knot selection:\n",
+		knots,"\n Check the feasibility of your 'constraint' and 'pointwise' or use a different knot selection.\n",
+		"If you are using automatic knot selection, try increase 'nk.start' from its default value of 2.\n"))
+	pseudo.resid <- (if(fieq) Yeq.. else Yeq) -
+	    c(as.matrix((if(fieq) Xeq.. else Xeq) %*% as.matrix.csr(z0$coef)))
+        if(any(is.na(pseudo.resid))) ## not really seen this case...
+	    warning(sprintf("pseudo residuals [c(%s)] are NA; (n,Tnobs)= (%d,%d)",
+			    paste(which(is.na(pseudo.resid)), collapse= ","), n,Tnobs))
+	resid <- pseudo.resid[1:n]
+	aRes <- abs(pseudo.resid)
+	k.idx <- c(1:nrq, if((nn <- nrq+nl1+niqc1+1) <= Tnobs) nn:Tnobs)
+###	k.idx <- c(1:nrq) #PN: this makes more sense than the previous def. of effective dimensionality
+        ##was k.idx <- 1:Tnobs ; k.idx <- c(k.idx[k.idx <= nrq], k.idx[k.idx >  nrq+nl1+niqc1])
+        ## or          (1:Tnobs <= nrq) | (1:Tnobs > nrq+nl1+niqc)
+	sol1[,ilam] <- c(Tlambda[ilam],
+			 z0$it,
+			 z0$ierr + 1, # =: ifl, i.e., success <==> ifl == 1 <==> ierr == 0
+			 sum((tau-(resid < 0))* resid), # =: fidel
+			 sum(aRes[(nrq+1):(nrq+nl1)])/Tlambda[ilam],
+			 ## Determination of the "effective dimensionality"  'k' :
+			 ##PN: too stringent: sum(aRes[k.idx] < tol.0res * mean(aRes[k.idx]))
+			 max(degree+1, sum(aRes[k.idx] < tol.0res.y))) # {a kludge ..}
+        allCoef[,ilam] <- z0$coef
+
+    }## end for(ilam ..)
+
+    if(trace == 1) ## only output at all:
+        cat(sprintf("fieq=%s -> Tnobs = %d, n0 = %d, |ptConstr| = %d\n",
+                    format(fieq), Tnobs, n0, length(Y.ptConstr)))
+
+    ## MM: return *sparse* pseudo.x
+    ##     Further: this is X~ of the last, not the best lambda
+    pseudo.x <- if(give.pseudo.x) (if(fieq) Xeq.. else Xeq) ## else NULL
+
+    if(select.lambda) {
+	##
+	## search for optimal lambda
+	##
+	is.ifl.1 <- sol1["ifl",] == 1
+        ##PN: Weed out lambdas that give rise to interpolating fit
+	notInt <- sol1["fidel",] > tol.0res.y
+	i.keep <- is.ifl.1 & notInt
+	n.keep <- sum(i.keep)
+        ## <NEW: PN 2006-08-24, 08-28>
+	## k.diff.tol <- 1
+	i.mask <- rep(FALSE,nj0)
+	if(any(sol1["k",i.keep] > sqrt(n)) & min(sol1["k",i.keep]) <= sqrt(n)) {
+            ##PN: Use k0 to guide the lower bound of the lambda grid; the lower bound
+            ##	is set when k0 declines by more than k.diff.tol while lambda decreases among the grid of i.keep lambdas
+            k.up <- min((1:n.keep)[sol1["k",i.keep] <= sqrt(n)])
+            i.k.up <- (1:nj0)[i.keep][k.up]
+            i.cut <- i.k.up - 1
+            i.mask[1:i.cut] <- TRUE
+            if(sol1["k",i.k.up] != sol1["k",nj0]) {
+                ##PN: exclude situations when the horizontal fit through discrete y
+                ## ends up with more zeros than two, hence, a non-monotonically
+                ## decreasing "k" in the right tail
+                i.keep <- i.keep & !i.mask
+                n.keep <- sum(i.keep)
+            }
+	}
+        ## </NEW>
+
+	if(n.keep == 0)
+	    stop("The problem is degenerate for the range of lambda specified.")
+
+        if(any(!is.ifl.1)) { ## had some errors in rq.fit.sfn*()
+	    sol.err <- t(sol1[, !is.ifl.1, drop = FALSE])
+	    if(print.warn) { ## had some errors in rq.fit.sfn*()
+		cat(gettextf("WARNING: Some lambdas had problems in %s():\n",
+			     if(fieq) "rq.fit.sfnc" else "rq.fit.sfn"))
+		print( sol.err )
+	    }
+        } else sol.err <- NULL
+
+	solx <- sol1[, i.keep, drop = FALSE]
+	sicA <- sol1["fidel",]/n * n^(sol1["k",] /(2*n))
+        ## round, so the subsequent selection is "less wavery":
+	sic. <- signif(sicA[i.keep], 6)
+	min.s <- min(sic.)
+	i.min <- (1:n.keep)[sic. == min.s]
+	if(sic.[n.keep] <= min.s && min.s < sic.[1]) { # min. at rightmost, i.e. roughest
+	    i.best <- max(i.min)
+	    wrn.flag <- 1
+	}
+	else if(sic.[1] <= min.s && min.s < sic.[n.keep]) { # min. at leftmost, i.e.smoothest
+	    i.best <- min(i.min)
+	    wrn.flag <- 2
+	}
+	else {
+	    i.best <- ceiling(median(i.min)) # take middle of all minimal values
+	    if(min.s == sic.[1] && min.s == sic.[n.keep])
+		wrn.flag <- 3
+	    else  ## "good" case
+		wrn.flag <- 4
+	}
+	##
+        ## trap infeasible solution when lam<0
+        ##
+        if(print.warn) {
+	    wrn1 <- "\n WARNING!  Since the optimal lambda chosen by SIC "
+	    wrnPlot <- paste("plot() the returned object",
+			     "(which plots 'sic' against 'lambda')")
+	    wrn3 <- "and possibly consider doing one of the following:"
+	    wrn4 <- "(1) reduce 'lambda.lo', increase 'lambda.hi', increase 'lambda.length' or all of the above;"
+	    ns <- "\n   "
+	    switch(wrn.flag,
+		   cat(wrn1, "reached the smoothest possible fit at `lambda.hi', you should",
+		       wrnPlot, wrn3, wrn4,
+		       "(2) decrease the number of knots.\n", sep = ns),
+		   cat(wrn1, "corresponds to the roughest possible fit, you should",
+		       wrnPlot, wrn3, wrn4,
+		       ## typically "increase"; sometimes decreasing is appropriate:
+		       "(2) modify the number of knots.\n", sep = ns),
+		   cat(wrn1, "rests on a flat portion, you might", wrnPlot,
+		       "to see if you want to reduce 'lambda.lo' and/or increase 'lambda.ho'\n",
+		       sep = ns),
+		   cat('', "The algorithm has converged.  You might", wrnPlot,
+			"to see if you have found the global minimum of the information criterion",
+			"so that you can determine if you need to adjust any or all of",
+			"'lambda.lo', 'lambda.hi' and 'lambda.length' and refit the model.\n",
+		       sep = ns))
+            ## if(solx["lambda",,i.best] == (Tlambda[i.keep])[length(Tlambda[i.keep])]
+            ## && solx["k",i.best] > max(2,niqc2))
+        }
+	list(coef = allCoef[, i.keep, drop = FALSE][, i.best],
+	     fidel = solx["fidel",],
+	     k = as.integer(sol1["k",notInt]), #PN was min(solx["k",i.best], length(knots)-2+degree+1),
+	     kk= as.integer(solx["k",i.best]),
+	     ifl = as.integer(sol1["ifl",notInt]),
+	     icyc = as.integer(sol1["icyc",notInt]), nvar = nvar,
+	     lambda = solx["lambda",i.best],
+	     pp.lambda = sol1["lambda",notInt], sic = log(sicA[notInt]),
+	     sol.err = sol.err, flag = wrn.flag,
+	     pseudo.x = pseudo.x, i.mask = i.mask[notInt])
+    }
+    else { ## not 'select.lambda' ---
+	l2 <- as.list(as.data.frame(t(sol1)))
+	for(nn in c("k", "ifl", "icyc")) l2[[nn]] <- as.integer(l2[[nn]])
+	c(list(coef = drop(allCoef), nvar = nvar, pseudo.x = pseudo.x),
+	  l2)
+    }
+} ## drqssbc2
+End of drqssbc.R
+echo qbsks.R 1>&2
+cat >qbsks.R <<'End of qbsks.R'
+#### $Id: qbsks.R,v 1.21 2006/08/16 19:23:27 maechler Exp maechler $
+
+qbsks2 <-
+    function(x,y,w,pw, knots,nknots, degree, Tlambda,
+             constraint, ptConstr, maxiter, trace,
+             nrq,nl1, neqc, tau, select.lambda,
+             ks, do.select, knots.add, repeat.delete.add, ic, print.mesg,
+             give.pseudo.x = TRUE,
+             rq.tol = 1e-8, tol.kn = 1e-6, tol.0res = 1e-6, print.warn,nk.start)
+{
+    ##=########################################################################
+    ##
+    ## Compute B-spline coefficients for quantile B-spline with stepwise knots
+    ## selection or with fixed knots (REGRESSION SPLINE), using
+    ## Koenker and Ng (2005)  `Inequality Constrained Quantile Regression,"
+    ## Sankhya, The Indian Journal of Statistics, 67, 418-440.
+    ##
+    ##=########################################################################
+
+    smll.log <- 50*floor(log(.Machine$double.xmin)/50) # heavily rounding down
+    finite.log <- function(x) {
+        r <- log(x)
+        if(is.na(r) || r > -Inf) r else smll.log # = -750 for IEEE arithmetic
+    }
+    n <- nrq
+    xo <- x[order(x)]
+    logn <- log(n)
+    f.IC <- switch(ic,
+		   "AIC" = 2,
+		   "BIC" =, "SIC" = logn,
+		   stop("in qbsks2(): invalid 'ic' = ", ic, call. = FALSE))
+    constraint.orig <- constraint
+
+    n.gr.sm <- with(ptConstr, n.greater + n.smaller)
+
+    if(do.select) { ##  perform first step : knots selection
+	if(length(Tlambda) > 1)
+	    stop("you cannot select knots for more than one lambda simultaneously")
+        if(print.mesg) cat("qbsks2():\n Performing general knot selection ...\n")#4
+        Tic <- Tifl <- double(nknots-1)
+        for(i in (nk.start-1):(nknots-1)) {
+            Tknots <- knots[seq(1,nknots, len = i+1)]
+            n.Tknts <- length(Tknots)
+            if(n.Tknts == 2 && degree == 1 && constraint %in% c("convex", "concave"))
+                ## guard against trying convex fit when only 2 knots are used
+                constraint <- "none"
+            dim.o <- getdim2(degree, n.Tknts, constraint)
+            ks <- dim.o$ks
+            Tnvar <- dim.o$nvar
+            niqc <- dim.o$n.iqc + n.gr.sm
+	    rqss <- drqssbc2(x,y,w, pw, Tknots, degree, Tlambda,
+			     constraint, ptConstr, maxiter, trace=trace-1,
+			     nrq,nl1,neqc,niqc, Tnvar,
+			     tau=tau, select.lambda=select.lambda,
+                             give.pseudo.x = give.pseudo.x,
+			     rq.tol = rq.tol, tol.0res = tol.0res,
+                             print.warn=print.warn)
+            constraint <- constraint.orig
+            Tic[i] <- finite.log(rqss$fidel) -logn + (i-1+ks)*f.IC / n
+            Tifl[i] <- rqss$ifl
+        }
+
+        ## "FIXME": allow  "+ 1 S.E." selection instead of ``simple arg_min''
+        Tic.min <- min(Tic)
+        Tifl.final <- Tifl[Tic == Tic.min]
+        nknots.min <- min((1:(nknots-1))[Tic == Tic.min])
+        if(nknots.min == 1 && Tifl.final != 1) {
+            ##
+            ## when the chosen nknots=2, guard against anomaly of ifl=5 when
+            ## constraint=='periodic', or ifl=2 when the chosen model is infeasible.
+            ##
+            Tic.min <- min(Tic[2:length(Tic)])
+            Tifl.final <- Tifl[Tic == Tic.min]
+            nknots.min <- min((1:(nknots-1))[Tic == Tic.min])
+        }
+        if(Tifl.final %in% c(2,3,4))
+            return(list(ifl = Tifl.final))
+
+	warnUP <- function(nknots, ic)
+	    ## warn(5,nknots,ic)
+	    cat("\n WARNING! Since the number of ",nknots," knots selected by ",
+		ic," reached the\n",
+		"  upper bound during general knot selection, you might want to rerun\n",
+		"  cobs with a larger number of knots. \n")
+
+        up.bound.reached <- (nknots.min + 1 == nknots)
+	if(up.bound.reached && print.warn)
+	    warnUP(nknots, ic)
+
+        knots <- knots[seq(1,nknots, len = nknots.min+1)]
+        names(knots) <- NULL
+        ##
+        ## perform knots deletion
+        ##
+        repeat.a.d <- TRUE
+        Tic.global.min <- Tic.min
+        while(repeat.a.d) {
+            delete <- TRUE
+            if(print.mesg) cat("\n Deleting unnecessary knots ...\n") # 5
+            while(delete && nknots.min > 1) {
+                n.Tknts <- length(knots)
+                Tic1 <- rep.int(0, n.Tknts-2)
+                n.Tknts.1 <- n.Tknts - 1
+                if(n.Tknts.1 == 2 && degree == 1 && constraint %in% c("convex", "concave"))
+                    ## guard against convex fit when only 2 knots are used
+                    constraint <- "none"
+                dim.o <- getdim2(degree,n.Tknts.1, constraint)
+                ks <- dim.o$ks
+                Tnvar <- dim.o$nvar
+                niqc <- dim.o$n.iqc + n.gr.sm
+                for(i in 2:(n.Tknts-1)) {
+                    Tknots <- knots[-i]
+		    rqss <- drqssbc2(x, y, w, pw, Tknots, degree, Tlambda, constraint,
+				     ptConstr, maxiter, trace=trace-1,
+				     nrq, nl1, neqc, niqc, Tnvar,
+				     tau=tau, select.lambda=select.lambda,
+				     give.pseudo.x = give.pseudo.x,
+				     rq.tol = rq.tol, tol.0res = tol.0res,
+				     print.warn = print.warn)
+                    constraint <- constraint.orig
+                    Tic1[i-1] <- finite.log(rqss$fidel)-logn+(n.Tknts.1-2+ks)*f.IC / n
+                }
+                Tic1.min <- min(Tic1)
+                idx.del <- min((2:(n.Tknts-1))[Tic1 == Tic1.min])
+                if((delete <- Tic1.min <= Tic.min)) {
+                    Tic.min <- Tic1.min
+                    if(print.mesg >= 3)
+                        cat("\n A knot at ",signif(knots[idx.del]),
+                            " is deleted.\n") # 6
+                    knots <- knots[-idx.del]
+                    nknots.min <- length(knots)-1
+                }
+            }## end while(delete...)
+            if(print.mesg >= 2) cat("\n No more knot to be deleted.\n") # 7
+            ##
+            ## perform knots addition
+            ##
+            if(knots.add) {
+                add <- TRUE
+                n.Tknts <- length(knots)
+                if(print.mesg) cat("\n Searching for missing knots ...\n") # 8
+                while(add && n.Tknts < nknots) {
+                    Tic2 <- double(n.Tknts-1)
+                    knots.add.1 <- (knots[1:(n.Tknts-1)]+knots[2:n.Tknts])/2
+                    n.Tknts.1 <- n.Tknts + 1
+                    dim.o <- getdim2(degree,n.Tknts.1,constraint)
+                    ks <- dim.o$ks
+                    Tnvar <- dim.o$nvar
+                    niqc <- dim.o$n.iqc + n.gr.sm
+                    for(i in 1:(n.Tknts-1)) {
+                        Tknots <- sort(c(knots,knots.add.1[i]))
+                        if(length(unique(cut00(x, Tknots))) != n.Tknts)
+                            Tic2[i] <- Tic.min+1
+                        else {
+			    rqss <-
+				drqssbc2(x,y,w,pw,Tknots,degree, Tlambda,
+					 constraint, ptConstr, maxiter, trace=trace-1,
+					 nrq,nl1,neqc,niqc,Tnvar,
+					 tau=tau, select.lambda=select.lambda,
+					 give.pseudo.x = give.pseudo.x,
+					 rq.tol = rq.tol, tol.0res = tol.0res,
+					 print.warn = print.warn)
+
+                            Tic2[i] <- finite.log(rqss$fidel) -logn +
+                                (n.Tknts.1-2+ks)*f.IC / n
+                        }
+                    }
+                    Tic2.min <- min(Tic2)
+                    idx.add <- min((1:(n.Tknts-1))[Tic2 == Tic2.min])
+                    if((add <- Tic2.min <= Tic.min)) {
+                        Tic.min <- Tic2.min
+                        knots <- sort(c(knots,knots.add.1[idx.add]))
+                        if(print.mesg >= 2)
+                            cat("\n A knot at ",signif(knots.add.1[idx.add]),
+                                " is added.\n") # 9
+                    }
+                    n.Tknts <- length(knots)
+                }## end while(add ..)
+                if(print.mesg >= 2) cat("\n No more knot to be added.\n") # 10
+                if(n.Tknts == nknots) up.bound.reached <- TRUE
+            }## (knots.add)
+
+            repeat.a.d <- repeat.delete.add && Tic.global.min > Tic.min
+            if(repeat.a.d) {
+                Tic.global.min <- Tic.min
+            }
+        }## end while(repeat.a.d)
+
+	if(up.bound.reached && print.warn)
+	    warnUP(nknots, ic)
+        if(print.mesg >= 2) cat("\n Computing the final fit ...\n") # 11
+    } ## end if(do.select)
+
+    ##
+    ## compute the B-spline coefficients for the full sample
+    ##
+    nknots <- length(knots)
+    ## shift the first and last knot a tiny bit "outside":
+    rk <- diff(range(knots))
+    knots[1] <- knots[1] - tol.kn*rk
+    knots[nknots] <- knots[nknots] + tol.kn*rk
+
+    if(nknots == 2 && (constraint %in% c("convex", "concave")) &&
+       degree == 1) { # guard against convex fit when only 2 knots are used
+        if(print.warn)
+	    cat(sprintf("WARNING: %s from \"%s\" to \"none\"\n",
+			"only two knots; changing 'constraint'", constraint))
+        constraint <- "none"
+    }
+    dim.o <- getdim2(degree, nknots, constraint)
+    ks <- dim.o$ks
+    Tnvar <- dim.o$nvar
+    niqc <- dim.o$n.iqc + n.gr.sm
+    rqss <- drqssbc2(x,y,w,pw, knots, degree,Tlambda,
+		     constraint, ptConstr, maxiter, trace=trace-1,
+		     nrq,nl1, neqc,niqc, Tnvar,
+		     tau=tau, select.lambda=select.lambda,
+		     give.pseudo.x = give.pseudo.x,
+		     rq.tol = rq.tol, tol.0res = tol.0res,
+		     print.warn = print.warn)
+    ## constraint <- constraint.orig
+
+    c(rqss[c("coef", "fidel", "ifl", "icyc", "pseudo.x")],
+      list(k = nknots-2+ks, knots = knots, nknots = nknots,
+	   nvar = Tnvar, lambda = Tlambda))
+
+} ## end qbsks()
+End of qbsks.R
+echo scobs.R 1>&2
+cat >scobs.R <<'End of scobs.R'
+#### $Id: scobs.R,v 1.44 2009/02/18 08:37:38 maechler Exp $
+
+.onLoad <- function(lib, pkg) {
+    ## now have NAMESPACE library.dynam("cobs", pkg, lib)
+    if(interactive() || getOption("verbose")) # not in test scripts
+	packageStartupMessage(sprintf(
+		"Package %s (%s) loaded.  To cite, see citation(\"%s\")\n",
+		pkg, utils::packageDescription(pkg)$Version, pkg))
+}
+
+## S+ does not allow "cut(*, labels = FALSE)" -- use cut00() for compatibility:
+if(is.R()) {
+    cut00 <- function(x, breaks)
+	cut.default(x, breaks, labels = FALSE, include.lowest = TRUE)
+} else { ## S-plus  (tested only with S+ 6.0):
+    cut00 <- function(x, breaks)
+	as.integer(cut.default(x, breaks, include.lowest = TRUE))
+}
+
+mk.pt.constr <- function(pointwise)
+{
+    ## Purpose: produce the 'ptConstr' list from the 'pointwise' 3-col. matrix
+    ## Author: Martin Maechler, 29 Jul 2006
+
+    if(is.null(pointwise)) {
+	list(n.equal = 0, n.greater = 0, n.smaller = 0, n.gradient = 0)
+    }
+    else { ## 'pointwise'
+	if(!is.matrix(pointwise)|| dim(pointwise)[2] != 3)
+	    stop("	Argument 'pointwise' has to be a three-column matrix.")
+	kind <- pointwise[,1]		# .Alias
+	equal	<- pointwise[kind ==  0, , drop = FALSE]
+	greater <- pointwise[kind ==  1, , drop = FALSE]
+	smaller <- pointwise[kind == -1, , drop = FALSE]
+	gradient <-pointwise[kind ==  2, , drop = FALSE]
+	list(equal   = equal,
+	     greater = greater,
+	     smaller = smaller,
+	     gradient= gradient,
+	     n.equal   = nrow(equal),# can be 0 ..
+	     n.greater = nrow(greater),
+	     n.smaller = nrow(smaller),
+	     n.gradient= nrow(gradient))
+    }
+}
+
+cobs <-
+function(x, y,
+	 constraint = c("none", "increase", "decrease",
+			"convex", "concave", "periodic"),
+	 w = rep(1,n),
+	 knots, nknots = if(lambda == 0) 6 else 20,
+         method = "quantile", degree = 2, tau = 0.5, lambda = 0,
+         ic = c("aic", "sic", "bic", "AIC", "SIC", "BIC"),
+	 knots.add = FALSE, repeat.delete.add = FALSE, pointwise = NULL,
+         keep.data = TRUE, keep.x.ps = TRUE,
+	 print.warn = TRUE, print.mesg = TRUE, trace = print.mesg,
+         lambdaSet = exp(seq(log(lambda.lo), log(lambda.hi), length= lambda.length)),
+	 lambda.lo = f.lambda*1e-4, lambda.hi = f.lambda*1e3, lambda.length = 25,
+	 maxiter = 100, rq.tol = 1e-8, toler.kn = 1e-6, tol.0res = 1e-6, nk.start=2,
+### old "back-compatibility-only" arguments:
+	 eps, n.sub, coef, lstart, factor)
+
+{
+    ## preamble
+    ##
+    cl <- match.call()
+    constraint <- match.arg(constraint, several.ok = TRUE)
+    if(length(constraint) == 0 || any(constraint == "none"))
+	constraint <- "none"
+    ic <- toupper(match.arg(ic))
+
+    if(any(oldN <- names(cl) %in% c("eps", "n.sub", "coef", "lstart", "factor"))) {
+	n <- sum(oldN)
+	warning(paste("The use of", ngettext(n,"argument", "arguments"),
+		      paste(sQuote(names(cl)[oldN]), collapse=", "),
+		      "is deprecated.\n ", ngettext(n,"It is","They are"),
+		      "now unused and will be removed in the future."))
+    }
+    ## FIXME: add "proper" na.action (as lm(), ..)
+    na.idx <- is.na(x) | is.na(y)
+    x <- x[!na.idx]
+    y <- y[!na.idx]
+    minx <- min(x)
+    maxx <- max(x)
+    n <- nrq <- length(x)
+    ox <- order(x)
+    xo <- x[ox]
+
+    select.lambda <- (lambda < 0)
+    if(select.lambda) {
+        ## To make things scale-equivariant, the default lambdaSet
+        ## must scale according scales of x and y :
+        ## oops: does NOT scale with 'y'!   f.lambda <- sd(y) * sd(x)^degree
+        f.lambda <- sd(x)^degree
+	if(lambda.lo >= lambda.hi)
+	    stop("The argument 'lambda.hi' has to be greater than 'lambda.lo'.")
+	if(lambda.lo <= 0) stop("The argument 'lambda.lo' has to be positive.")
+    }
+    if(length(unique(y)) == 2 && print.warn)
+	## warn(7)
+	cat("\n It looks like you are fitting a binary choice model.",
+	    "We recommend pre-smoothing your data using smooth.spline(),",
+	    "loess() or ksmooth() before calling COBS\n", sep="\n ")
+
+    ##
+    ## generate default knots sequence
+    ##
+    lux <- length(ux <- unique(xo)) # needed in both cases
+    if(missing(knots)) {
+	select.knots <- TRUE
+	nk.max <- if(degree == 1) lux else lux - 1
+	if(nknots > nk.max) {
+	    if(!missing(nknots)) ## 'nknots' specified explicitly
+		warning("You chose nknots = ", nknots,
+			". It has to be no greater than ", nk.max,
+			" for degree = ", degree, ".\n",
+			" cobs() has automatically reduced it to ", nk.max, ".\n")
+	    nknots <- nk.max
+	}
+
+	knots <-
+	    if(method == "quantile") {
+		if(degree == 1 && lux == nknots)
+		    ux
+		else ux[seq(1, lux, len = nknots)] ## ``rounded'' quantiles
+	    }
+	    else ## "equidistant"
+		seq(xo[1], xo[n], len = nknots)
+    }
+    else {
+	names(knots) <- NULL
+	lKn <- length(knots <- sort(knots))
+	select.knots <-
+	    if(!missing(nknots) && nknots != lKn) {
+		warning("you specified 'nknots' and 'knots' with  nknots != length(knots).\n",
+			" Hence will disregard 'nknots' and select from 'knots'")
+		TRUE
+	    } else missing(nknots)
+	## => select.knots is FALSE  iff  nknots == length(knots), both specified
+	nknots <- lKn
+	if(degree == 2 && nknots == lux) {
+	    ## ensure that  max #{knots} is n-1 for quadratic spline
+            ## If we don't do this we get "singularity problem .." warnings
+            ## in some cases
+	    warning("The number of knots can't be equal to the number of unique x for degree = 2.\n",
+		    "'cobs' has automatically deleted the middle knot.")
+	    nknots <- length(knots <- knots[-round(nknots/2)])
+	}
+	if(knots[1] > minx || knots[nknots] < maxx)
+	    stop("  The range of knots should cover the range of x.")
+    }
+    if(nknots < 2) stop("  A minimum of two knots is needed.")
+    if(nknots == 2) {
+	if(lambda == 0 && select.knots)
+	    stop("  Can't perform automatic knot selection with nknots == 2.",
+		 if(degree == 2) " Try 'degree=1'.")
+	else if(degree == 1)
+	    stop("  You need at least 3 knots when lambda!=0 and degree==1")
+    }
+    ## make sure that there is at least one observation between any pair of
+    ## adjacent knots
+    if(length(unique(cut00(x, knots))) != nknots - 1)
+	stop("There is at least one pair of adjacent knots that contains no observation.")
+
+    ptConstr <- mk.pt.constr(pointwise)
+
+    ##
+    ## set up proper dimension for the pseudo design matrix
+    ##
+    dim.o <- getdim2(degree,nknots,constraint)
+    ks <- dim.o$ks
+    neqc <- dim.o$n.eqc + ptConstr$n.equal + ptConstr$n.gradient
+    niqc <- dim.o$n.iqc + ptConstr$n.greater + ptConstr$n.smaller
+    if(lambda == 0) { ## quantile *regression* splines (no penalty)
+	##
+	## compute B-spline coefficients for quantile *regression* B-spline with
+	## stepwise knots selection or with fixed knots
+	##
+	rr <- qbsks2(x, y, w, pw = 0, knots, nknots, degree, Tlambda = lambda,
+		     constraint, ptConstr, maxiter, trace,
+		     nrq, nl1 = 0, neqc, tau, select.lambda = select.lambda,
+		     ks, do.select = select.knots, knots.add, repeat.delete.add, ic,
+		     print.mesg = print.mesg,
+                     give.pseudo.x = keep.x.ps,
+		     rq.tol = rq.tol, tol.kn = toler.kn, tol.0res = tol.0res,
+		     print.warn = print.warn,nk.start)
+	knots <- rr$knots
+	nknots <- rr$nknots
+    }
+    else { ## lambda !=0 : quantile *smoothing* B-Splines with penalty
+
+	if(degree == 1) {
+	    nl1 <-  nknots - 2
+	    nvar <- dim.o$nvar
+	}
+	else { ## degree == 2
+	    nl1 <- 1
+	    nvar <- dim.o$nvar + 1 # one more parameter for sigma
+	    niqc <- niqc + 2 * (nknots - 1)
+	}
+        pw <- rep(1, nknots + degree-3)
+
+        ## => lambda is chosen by ic (SIC / AIC )
+        ## and lambdaSet := grid of lambdas in log scale [ == sfsmisc::lseq()
+
+	##
+	## compute B-spline coefficients for quantile smoothing B-spline
+	##
+	if(select.lambda && print.mesg)
+	    cat("\n Searching for optimal lambda. This may take a while.\n",
+		"  While you are waiting, here is something you can consider\n",
+		"  to speed up the process:\n",
+		"      (a) Use a smaller number of knots;\n",
+		"      (b) Set lambda==0 to exclude the penalty term;\n",
+		"      (c) Use a coarser grid by reducing the argument\n",
+		"	   'lambda.length' from the default value of 25.\n") # 3
+
+        ## shift the first and last knot a tiny bit "outside" {same as in qbsks2()}:
+        rk <- diff(range(knots))
+        knots[1] <- knots[1] - toler.kn*rk
+        knots[nknots] <- knots[nknots] + toler.kn*rk
+
+	rr <- drqssbc2(x, y, w, pw = pw, knots = knots, degree = degree,
+		       Tlambda = if(select.lambda) lambdaSet else lambda,
+		       constraint = constraint, ptConstr = ptConstr,
+		       maxiter = maxiter, trace = trace-1,
+		       nrq, nl1, neqc, niqc, nvar,
+		       tau = tau, select.lambda = select.lambda,
+		       give.pseudo.x = keep.x.ps,
+		       rq.tol = rq.tol, tol.0res = tol.0res,
+		       print.warn = print.warn)
+    }
+    if(any(rr$icyc >= maxiter))
+	warning("The algorithm has not converged after ", maxiter, " iterations",
+		if(select.lambda) " for at least one lambda", if(!is.null(pointwise)|
+		constraint!="none") "\nCheck to make sure that your constraint is feasible", 
+		immediate. = TRUE)
+    if(!all(rr$ifl == 1)) ## had problem
+	warning("Check 'ifl'")
+
+    nvar <- rr$nvar
+    if(length(rr$coef) != nvar) message("length(rr$coef) != nvar -- and MM thought it should")
+    Tcoef <- rr$coef[1:nvar]
+    ##
+    ## compute the residual
+    ##
+    y.hat <- .splValue(degree, knots, Tcoef, xo)
+    y.hat <- y.hat[order(ox)]		# original (unsorted) ordering
+
+    r <- list(call = cl,
+	      tau = tau, degree = degree, constraint = constraint,
+	      ic = if(select.knots) ic, pointwise = pointwise,
+	      select.knots = select.knots, select.lambda = select.lambda,
+	      x = if(keep.data) x,
+	      y = if(keep.data) y,
+	      resid = y - y.hat, fitted = y.hat,
+	      coef = Tcoef, knots = knots,
+	      k0 = rr$k,
+	      k	 = if(select.lambda) rr$kk else rr$k, ##was: min(rr$k, nknots-2+ks),
+	      x.ps = rr$pseudo.x,
+	      SSy = sum((y - mean(y))^2),
+	      lambda = rr$lambda,
+	      icyc   = rr$icyc,
+	      ifl    = rr$ifl,
+	      pp.lambda = if(select.lambda) rr$pp.lambda,
+	      pp.sic	= if(select.lambda) rr$sic,
+	      i.mask	= if(select.lambda) rr$i.mask)
+
+    class(r) <- "cobs"
+    r
+} ## cobs()
+
+knots.cobs <- function(Fn, ...) Fn$knots
+
+coef.cobs  <- function(object, ...) object$coef
+
+.print.part <- function(x, nMin, namX = deparse(substitute(x)),
+                        digits = getOption("digits"))
+{
+    ## Purpose: print (only part) of (numeric) vector 'x'
+    ## ----------------------------------------------------------------------
+    ## Author: Martin Maechler, Date: 7 Aug 2006
+    force(namX)
+    stopifnot(length(nMin) == 1, nMin == round(nMin))
+    nx <- length(x)
+    cat(namX, "[1:", nx,"]: ", sep = "")
+    chk <- format(x[if(nx <= nMin) 1:nx else c(1:(nMin-1), nx)], digits=digits)
+    if(nx > nMin) chk[nMin-1] <- "... "
+    cat(chk, sep = ", "); cat("\n")
+}
+
+print.cobs <- function(x, digits = getOption("digits"), ...) {
+    if(!is.numeric(lam <- x$lambda))
+	stop("'x' is not a valid \"cobs\" object")
+    cat("COBS ", if(lam == 0) "regression" else "smoothing",
+	" spline (degree = ", x$degree, ") from call:\n	 ", deparse(x$call),
+	if(any(x$ifl != 1)) {
+	    if(all(x$ifl != 1))
+		sprintf("\n\n **** ERROR in algorithm: ifl = %d\n\n", x$ifl[1])
+	    else "\n * Warning in algorithm: some ifl != 1\n"
+	},
+	"\n{tau=",format(x$tau,digits),"}-quantile",
+	";  dimensionality of fit: ",x$k," from {",
+	paste(unique(x$k0),collapse=","), "}\n", sep="")
+
+    .print.part(x$knots, nMin = 5, digits = digits)
+    if(lam != 0) {
+	cat("lambda =", format(lam, digits = digits))
+	if((nlam <- length(x$pp.lambda))) {
+	    cat(", selected via ", "SIC",# x$ic,
+		", out of ", nlam, " ones.", sep='')
+	}
+	cat("\n")
+    }
+    invisible(x)
+} # print
+
+summary.cobs <- function(object, digits = getOption("digits"), ...) {
+    if(!is.numeric(lam <- object$lambda))
+	stop("'object' is not a valid \"cobs\" object")
+    print(object, digits = digits, ...)# includes knots
+    if(!is.null(pw <- object$pointwise)) {
+	cat("with",nrow(pw),"pointwise constraints\n")
+    }
+    .print.part(object$coef, nMin = 7, nam = "coef", digits = digits)
+    tau <- object$tau
+    if(abs(tau - 0.50) < 1e-6)
+	cat("R^2 = ", round(100 * (1 - sum(object$resid^2) / object$SSy), 2),
+	    "% ;  ", sep="")
+    k <- sum((r <- resid(object)) <= 0)
+    n <- length(r)
+    cat("empirical tau (over all): ",k,"/",n," = ", format(k/n,digits),
+	" (target tau= ",tau,")\n", sep="")
+
+    ## add more -- maybe finally *return* an object and define
+    ## print.summary.cobs <- function(x, ...)
+
+} # summary
+
+residuals.cobs <- function (object, ...) object$resid
+fitted.cobs <- function (object, ...) object$fitted
+
+predict.cobs <-
+    function(object, z, minz = knots[1], maxz = knots[nknots], nz = 100,
+	     interval = c("none", "confidence", "simultaneous", "both"),
+	     level = 0.95, ...)
+{
+    if(is.null(knots <- object$knots)	||
+       is.null(coef  <- object$coef)	||
+       is.null(degree<- object$degree)	||
+       is.null(tau   <- object$tau)) stop("not a valid 'cobs' object")
+
+    interval <- match.arg(interval)
+
+    big	       <- if(is.R()) 3.4028234663852886e+38 else .Machine$single.xmax
+    ##IN
+    single.eps <- if(is.R())1.1920928955078125e-07 else .Machine$single.eps
+
+    nknots <- length(knots)
+    ord <- as.integer(degree + 1)
+    nvar   <- length(coef)
+
+    ##DBG cat("pr..cobs(): (ord, nknots, nvar) =",ord, nknots, nvar, "\n")
+
+    backOrder <- function(m) m
+    ##
+    ## compute fitted value at z
+    ##
+    ## MM: why should z be *inside* (even strictly) the knots interval? _FIXME_
+    if(missing(z)) {
+	if(minz >= maxz) stop("minz >= maxz")
+	##NOT YET (for "R CMD check" compatibility):
+	## z <- seq(minz, maxz, len = nz)
+	z <- seq(max(minz,knots[1]     + single.eps),
+                 min(maxz,knots[nknots]- single.eps), len = nz)
+    }
+    else {
+        ## Careful:  predict(*, x) should predict at 'x', not sort(x) !!
+        ## Note this is needed, since .splValue() requires *increasing* z
+        notOrd <- is.unsorted(z)
+        if (notOrd) {
+            iz.ord <- order(z)
+            z <- z[iz.ord]
+            i.rev <- order(iz.ord)
+            backOrder <- function(m) m[ i.rev , , drop = FALSE]
+        }
+	##IN z <- z[z > knots[1] & z < knots[nknots]]
+	nz <- length(z)
+    }
+
+    fit <- .splValue(degree, knots, coef, z)
+
+    if(interval != "none") {
+	##
+	## compute confidence bands
+	## both (pointwise and simultaneous : as cheap as only one !
+	##
+	z3 <- .splBasis(ord = ord, knots, ncoef = nknots + degree - 1, xo = z)
+	idx <- cbind(rep(1:nz, rep(ord, nz)),
+		     c(outer(1:ord, z3$offsets, "+")))
+	X <- matrix(0, nz, nvar)
+	X[idx] <- z3$design
+        ## This is a residuum from cobs99 to make the old Bartel and Conns'
+        ## algorithm more stable (and will probably never be used now):
+	if(any(ibig <- abs(X) > big)) {
+	    X[ibig] <- X[ibig] / big^0.5
+	    warning("re-scaling ", sum(ibig), "values of spline basis 'X'")
+	}
+
+        if(is.null(object$x.ps))
+	    stop("no 'x.ps' pseudo.x component; must use cobs(*, keep.x.ps = TRUE)")
+        ##MM: We should have crossprod() and qr() working for sparse matrices,
+        ## 	at least '%*%' and t() work; [hmm, but there is  slm() in 'SparseM' !]
+	## Tqr <- qr(crossprod(object$x.ps))
+        Tqr <- qr(as.matrix(t(object$x.ps) %*% object$x.ps))
+	if(Tqr$rank != dim(object$x.ps)[2])
+	    stop("The pseudo design matrix is singular; this can most likely be solved by using a smaller lambda")# when obtaining qsbs.out
+	## Improved way of computing xQx = diag(X %*% solve(Tqr) %*% t(X)) :
+	tX <- t(X)
+	xQx <- colSums(qr.coef(Tqr, tX) * tX)
+
+	res <- object$resid
+	n <- length(res)
+
+	s <- shat(res, tau, 1 - level, hs = TRUE)
+	cn <- sqrt(xQx * tau * (1 - tau))
+	sde <- cn * s
+	an <- sqrt(qchisq(level, object$k))   * sde
+	bn <- qt((1 + level)/2, n - object$k) * sde
+
+	backOrder(cbind(z = z, fit = fit,
+                        cb.lo = fit - an, cb.up = fit + an,
+                        ci.lo = fit - bn, ci.up = fit + bn))
+    }# interval
+    else
+	backOrder(cbind(z = z, fit = fit))
+} # predict
+
+
+
+##   "2" : 2nd ("scobs") cobs version
+getdim2 <- function(degree, nknots,
+		   constraint = c("none", "increase", "decrease",
+		   "convex", "concave", "periodic"))
+{
+    ##=########################################################################
+    ##
+    ## Compute the appropriate dimension for the pseudo design matrix
+    ##
+    ##=########################################################################
+    ## Note: "periodic" is here treated differently than in "cobs99" cobs()
+    ##	   because the new FN algorithm doesn't handle separate equality
+    ##     constraints. Hence, all equality constraints are processed through
+    ##	   pairs of inequality contraints.
+    ## Note 2: now also works for  *multiple* constraints
+    ##	      n.iqc will be a vector of the same length as 'constraint'
+    if(degree == 1)	ks <- 2
+    else if(degree == 2)ks <- 3
+    else stop("degree has to be either 1 or 2")
+    deg1 <- as.integer(degree == 1)
+    nvar <- nknots - 2 + ks
+    n.eqc <- # the number of EQuality Constraints
+        0 ## if(constraint == "periodic") 2 else 0
+    n.iqc <- # the number of IneQuality Constraints,  will be summed up :
+	sapply(match.arg(constraint, several.ok = TRUE),
+	       function(constr) {
+		   if(constr == "increase" || constr == "decrease")
+		       nknots - deg1
+		   else if(constr == "concave" || constr == "convex")
+		       nknots - 1 - deg1
+		   else if(constr == "periodic" )
+		       4
+		   else if(constr == "none")
+		       0
+	       })
+    list(n.iqc = n.iqc, n.eqc = n.eqc, ks = ks, nvar = nvar)
+}
+
+### These are (only) used for confidence intervals :
+
+shat <- function(residual, tau, alpha, hs)
+{
+    ##=########################################################################
+    ##
+    ## sparsity estimate from empirical quantile function using residuals
+    ##
+    ##=########################################################################
+    residual <- sort(residual)
+    n <- length(residual)
+    residual <- c(residual[1], residual, residual[n])
+    grid <- c(0, seq(0.5/n, 1 - 0.5/n, 1/n), 1)
+    hn <- dn(tau, n, hs = hs, alpha)
+    ## for small n,  tau +/- hn might be outside [0,1]
+    bound <- pmax(0, pmin(1, c(tau - hn, tau + hn)))
+    idx <- cut00(bound, grid)
+    lambda <- bound * n - (idx - 1) + 0.5
+    return(diff(lambda * residual[idx + 1] +
+		(1 - lambda) * residual[idx])/(2 * hn))
+}
+
+dn <- function(p, n, hs = FALSE, alpha)
+{
+    ##=########################################################################
+    ##
+    ## compute window width for sparsity estimator
+    ## at quantile p, level = 1-alpha,	n observations
+    ## according to
+    ##	 Hall and Sheather (1988),  <<-	 hs=TRUE,   or
+    ##	 Bofinger (1975),	    <<-	 hs=FALSE
+    ##=########################################################################
+    x0 <- qnorm(p)
+    f0 <- dnorm(x0)
+    stopifnot(is.logical(hs))
+    if(hs)
+	n^(-1/3) * qnorm(1 - alpha/2)^(2/3) *
+	    ((1.5 * f0^2)/(2 * x0^2 + 1))^(1/3)
+    else n^-0.2 * ((4.5 * f0^4)/(2 * x0^2 + 1)^2)^ 0.2
+}
+
+plot.cobs <-
+    function(x, which = if(x$select.lambda) 1:2 else 2, show.k = TRUE,
+	     col = par("col"), l.col = c("red","pink"), k.col = gray(c(0.6, 0.8)),
+             lwd = 2, cex = 0.4, ylim = NULL,
+	     xlab = deparse(x$call[[2]]),
+	     ylab = deparse(x$call[[3]]),
+	     main = paste(deparse(x$call, width.cut = 100), collapse="\n"),
+	     subtit= c("choosing lambda", "data & spline curve") , ...)
+{
+    stopifnot(all((which <- sort(unique(which))) %in% 1:2))
+    both.plots <- all(which == 1:2)
+
+    if(any(which == 1)) { ## --- SIC ~ lambda --------------
+	stopifnot(x$select.lambda) # have no $pp.lambda . . .
+
+	if(both.plots) {
+	    op <- par(mfcol = 1:2, mgp = c(1.6, 0.5, 0),
+		      mar = c(3.1, 3.1, 4.1, 0.6))
+	}
+	i.good <- x$ifl == 1
+	i.bad  <- !i.good
+        i.mask <- x$i.mask
+        i.show <- !i.mask
+
+	plot(x$pp.lambda, x$pp.sic, type = "n", log = "x",
+	     xlab = expression(lambda),
+	     ylab = "SIC",# paste("ic =", x$ic))
+	     main = if(!both.plots) main) # no, col.axis="red")
+	mtext(subtit[1], side=3, font = par("font.main"))
+	lines (x$pp.lambda[i.good], x$pp.sic[i.good], type = 'o',
+	       col = l.col[2], pch = 16)
+	lines (x$pp.lambda[i.good & i.show], x$pp.sic[i.good & i.show], type = 'o',
+	       col = l.col[1], pch = 16)
+	lines(x$lambda, x$pp.sic[x$pp.lambda == x$lambda],# <- the chosen lambda
+	      type = "h", lty = 3, col = l.col[1])
+        mtext(substitute(hat(lambda) == LAM, list(LAM = formatC(x$lambda, dig=3))),
+              side = 3, line = -1, col = l.col[1])
+	if(any(i.bad) || any(i.mask)) {
+	    all.are.11 <- all(x$ifl[i.bad] == 11)
+	    all.are.18 <- all(x$ifl[i.bad] == 18) # = 1+{17 : the new code}
+	    ch <- if(all.are.11) "ifl = 10+1"
+	    else  if(all.are.18) "ifl = 17+1"
+	    else paste("ifl in {",
+		       paste(unique(x$ifl[i.bad]), collapse= ","), "}", sep='')
+	    ## TODO(?) could use even more legend categories ..
+	    points(x$pp.lambda [i.bad], x$pp.sic[i.bad], col = l.col[2], pch = 1)
+	    points(x$pp.lambda [i.bad & i.show], x$pp.sic[i.bad & i.show], col = l.col[1], pch = 1)
+	    legend("right", ## MM had "topleft"
+		   c(if(any(i.bad)) c("ifl = 1, good fits",
+                                      paste(ch,", bad fits", sep='')),
+                     if(any(i.mask)) c("SIC when k <= sqrt(n)",
+                                       "SIC when k > sqrt(n)")),
+		   pch = c(if(any(i.bad)) c(16, 1), if(any(i.mask)) c(16,16)),
+                   col = c(if(any(i.bad)) rep(l.col[1],2), if(any(i.mask)) l.col))
+
+	}
+	if(show.k) {
+	    par(new = TRUE)
+            ## plot(x$pp.lambda[i.good], x$k0[i.good], axes = FALSE, ann = FALSE,
+            ##     type = 'l', log = "x", col = col.k, lty = 2)
+	    plot(x$pp.lambda, x$k0, log = "x", type = "n",
+                 axes = FALSE, ann = FALSE)
+            lines (x$pp.lambda[i.good], x$k0[i.good], type = 'o',
+                   col = k.col[2], pch = 16)
+            lines (x$pp.lambda[i.good & i.show], x$k0[i.good & i.show], type = 'o',
+                   col = k.col[1], pch = 16)
+	    axis(4, at = unique(c(0, x$k0[i.good])),
+		 las = 2, col = k.col[1], col.axis = k.col[1])
+	    mtext("k", side = 4, line = .5, at = par("usr")[4],
+                  las = 2, col = k.col[1])
+            if(any(i.bad)) {
+                points(x$pp.lambda[i.bad], x$k0[i.bad], col = gray(.9), pch = 1)
+                points(x$pp.lambda[i.bad & i.show], x$k0[i.bad & i.show],
+                       col = gray(.8), pch = 1)
+            }
+	}
+    }
+
+    ## warning("case of lambda = 0  not fully implemented")
+
+    ## FIXME -- do something (?) for 'lambda = 0', i.e. select.knots
+
+    if(any(which == 2)) { ## ---------- (x,y) + smooth cobs curve ----
+	if(is.null(x$x)) {
+	    ## MM: "works"	only if original (x,y) objects are still "there":
+	    x$x <- eval.parent(x$call[[2]])
+	    x$y <- eval.parent(x$call[[3]])
+	}
+        px <- predict(x)
+	if(is.null(ylim)) # make sure ylim fits (y & predict(.)):
+            ylim <- range(x$y, px[,"fit"], finite=TRUE)
+        plot(x$x, x$y, xlab = xlab, ylab = ylab, ylim= ylim,
+             main = if(!both.plots) main, col = col, cex = cex, ...)
+	lines(px, col = l.col[1], lwd = lwd, ...)
+	if(both.plots) {
+	    mtext(subtit[2], side = 3, font = par("font.main"))
+	    par(op)		# <- back to 1x1 figure (we assume ..)
+	    mtext(main, side=3, line=1,
+		  cex = par("cex.main"), font = par("font.main"))
+	}
+    }
+}
+End of scobs.R
