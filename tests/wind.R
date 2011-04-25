@@ -6,7 +6,7 @@ data(DublinWind)
 attach(DublinWind)##-> speed & day (instead of "wind.x" & "DUB.")
 iday <- sort.list(day)
 
-if(!interactive()) postscript("wind.ps", horizontal = TRUE)
+if(!dev.interactive(orNone=TRUE)) pdf("wind.pdf", width=10)
 
 stopifnot(identical(day,c(rep(c(rep(1:365,3),1:366),4),
                           rep(1:365,2))))

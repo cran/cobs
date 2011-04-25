@@ -3,7 +3,7 @@
 suppressMessages(library(cobs))
 
 options(digits = 6)
-postscript("multi-constr.ps")
+if(!dev.interactive(orNone=TRUE)) pdf("multi-constr.pdf")
 
 source(system.file("util.R", package = "cobs"))
 

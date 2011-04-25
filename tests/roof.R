@@ -3,7 +3,7 @@ suppressMessages(library(cobs))
 data(USArmyRoofs)
 attach(USArmyRoofs)#-> "age" and "fci"
 
-if(!interactive()) postscript("roof.ps", horizontal = TRUE)
+if(!dev.interactive(orNone=TRUE)) pdf("roof.pdf", width=10)
 
 ## Compute the quadratic median smoothing B-spline with SIC
 ## chosen lambda

@@ -1,7 +1,8 @@
 
-R version 2.11.1 Patched (2010-08-09 r52698)
-Copyright (C) 2010 The R Foundation for Statistical Computing
+R version 2.13.0 Patched (2011-04-24 r55634)
+Copyright (C) 2011 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
+Platform: i686-pc-linux-gnu (32-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -20,7 +21,7 @@ Type 'q()' to quit R.
 > data(USArmyRoofs)
 > attach(USArmyRoofs)#-> "age" and "fci"
 > 
-> if(!interactive()) postscript("roof.ps", horizontal = TRUE)
+> if(!dev.interactive(orNone=TRUE)) pdf("roof.pdf", width=10)
 > 
 > ## Compute the quadratic median smoothing B-spline with SIC
 > ## chosen lambda
@@ -127,7 +128,7 @@ COBS smoothing spline (degree = 2) from call:
 x$knots[1:10]:  0.04998504,  1.06000000,  2.11000000, ... , 15.01001496
 lambda = 73.84247, selected via SIC, out of 25 ones.
 with 1 pointwise constraints
-coef[1:12]: 99.618962, 95.779514, 88.792730, 82.920768, 79.115907, ... ,  0.811392
+coef[1:12]: 99.6189624, 95.7795144, 88.7927299, 82.9207676, 79.1159073, ... ,  0.8113919
 empirical tau (over all): 44/153 = 0.2875817 (target tau= 0.25)
 > 
 > ## Again plot $pp.sic against $pp.lambda
@@ -588,5 +589,5 @@ lambda = 5.030829, selected via SIC, out of 25 ones.
 > lines(pa75, col = 3)
 > 
 > cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''
-Time elapsed:  4.424 0.063 4.558 0 0 
+Time elapsed:  4.152 0.101 4.364 0 0 
 > 

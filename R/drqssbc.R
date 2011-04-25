@@ -1,4 +1,4 @@
-#### $Id: drqssbc.R,v 1.41 2009/02/24 13:51:20 maechler Exp maechler $
+#### $Id: drqssbc.R,v 1.42 2011/04/25 15:48:34 maechler Exp $
 
 drqssbc2 <-
     function(x,y, w = rep.int(1,n), pw, knots, degree, Tlambda, constraint,
@@ -69,6 +69,7 @@ drqssbc2 <-
 		    namX, d[1], d[2], k, k/prod(d))
 	}
 
+    rqCtrl <- list(maxiter=maxiter, warn.mesg = rq.print.warn, small= rq.tol)
     for(ilam in 1:nj0) { ## for each lambda in Tlambda[] : `` grid search ''
 	XX <-
 	    if(degree == 1)
@@ -134,10 +135,8 @@ drqssbc2 <-
 			      else rhs))
 	z0 <-
 	    if(fieq)
-		rq.fit.sfnc(Xeq,Yeq, Xieq,Yieq, tau = tau, rhs = rhs,
-			    maxiter = maxiter, warn.mesg = rq.print.warn, small=rq.tol)
-	    else rq.fit.sfn(Xeq,Yeq,		tau = tau, rhs = rhs,
-			    maxiter = maxiter, warn.mesg = rq.print.warn, small=rq.tol)
+		rq.fit.sfnc(Xeq,Yeq, Xieq,Yieq, tau=tau, rhs=rhs, control=rqCtrl)
+	    else rq.fit.sfn(Xeq,Yeq,		tau=tau, rhs=rhs, control=rqCtrl)
         ## rq.fit.sfn[c] : both in ../../quantreg/R/sfn.R
         ##  these call .Fortran("srqfn[c]", ..) in
         ##    -> ../../quantreg/src/srqfn.c and ..../srqfnc.c

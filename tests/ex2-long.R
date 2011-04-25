@@ -2,7 +2,7 @@
 suppressMessages(library(cobs))
 
 options(digits = 5)
-postscript("ex2.ps")
+if(!dev.interactive(orNone=TRUE)) pdf("ex2.pdf")
 
 source(system.file("util.R", package = "cobs"))
 

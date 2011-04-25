@@ -36,7 +36,8 @@ drqssbc2(x, y, w = rep.int(1,n), pw, knots, degree, Tlambda,
     \emph{underlying} algorithms; not much implemented (due to lack of trace
     in quantreg ...)}
   \item{nrq}{integer, \eqn{= n}, the number of observations.}
-  \item{nl1}{integer, ...., passed to  ~~Describe \code{nl1} here~~ }
+  \item{nl1}{integer, number of observations in the l1 norm that
+    correspond to roughness measure (may be zero).}
   \item{neqc}{integer giving the number of equations.}
   \item{niqc}{integer giving the number of \bold{i}ne\bold{q}uality
     \bold{c}onstraints; of the same length as \code{constraint}.}

@@ -1,7 +1,8 @@
 
-R version 2.11.1 Patched (2010-08-09 r52698)
-Copyright (C) 2010 The R Foundation for Statistical Computing
+R version 2.13.0 Patched (2011-04-24 r55634)
+Copyright (C) 2011 The R Foundation for Statistical Computing
 ISBN 3-900051-07-0
+Platform: i686-pc-linux-gnu (32-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -19,7 +20,7 @@ Type 'q()' to quit R.
 > 
 > #### Example 1 of   He and Ng (1999) :
 > #### -------------------------------
-> if(!interactive()) postscript("temp.ps", horizontal = TRUE)
+> if(!dev.interactive(orNone=TRUE)) pdf("temp.pdf", width=10)
 > 
 > data(globtemp)
 > str(globtemp)## time series T=113,  1880:1992
@@ -71,7 +72,7 @@ R^2 = 70.37% ;  empirical tau (over all): 56/113 = 0.4955752 (target tau= 0.5)
 COBS regression spline (degree = 1) from call:
 	 cobs(x = year, y = temp, constraint = "increase", knots = a50$knot,     nknots = length(a50$knots), degree = 1, tau = 0.1, ic = "SIC")
 {tau=0.1}-quantile;  dimensionality of fit: 4 from {4}
-x$knots[1:4]: 1880.000, 1936.000, 1964.000, 1992.000
+x$knots[1:4]: 1880, 1936, 1964, 1992
 coef[1:4]: -0.5700016, -0.1700000, -0.1700000,  0.1300024
 empirical tau (over all): 12/113 = 0.1061947 (target tau= 0.1)
 > a90 <- cobs(year, temp, nknots = length(a50$knots), knots = a50$knot,
@@ -80,7 +81,7 @@ empirical tau (over all): 12/113 = 0.1061947 (target tau= 0.1)
 COBS regression spline (degree = 1) from call:
 	 cobs(x = year, y = temp, constraint = "increase", knots = a50$knot,     nknots = length(a50$knots), degree = 1, tau = 0.9, ic = "SIC")
 {tau=0.9}-quantile;  dimensionality of fit: 4 from {4}
-x$knots[1:4]: 1880.000, 1936.000, 1964.000, 1992.000
+x$knots[1:4]: 1880, 1936, 1964, 1992
 coef[1:4]: -0.2576939,  0.1300000,  0.1300000,  0.4961568
 empirical tau (over all): 104/113 = 0.920354 (target tau= 0.9)
 > 
@@ -479,13 +480,13 @@ R^2 = 72.56% ;  empirical tau (over all): 54/113 = 0.4778761 (target tau= 0.5)
 COBS regression spline (degree = 1) from call:
 	 cobs(x = year, y = temp, constraint = "none", knots = a50$knot,     nknots = length(a50$knots), degree = 1, tau = 0.1, ic = "SIC")
 {tau=0.1}-quantile;  dimensionality of fit: 5 from {5}
-x$knots[1:5]: 1880.000, 1908.000, 1936.000, 1964.000, 1992.000
+x$knots[1:5]: 1880, 1908, 1936, 1964, 1992
 > (a90 <- cobs(year, temp, nknots = length(a50$knots), knots = a50$knot,
 +              degree = 1, tau = 0.9, constraint = "none", ic = "SIC"))
 COBS regression spline (degree = 1) from call:
 	 cobs(x = year, y = temp, constraint = "none", knots = a50$knot,     nknots = length(a50$knots), degree = 1, tau = 0.9, ic = "SIC")
 {tau=0.9}-quantile;  dimensionality of fit: 5 from {5}
-x$knots[1:5]: 1880.000, 1908.000, 1936.000, 1964.000, 1992.000
+x$knots[1:5]: 1880, 1908, 1936, 1964, 1992
 > which(hot.idx  <- temp >= a90$fit)
  [1]  10  18  21  22  47  61  68  74  78  79 102 111
 > which(cold.idx <- temp <= a10$fit)
@@ -508,5 +509,5 @@ x$knots[1:5]: 1880.000, 1908.000, 1936.000, 1964.000, 1992.000
 > 
 > 
 > cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''
-Time elapsed:  2.224 0.053 2.353 0 0 
+Time elapsed:  2.329 0.109 2.542 0 0 
 > 

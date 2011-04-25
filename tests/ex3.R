@@ -1,7 +1,7 @@
 suppressMessages(library(cobs))
 
 options(digits = 6)
-## postscript("ex3.ps")
+## pdf("ex3.pdf")
 
 data(women) # 15 obs.
 attach(women)

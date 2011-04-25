@@ -1,3 +1,10 @@
+2011-04-25  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 1.2-2
+
+	* R/drqssbc.R (drqssbc2): adapt to the latest "quantreg" release
+	which changed rq.fit.sfn[c]() incompatibly.
+
 2010-08-11  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* man/qbsks.Rd: make 'R CMD check' happy (again)

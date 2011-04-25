@@ -2,7 +2,7 @@ suppressMessages(library(cobs))
 
 #### Example 1 of   He and Ng (1999) :
 #### -------------------------------
-if(!interactive()) postscript("temp.ps", horizontal = TRUE)
+if(!dev.interactive(orNone=TRUE)) pdf("temp.pdf", width=10)
 
 data(globtemp)
 str(globtemp)## time series T=113,  1880:1992
