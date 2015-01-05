@@ -1,3 +1,13 @@
+2015-01-02  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 1.3-0;  Depends: only 'SparseM'; rest "Imports"
+	* NAMESPACE:	carefully import
+
+2011-04-29  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/scobs.R (plot.cobs, summary.cobs): cosmetics (full name
+	arguments) to make the CRAN maintainers happier.
+
 2011-04-25  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Version): 1.2-2

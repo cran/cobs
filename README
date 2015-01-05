@@ -1,3 +1,45 @@
+Calling tree :
+~~~~~~~~~~~~
+
+scobs()
+|
+|-> shat
+|   |
+|   \-> dn
+|
+|-> qbsks
+|   |
+|---|-> getdim
+|   |
+|   v
+\-> drqssbc
+    |   /
+    |  /  (possibly calls itself once)
+    |--
+    |
+    |-> l1.design
+    |
+    |-> l00.design
+    |
+    \-> .Fortran("drqssbc", ..)
+
+
+----------------------------------------------------------------
+
+qbsks(x,y,w,pw, knots,nknots, degree,Tlambda,constraint,
+      equal,smaller,greater,gradient, coef,maxiter,
+      pswitch, n.equal,n.smaller,n.greater,n.gradient,
+      nrq,nl1, neqc, nj0, tau,lam,tmin,kmax,lstart,
+      ks,mk.flag, knots.add, ic, print.mesg, factor,print.warn)
+
+drqssbc(x,y,w,pw, knots, degree,Tlambda,constraint,
+	equal,smaller,greater,gradient, coef,maxiter,
+	pswitch, n.equal,n.smaller,n.greater,n.gradient,
+	nrq,nl1, neqc,niqc, nvar,nj0, tau,lam,tmin,kmax,lstart,
+	factor,print.warn)
+
+-------------------------------------------------------------------------------
+
 The following relates to the older COBS version,
 nowadays in package   "cobs99"
 --------------------------------------------------------

@@ -1,7 +1,10 @@
 useDynLib(cobs, spline_basis, spline_value)
-##        ----  TODO: replace the above by calling into splines' package!!
+##        ----  TODO: replace the above by calling into splines package!!
 
 import("SparseM") # need at least as.matrix()
+## NB: Still need 'Depends: SparseM' in DESCRIPTION - as SparseM does not S3export() all
+importFrom("quantreg",
+           rq.fit.sfn, rq.fit.sfnc)
 ## Import non-base functions we need explicitly,
 ## notably for which we define methods (here, only S3 ones):
 importFrom("grDevices", xy.coords)

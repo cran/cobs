@@ -1,6 +1,1 @@
-##By Pin: PKG_LIBS= $(BLAS_LIBS) $(FLIBS) ../libs/cholesky.a
-##MM: we can only use *SRC* ! :
 PKG_LIBS= $(BLAS_LIBS) $(FLIBS)
-
-## otherwise, for S+, need  ../src/Orig/dblas1.f
-## {need anyway at the moment : srotm1() and srotmg1()

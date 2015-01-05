@@ -1,6 +1,13 @@
 suppressMessages(library(cobs))
 options(digits = 6, warn = 2) ## << all warnings to errors!
 
+## When 'R CMD check'ing, we may want to see exact package information:
+sessionInfo() # plus the details of the major dependent packages:
+packageDescription("SparseM")
+packageDescription("quantreg")
+packageDescription("cobs")
+##
+
 set.seed(101)
 x <- seq(-2,2,length = 100)
 y <- x^2+0.5*rnorm(100)

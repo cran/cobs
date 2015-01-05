@@ -1,10 +1,10 @@
-#### $Id: scobs.R,v 1.45 2009/02/24 17:19:24 maechler Exp $
+#### $Id: scobs.R,v 1.46 2011/04/29 15:16:14 maechler Exp $
 
-.onLoad <- function(lib, pkg) {
+.onAttach <- function(lib, pkg) {
     ## now have NAMESPACE library.dynam("cobs", pkg, lib)
     if(interactive() || getOption("verbose")) # not in test scripts
 	packageStartupMessage(sprintf(
-		"Package %s (%s) loaded.  To cite, see citation(\"%s\")\n",
+		"Package %s (%s) attached.  To cite, see citation(\"%s\")\n",
 		pkg, utils::packageDescription(pkg)$Version, pkg))
 }
 
@@ -323,7 +323,7 @@ summary.cobs <- function(object, digits = getOption("digits"), ...) {
     if(!is.null(pw <- object$pointwise)) {
 	cat("with",nrow(pw),"pointwise constraints\n")
     }
-    .print.part(object$coef, nMin = 7, nam = "coef", digits = digits)
+    .print.part(object$coef, nMin = 7, namX = "coef", digits = digits)
     tau <- object$tau
     if(abs(tau - 0.50) < 1e-6)
 	cat("R^2 = ", round(100 * (1 - sum(object$resid^2) / object$SSy), 2),
@@ -524,7 +524,7 @@ plot.cobs <-
              lwd = 2, cex = 0.4, ylim = NULL,
 	     xlab = deparse(x$call[[2]]),
 	     ylab = deparse(x$call[[3]]),
-	     main = paste(deparse(x$call, width.cut = 100), collapse="\n"),
+	     main = paste(deparse(x$call, width.cutoff = 100), collapse="\n"),
 	     subtit= c("choosing lambda", "data & spline curve") , ...)
 {
     stopifnot(all((which <- sort(unique(which))) %in% 1:2))
@@ -553,7 +553,7 @@ plot.cobs <-
 	       col = l.col[1], pch = 16)
 	lines(x$lambda, x$pp.sic[x$pp.lambda == x$lambda],# <- the chosen lambda
 	      type = "h", lty = 3, col = l.col[1])
-        mtext(substitute(hat(lambda) == LAM, list(LAM = formatC(x$lambda, dig=3))),
+        mtext(substitute(hat(lambda) == LAM, list(LAM = formatC(x$lambda, digits=3))),
               side = 3, line = -1, col = l.col[1])
 	if(any(i.bad) || any(i.mask)) {
 	    all.are.11 <- all(x$ifl[i.bad] == 11)

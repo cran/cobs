@@ -12,7 +12,7 @@
      lwd = 2, cex = 0.4, ylim = NULL,
      xlab = deparse(x$call[[2]]),
      ylab = deparse(x$call[[3]]),
-     main = paste(deparse(x$call, width.cut = 100), collapse="\n"),
+     main = paste(deparse(x$call, width.cutoff = 100), collapse="\n"),
      subtit= c("choosing lambda", "data & spline curve") , \dots)
 }
 \arguments{

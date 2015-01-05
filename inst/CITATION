@@ -1,0 +1,35 @@
+PKG <- "cobs"
+citHeader(paste("To cite the ",PKG," package in publications use:"))
+
+if(!exists("meta") || is.null(meta)) meta <- packageDescription(PKG)
+stopifnot(meta$Package == PKG)
+year <- sub("-.*", "", meta$Date)
+note <- sprintf("R package version %s.", meta$Version)
+if(getRversion() < "2.15") paste0 <- function(...) paste(..., sep="")
+url <- paste0("http://CRAN.R-project.org/package=", PKG)
+
+bibentry(bibtype = "Manual",
+	 title = "COBS -- Constrained B-splines (Sparse matrix based)",
+	 author = c(person(given = c("Pin", "T."), family = "Ng",
+			   email = "Pin.Ng@nau.edu"),
+		    person(given = "Martin", family = "Maechler")),
+	 year = year,
+	 note = note,
+	 url = url,
+	 textVersion =
+	 paste("Pin T. Ng and Martin Maechler",
+	       sprintf("(%s).", year),
+	       "COBS -- Constrained B-splines (Sparse matrix based).",
+	       note, "URL", url))
+
+bibentry(bibtype = "Article",
+	 title = "A Fast and Efficient Implementation of Qualitatively Constrained Quantile Smoothing Splines",
+	 author = c(person("Pin", "Ng"),
+		    person("Martin", "Maechler")),
+	 year = 2007,
+	 journal = "Statistical Modelling",
+	 volume = "7",
+	 number = "4",
+	 pages = "315--328",
+	 url = "http://smj.sagepub.com/content/7/4/315.abstract")
+

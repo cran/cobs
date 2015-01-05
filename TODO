@@ -1,3 +1,18 @@
+-*- org -*-
+
+* conreg(), SR()
+** Need a release with*OUT* SR(), because "old cobs" has Fortran fbounds problem
+** see  convexreg-PietGr/convexregresnew/README_MM
+** also ./src/Notes_SR
+** ->  convexreg-PietGr/RcodeConvex.R  has an  "R-only" version *and* "testing" code
+** FIXME: do not use src/nrutils.c (and src/nrutils.h ): Numerical Recipes
+   -----  copyright protected, not to be used in GPL
+**  merge the two;  ask Piet Groeneboom about 'weights' for SR() :
+** --> convexreg-PietGr/convexregres-PietGr.mail and more
+
+   
+   
+* cobs()
 -  allow  ic = <number> ==> something between AIC & BIC, or (ic = 1 :more
        overfitting than AIC)
 
@@ -37,11 +52,10 @@
   return both components : Log.lik. and p[lambda] ( = k[lambda] ), the dim.
 
 
+* *Old TODOs* which are *done* (here for reference only, newest first):
 
-------------------------------------------------------
-Old 'TODOs' which are done (here for reference only):
-==========            ====
-------------------------------------------------------
+- Use *,v files to produce "svn" version --> move to ~/R/D/R-forge/curves-etc/pkg/
+  (Done: 2012, Nov. 1)
 
 - add the three interesting real data examples from the COBS "paper".
   in the paper, they say that S-plus code for these examples is available

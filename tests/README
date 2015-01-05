@@ -1,5 +1,11 @@
-NOTE
-----
+				-*- org -*- for Emacs: use 'Org' menu and [Tab] key
+* NOTE:  *.Rout.save  +- ok
+** Cobs version 1.2-2, CRAN Date: 2011-04-25: they *.Rout.save are there and +- ok
+** Goal: Still get rid of several *.Rout.save  and use  all.equal() etc
+** [[0_pt-ex.R]] : first file with sessionInfo() etc:
+ packageVersions of SparseM, quantreg, cobs and *no* .Rout.save file of course
+* Old Note (Apr 28, 2002):  Platform dependence
+  --------
 All the *.Rout-N-save files have been renamed from
         *.Rout.save
 because the result of these examples depend *very* much
@@ -11,4 +17,3 @@ used.  I have seen big differences on the same Linux
 architecture, just from using different version of gcc (2.96 <-> 3.0.1)
 The current ./tests/*.Rout.save  files were produced on an oldish "robust"
 Solaris compiler set.
-				Martin Maechler

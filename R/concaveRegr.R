@@ -164,7 +164,7 @@ conreg <- function(x, y = NULL, w = NULL, convex = FALSE,
 		  maxit[2], " steps")
       M <- M_new
       Conv <- Conv_new
-      iK <- c(1, i.n[Conv < -eConv], nx) ## = locKnInd(Conv,eConv)
+      iK <- c(1L, i.n[Conv < -eConv], nx) ## = locKnInd(Conv,eConv)
       wR <- (M-y.)* w.
       H	 <- locDirDeriv(x., wR, iK)
       iter <- iter+1
