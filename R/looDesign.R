@@ -42,8 +42,8 @@ loo.design2 <- function(x, w, constraint, ptConstr, knots,
 			     ia = i1, ja = j1,
 			     dimension = as.integer(c(nrq, nvar))))
     nd <- nk - 5
-    nrql1 <- nrq + nl1
-    nrleq <- nrql1 + neqc
+    ## nrql1 <- nrq + nl1
+    ## nrleq <- nrql1 + neqc
     ## ==> nobs == nrleq + niqc
 
     ##
@@ -94,7 +94,7 @@ loo.design2 <- function(x, w, constraint, ptConstr, knots,
         else if(constr == "periodic") {
             ## *equality* constraint, coded as {+1, -1} INequalities
 
-	    neqc3 <- 2
+	    ## neqc3 <- 2
 	    z1.3 <- .splBasis(ord = ks, knots, ncoef,
 			    xo = sortx[c(1,nrq)], derivs = c(1,1))
 	    ra <- c(z1.3$design)

@@ -7,9 +7,14 @@ importFrom("quantreg",
            rq.fit.sfn, rq.fit.sfnc)
 ## Import non-base functions we need explicitly,
 ## notably for which we define methods (here, only S3 ones):
-importFrom("grDevices", xy.coords)
-importFrom("graphics", plot, lines)
-importFrom("stats",    knots, fitted, residuals)
+importFrom("grDevices", gray,xy.coords)
+importFrom("graphics", axis, legend, mtext, par, plot, points, lines)
+importFrom("methods", new)
+importFrom("stats",
+           approx, coef, knots, fitted, median, predict, resid, residuals, sd, dnorm,pnorm,
+           qnorm, qchisq, qt)
+importFrom("utils",
+           capture.output, str)
 
 export(cobs,
        conreg,
@@ -20,6 +25,7 @@ export(cobs,
        l1.design2,
        loo.design2,
        shat,
+       ## SR ! -- not yet --> R/SR.R man/conreg.Rd
 
        ## Don't hide the plot methods on purpose (many surprising args):
        plot.cobs,
@@ -38,9 +44,8 @@ S3method(print, conreg)
 S3method(predict, cobs)
 S3method(predict, conreg)
 
-## Don't hide the plot methods on purpose (many surprising args):
-## S3method(plot, cobs)
-## S3method(plot, conreg)
+S3method(plot, cobs)
+S3method(plot, conreg)
 S3method(lines, conreg)
 #TODO: S3method(lines, cobs)
 

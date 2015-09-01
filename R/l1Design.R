@@ -98,7 +98,7 @@ l1.design2 <- function(x, w, constraint, ptConstr, knots,
 	    else if (constr == "periodic") {
 		## *equality* constraint, coded as {+1, -1} INequalities
 
-		neqc3 <- 2
+		## neqc3 <- 2
 		z1.3 <- .splBasis(ord = ks, knots, ncoef,
 				  xo = sortx[c(1, nrq)], derivs = c(1,1))
 		ra <- c(z1.3$design)

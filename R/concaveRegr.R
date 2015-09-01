@@ -140,7 +140,7 @@ conreg <- function(x, y = NULL, w = NULL, convex = FALSE,
 	  ## modify M_new and (typically!) reduce the set of knots:
 	  JJ <- (Conv_new > eConv) # non-empty
 	  t <- min(- Conv[JJ] / (Conv_new[JJ] - Conv[JJ]))
-	  if(adjTol) oM <- M
+	  ## if(adjTol) ## FIXME: can restore 'M' from 'oM' -- or return 'oM' ??    oM <- M
 	  M <- (1 - t)*M + t*M_new
 	  Conv	<- locConvexities(x.,M)
 	  oiK <- iK
@@ -226,7 +226,7 @@ locDirDeriv <- function(x, wRes, iK) {
   n <- length(x)
   H  <- numeric(n)
   ## Note that iK == JJ <- which(isKnot)
-  p  <- length(iK)
+  ## p  <- length(iK)
   cs <- cumsum(wRes)
   for (i in seq_len(length(iK)-1)) {
       if(iK[i]+2 <= iK[i+1]) { ## <- safety check

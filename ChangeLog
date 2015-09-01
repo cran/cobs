@@ -1,3 +1,8 @@
+2015-09-01  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 1.3-1;  no Depends, only Imports
+	* NAMESPACE:	import also from base packages
+
 2015-01-02  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Version): 1.3-0;  Depends: only 'SparseM'; rest "Imports"

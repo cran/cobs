@@ -23,7 +23,7 @@ qbsks2 <-
         if(is.na(r) || r > -Inf) r else smll.log # = -750 for IEEE arithmetic
     }
     n <- nrq
-    xo <- x[order(x)]
+    ## xo <- x[order(x)]  <-- TODO ?
     logn <- log(n)
     f.IC <- switch(ic,
 		   "AIC" = 2,

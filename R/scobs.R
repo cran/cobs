@@ -317,7 +317,7 @@ print.cobs <- function(x, digits = getOption("digits"), ...) {
 } # print
 
 summary.cobs <- function(object, digits = getOption("digits"), ...) {
-    if(!is.numeric(lam <- object$lambda))
+    if(!is.numeric(object$lambda))
 	stop("'object' is not a valid \"cobs\" object")
     print(object, digits = digits, ...)# includes knots
     if(!is.null(pw <- object$pointwise)) {
