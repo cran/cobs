@@ -1,5 +1,5 @@
-c49ccc3b29a3b5c8a2f85cbc39620606 *ChangeLog
-ed01438410f239330fd63078a37cedea *DESCRIPTION
+d02619e8205253c9deac049c249efd5c *ChangeLog
+a46ddc5e783a2d08f6027692b3411d97 *DESCRIPTION
 b0e8dc41e67f25dbe74593ed30383c56 *NAMESPACE
 8cf78bac690d5be1c6c6b5d4b5e5a041 *R/concaveRegr.R
 8077d1db4e70ace333ca14f29a8350bc *R/drqssbc.R
@@ -14,7 +14,7 @@ c1b3f7bbcc5d37bd3eb6764fd2575b57 *TODO
 0362e62ff05d9b1c082a3646ac9e1dac *data/USArmyRoofs.tab
 f920167b0904c6d5f314468380bf14b7 *data/exHe.tab
 d39b00696453b8dcc331ce3e62cf682d *data/globtemp.R
-5aa5db5e9fab09542964e822345a7287 *inst/CITATION
+a20bf393043e8d41ee7d313544fcdd11 *inst/CITATION
 cc8b655020f7033e20271d5539828a3f *inst/scripts/README
 052040d3558d2934ae015b22c7ed7d3f *inst/scripts/roof.R
 de0797811a7ffd10da455c92a033351b *inst/scripts/temp.R
@@ -46,14 +46,14 @@ b011c5d7a6974ef0f9918f74950ce0be *tests/ex1.R
 718531d20bbcdafbdfca9d0d8e0de520 *tests/ex3.R
 3160cd50000fc344009cfcd3dbfb1392 *tests/ex3.Rout.save
 5487e9404815d9303405f393cf028566 *tests/multi-constr.R
-2c178680467c31db81da16b18ddb1009 *tests/multi-constr.Rout.save
+209cbad474a26cb50df262be44a7e875 *tests/multi-constr.Rout.save
 6adca369981e101e619d1c558eb594d0 *tests/roof.R
 c6a3f148f03e677f916c3c8664935e89 *tests/roof.Rout-N-save
 44f4fd4af0e5d73d9495aed31fbd0320 *tests/roof.Rout.save
 7c1a4e05f292166af2c1d1a399965e43 *tests/small-ex.R
 789573c52a6036cec3d094262158c035 *tests/small-ex.Rout.save
-15746ace34c9655b669a267484da347d *tests/spline-ex.R
-4f38a8039d98416924e28496b229ce2c *tests/spline-ex.Rout.save
+7c968c1411214611caffc88fa775c9f8 *tests/spline-ex.R
+7d9fb71740d7030e6872b0b589dd5ac1 *tests/spline-ex.Rout.save
 e17d744c0dc834a6f5478f067a31fb6d *tests/temp.R
 a3222ca6ce6eeedc79338611c6badc82 *tests/temp.Rout-N-save
 5f398584e88fca4b881240f2d0225be2 *tests/temp.Rout.save

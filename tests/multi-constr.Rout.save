@@ -1,7 +1,7 @@
 
-R version 3.0.0 Patched (2013-04-21 r62631) -- "Masked Marvel"
-Copyright (C) 2013 The R Foundation for Statistical Computing
-Platform: x86_64-unknown-linux-gnu (64-bit)
+R version 3.3.2 Patched (2017-01-30 r72057) -- "Sincere Pumpkin Patch"
+Copyright (C) 2017 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -269,8 +269,6 @@ qbsks2():
  Performing general knot selection ...
 
  Deleting unnecessary knots ...
-Warning message:
-In cobs(x, y, constraint = "increase", pointwise = con) : Check 'ifl'
 > ## when plotting it, we see that it gave a trivial constant!!
 > cp2c  <- cobs(x,y, constraint = "concave",  pointwise = con, trace = 3)
 qbsks2():
@@ -442,4 +440,4 @@ Warning messages:
 > 
 > proc.time()
    user  system elapsed 
-  3.033   0.103   3.290 
+  1.592   0.160   1.852 

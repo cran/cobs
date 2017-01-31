@@ -3,6 +3,7 @@ library(splines) ## for the splines
 suppressMessages(library(cobs))
 
 options(digits = 9)
+if(!dev.interactive(orNone=TRUE)) pdf("spline-ex.pdf")
 
 ### -- 1) -- Look at `splines' pkg code :
 data(women)
@@ -21,39 +22,31 @@ all.equal(pIspl, p2Ispl, tol = 1e-15)# TRUE
 ### -- 2) --- substituting our .splBasis()  by splines package splineDesign() --
 ### ========
 ### ---> done (in principle; not yet implemented!),  Feb.2002
+splBasis <- cobs:::.splBasis
+C_splBasis <- if(getRversion() >= "3.0.0") splines:::C_spline_basis else "spline_basis"
 
-str(cobs:::.splBasis(4, bIspl$knots, length(bIspl$coef) + 6, x = .5 + 57:72))# outside!
+str(splBasis(4, bIspl$knots, length(bIspl$coef) + 6, x = .5 + 57:72))# outside!
 xo <- 0.5 + 59:70 # should work up to ord = 5
 
 ## ord <- 4 # cubic splines
 ## ord <- 3 # quadratic splines
 for(ord in 5:1) {
     cat("\n\nord = ",ord,"\n========\n")
-    print(spB <- cobs:::.splBasis(ord, bIspl$knots,
-                           length(bIspl$coef) + ord + 2, x = xo))
+    print(spB <- splBasis(ord, bIspl$knots,
+                          length(bIspl$coef) + ord + 2, x = xo))
     ## Gives error for ord = 5:4 --- data must be INSIDE :
     try(       splineDesign(bIspl$knots, x = 0.5 + 57:72, ord = ord))
     str(spD <- splineDesign(bIspl$knots, x = xo,          ord = ord))
 
     ## splineDesign() contains:
-    tmp <- .Call("spline_basis", bIspl$knots, ord=ord, x= xo,
-                 derivs = integer(length(xo)), PACKAGE = "splines")
+    tmp <- .Call(C_splBasis, bIspl$knots, ord=ord,
+                 x = xo, derivs = integer(length(xo)), PACKAGE = "splines")
     print(offs.tmp <- attr(tmp, "Offsets"))
     attr(tmp, "Offsets") <- NULL
-    print(all.equal(tmp, spB$design, tol = 4e-16)) # TRUE
-    print(all(spB$offsets - offs.tmp == ord - 1)) # TRUE
+    stopifnot(all.equal(tmp, spB$design, tol = 4e-16),
+              spB$offsets - offs.tmp == ord - 1)
 }
 
-## This (comments dropped) checks the same but gives no output (iff OK)
-for(ord in 5:1) {
-    spB <- cobs:::.splBasis(ord, bIspl$knots, length(bIspl$coef) + ord + 2, x = xo)
-    tmp <- .Call("spline_basis", bIspl$knots, ord=ord, x= xo,
-                 derivs = integer(length(xo)), PACKAGE = "splines")
-    offs.tmp <- attr(tmp, "Offsets")
-    attr(tmp, "Offsets") <- NULL
-    stopifnot(all.equal(tmp, spB$design, tol = 4e-16),
-              all(spB$offsets - offs.tmp == ord - 1))
-}
 
 ### -- 3) --- substituting our cobs:::.splValue() by splines package predict.bSpline
 ### ========
@@ -81,3 +74,10 @@ predict(bIspl, xo)
 
 cobs:::.splValue(deg = 3, knots = bIspl$knots, coef = bIspl$coef, xo = xo)
 ## hmm, not the same as $ y above ...
+## ... but this plot reveals  "some parallelism":
+plot(bIspl)
+lines(predict(bIspl, xo), col=2, type = "o")
+rug(xo)
+lines(xo, cobs:::.splValue(deg = 3, knots = bIspl$knots, coef = bIspl$coef, xo = xo),
+      col=3, type = "o")
+
