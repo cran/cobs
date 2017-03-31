@@ -1,8 +1,8 @@
-useDynLib(cobs, spline_basis, spline_value)
-##        ----  TODO: replace the above by calling into splines package!!
+useDynLib(cobs, .registration=TRUE)
 
-import("SparseM") # need at least as.matrix()
-## NB: Still need 'Depends: SparseM' in DESCRIPTION - as SparseM does not S3export() all
+importFrom("SparseM", as.matrix, as.matrix.csr, solve, t)
+##  notably the S4 generics
+
 importFrom("quantreg",
            rq.fit.sfn, rq.fit.sfnc)
 ## Import non-base functions we need explicitly,
@@ -11,10 +11,11 @@ importFrom("grDevices", gray,xy.coords)
 importFrom("graphics", axis, legend, mtext, par, plot, points, lines)
 importFrom("methods", new)
 importFrom("stats",
-           approx, coef, knots, fitted, median, predict, resid, residuals, sd, dnorm,pnorm,
-           qnorm, qchisq, qt)
+	   approx, coef, knots, fitted, median, predict, resid, residuals, sd,
+	   dnorm, pnorm, qnorm, qchisq, qt)
 importFrom("utils",
            capture.output, str)
+importFrom("splines", interpSpline)
 
 export(cobs,
        conreg,
@@ -25,7 +26,7 @@ export(cobs,
        l1.design2,
        loo.design2,
        shat,
-       ## SR ! -- not yet --> R/SR.R man/conreg.Rd
+       interpSplineCon, isIsplineCon,
 
        ## Don't hide the plot methods on purpose (many surprising args):
        plot.cobs,

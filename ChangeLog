@@ -1,3 +1,26 @@
+2017-03-28  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/concaveRegr.R (conreg): include the former unexported SR() as
+	conreg(*, method = "SR").  Add `verbose` option.
+
+	New utilities for cubic spline interpolation, `interpSplineCon()` etc.
+
+2017-03-21  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* R/scobs.R (predict.cobs): fix the bug that "extrapolation to the
+	right" gave 'NaN' (from division by zero),
+	by removing the extraneous coef[]  (I call a 'Kludge').
+
+	* src/init.c, src/splines.h: new, add "proper registration"
+	* NAMESPACE: ditto
+	* DESCRIPTION (Version): 1.3-3
+
+2017-03-19  Martin Mächler  <maechler@stat.math.ethz.ch>
+
+	* R/scobs.R (predict.cobs): new 'deriv = 0' argument; allows
+	'deriv = 1' to compute first derivatives s'().
+	* R/scobs.R (cobs): remove deprecated arguments (of *long* ago).
+
 2017-01-31  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* DESCRIPTION (Version): 1.3-2

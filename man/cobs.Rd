@@ -19,8 +19,7 @@ cobs(x, y, constraint = c("none", "increase", "decrease",
      lambdaSet = exp(seq(log(lambda.lo), log(lambda.hi), length = lambda.length)),
      lambda.lo = f.lambda*1e-4, lambda.hi = f.lambda*1e3, lambda.length = 25,
      maxiter = 100,
-     rq.tol = 1e-8, toler.kn = 1e-6, tol.0res = 1e-6, nk.start = 2,
-     eps, n.sub, coef, lstart, factor)
+     rq.tol = 1e-8, toler.kn = 1e-6, tol.0res = 1e-6, nk.start = 2)
 }
 \arguments{
   \item{x}{vector of covariate; missing values are omitted.}
@@ -121,9 +120,6 @@ cobs(x, y, constraint = c("none", "increase", "decrease",
     \code{\link{qbsks2}} and \code{\link{drqssbc2}}.}
   \item{nk.start}{number of starting knots used in automatic knot
     selection. Defaults to the minimum of 2 knots.}
-  \item{eps, n.sub, coef, lstart, factor}{unused arguments of the 1999/2002 version
-    of \code{cobs()}, currently still allowed (with a
-    \code{\link{warning}}) for back compatibility reasons.}
 }
 \value{
   an object of class \code{cobs}, a list with components

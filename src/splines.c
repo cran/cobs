@@ -10,19 +10,10 @@
 /* ============
  * REPLACE THIS by calling much nicer code in standard R "splines" package !!
  * ============
+ * (but that also has a FIXME in C code)
  */
 
-#include <R.h>
-/* defines `Sint' as `int' for R; (and define it as `long' for S-plus !!)
- *          ====      ~~~                            ~~~~      !!!!!!
- * and  S_alloc() */
-#ifdef not_in_R
-# ifdef __STDC__
-  extern void *S_alloc();
-# else
-  extern char *S_alloc();
-# endif
-#endif
+#include "splines.h"
 
 /* GLOBALS VARIABLES for difference tables : */
 static double *ldel, *rdel;

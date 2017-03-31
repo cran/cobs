@@ -22,7 +22,15 @@ summaryCobs <- function(x, level = 0.90, ...)
 cpuTime <- function(expr)
     cat("Time elapsed:", format(system.time(expr)[3]),"\n")
 
-## a cheap version of sfsmisc::rrange():
+##' Robust Range(): a cheap version of sfsmisc::rrange():
 robrng <- function(x, coef=1.5)
     boxplot.stats(x, coef = coef, do.conf = FALSE, do.out = FALSE)$stats[c(1, 5)]
 
+## For testing (in ../tests/ ) only [in my other packages, have this hidden *in* pkg]
+doExtras <- function() {
+    interactive() || nzchar(Sys.getenv("R_cobs_check_extra")) ||
+        identical("true", unname(Sys.getenv("R_PKG_CHECKING_doExtras")))
+}
+
+##' We want to use  withAutoprint({...}) when available :
+if(!exists("withAutoprint", mode="function")) withAutoprint <- identity

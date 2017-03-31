@@ -6,8 +6,8 @@
   bounds for \code{\link{cobs}} objects.
 }
 \usage{
-\method{predict}{cobs}(object,
-        z, minz = knots[1], maxz = knots[nknots], nz = 100,
+\method{predict}{cobs}(object, z, deriv = 0L,
+        minz = knots[1], maxz = knots[nknots], nz = 100,
         interval = c("none", "confidence", "simultaneous", "both"),
         level = 0.95, \dots)
 }
@@ -17,6 +17,8 @@
     evaluated; defaults to an equally spaced grid with \code{nz} grid
     points between \code{minz} and \code{maxz}.  Note that now \code{z}
     may lie outside of the knots interval which was not allowed originally.}
+  \item{deriv}{scalar integer specifying (the order of) the derivative
+    that should be computed.}
   \item{minz}{numeric needed if \code{z} is not specified; defaults to
     \code{min(x)} or the first knot if \code{knots} are given.}
   \item{maxz}{analogous to \code{minz}; defaults to \code{max(x)} or the

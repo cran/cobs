@@ -35,7 +35,7 @@
        offsets = integer(n))[c("design","offsets")]
 }
 
-.splValue <- function(degree, knots, coef, xo)
+.splValue <- function(degree, knots, coef, xo, deriv = 0L)
 {
     ## Purpose: encapsulate .C("spline_value", ..)
     ## ----------------------------------------------------------------------
@@ -48,7 +48,7 @@
     new.knots <- c(rep.int(knots[1], degree),
                    knots,
                    rep.int(knots[length(knots)], degree))
-    derivs <- as.integer(0)
+    deriv <- as.integer(deriv[1L])
     n <- length(xo)
     .C(spline_value,
        as.double(new.knots),
@@ -57,6 +57,6 @@
        ord,
        as.double(xo),
        as.integer(n),
-       derivs,
+       deriv,
        y = double(n))$y
 } ## .splValue

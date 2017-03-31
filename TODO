@@ -10,8 +10,8 @@
 **  merge the two;  ask Piet Groeneboom about 'weights' for SR() :
 ** --> convexreg-PietGr/convexregres-PietGr.mail and more
 
-   
-   
+
+
 * cobs()
 -  allow  ic = <number> ==> something between AIC & BIC, or (ic = 1 :more
        overfitting than AIC)

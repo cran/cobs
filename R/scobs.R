@@ -57,9 +57,7 @@ function(x, y,
 	 print.warn = TRUE, print.mesg = TRUE, trace = print.mesg,
          lambdaSet = exp(seq(log(lambda.lo), log(lambda.hi), length= lambda.length)),
 	 lambda.lo = f.lambda*1e-4, lambda.hi = f.lambda*1e3, lambda.length = 25,
-	 maxiter = 100, rq.tol = 1e-8, toler.kn = 1e-6, tol.0res = 1e-6, nk.start = 2,
-### old "back-compatibility-only" arguments:
-	 eps, n.sub, coef, lstart, factor)
+	 maxiter = 100, rq.tol = 1e-8, toler.kn = 1e-6, tol.0res = 1e-6, nk.start = 2)
 
 {
     ## preamble
@@ -69,13 +67,6 @@ function(x, y,
     if(length(constraint) == 0 || any(constraint == "none"))
 	constraint <- "none"
 
-    if(any(oldN <- names(cl) %in% c("eps", "n.sub", "coef", "lstart", "factor"))) {
-	n <- sum(oldN)
-	warning(paste("The use of", ngettext(n,"argument", "arguments"),
-		      paste(sQuote(names(cl)[oldN]), collapse=", "),
-		      "is deprecated.\n ", ngettext(n,"It is","They are"),
-		      "now unused and will be removed in the future."))
-    }
     ## FIXME: add "proper" na.action (as lm(), ..)
     na.idx <- is.na(x) | is.na(y)
     x <- x[!na.idx]
@@ -240,35 +231,38 @@ function(x, y,
 	warning("Check 'ifl'")
 
     nvar <- rr$nvar
-    if(length(rr$coef) != nvar) message("length(rr$coef) != nvar -- and MM thought it should")
-    Tcoef <- rr$coef[1:nvar]
+    Tcoef <-
+	if(length(rr$coef) != nvar) {
+	    message("length(rr$coef) != nvar -- and MM thought it should")
+	    rr$coef[1:nvar]
+	}
+	else rr$coef
     ##
     ## compute the residual
     ##
-    y.hat <- .splValue(degree, knots, Tcoef, xo)
+    y.hat <- .splValue(degree, knots, Tcoef, xo)# deriv=0L
     y.hat <- y.hat[order(ox)]		# original (unsorted) ordering
 
-    r <- list(call = cl,
-	      tau = tau, degree = degree, constraint = constraint,
-	      ic = if(lambda == 0) ic, pointwise = pointwise,
-	      select.knots = select.knots, select.lambda = select.lambda,
-	      x = if(keep.data) x,
-	      y = if(keep.data) y,
-	      resid = y - y.hat, fitted = y.hat,
-	      coef = Tcoef, knots = knots,
-	      k0 = rr$k,
-	      k	 = if(select.lambda) rr$kk else rr$k, ##was: min(rr$k, nknots-2+ks),
-	      x.ps = rr$pseudo.x,
-	      SSy = sum((y - mean(y))^2),
-	      lambda = rr$lambda,
-	      icyc   = rr$icyc,
-	      ifl    = rr$ifl,
-	      pp.lambda = if(select.lambda) rr$pp.lambda,
-	      pp.sic	= if(select.lambda) rr$sic,
-	      i.mask	= if(select.lambda) rr$i.mask)
-
-    class(r) <- "cobs"
-    r
+    structure(class = "cobs",
+              list(call = cl,
+                   tau = tau, degree = degree, constraint = constraint,
+                   ic = if(lambda == 0) ic, pointwise = pointwise,
+                   select.knots = select.knots, select.lambda = select.lambda,
+                   x = if(keep.data) x,
+                   y = if(keep.data) y,
+                   resid = y - y.hat, fitted = y.hat,
+                   coef = Tcoef,
+		   knots = knots,
+                   k0 	= rr$k,
+                   k	= if(select.lambda) rr$kk else rr$k, ##was: min(rr$k, nknots-2+ks),
+                   x.ps = rr$pseudo.x,
+                   SSy = sum((y - mean(y))^2),
+                   lambda = rr$lambda,
+                   icyc   = rr$icyc,
+                   ifl    = rr$ifl,
+                   pp.lambda = if(select.lambda) rr$pp.lambda,
+                   pp.sic	= if(select.lambda) rr$sic,
+                   i.mask	= if(select.lambda) rr$i.mask))
 } ## cobs()
 
 knots.cobs <- function(Fn, ...) Fn$knots
@@ -342,7 +336,7 @@ residuals.cobs <- function (object, ...) object$resid
 fitted.cobs <- function (object, ...) object$fitted
 
 predict.cobs <-
-    function(object, z, minz = knots[1], maxz = knots[nknots], nz = 100,
+    function(object, z, deriv = 0L, minz = knots[1], maxz = knots[nknots], nz = 100,
 	     interval = c("none", "confidence", "simultaneous", "both"),
 	     level = 0.95, ...)
 {
@@ -389,7 +383,10 @@ predict.cobs <-
 	nz <- length(z)
     }
 
-    fit <- .splValue(degree, knots, coef, z)
+    ## Kludge-Fix for extrapolation to the right
+    if(length(coef) > (nk1 <- length(knots)+1L)) length(coef) <- nk1
+
+    fit <- .splValue(degree, knots, coef, z, deriv = deriv)
 
     if(interval != "none") {
 	##

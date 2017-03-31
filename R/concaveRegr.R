@@ -7,8 +7,10 @@
 ## 'conreg' is analogue to the standard R  'isoreg()'
 ## also, it now can be convex or concave regression
 conreg <- function(x, y = NULL, w = NULL, convex = FALSE,
-			tol = 1e-7, maxit = c(200,20),
-			adjTol = TRUE, verbose = FALSE)
+		   method = c("Duembgen06_R", "SR"),
+		   tol = c(1e-10, 1e-7),
+                   maxit = c(500, 20),
+		   adjTol = TRUE, verbose = FALSE)
 {
   ## Ported to R and enhanced:
   ## - work for unordered, even duplicated 'x'
@@ -19,10 +21,6 @@ conreg <- function(x, y = NULL, w = NULL, convex = FALSE,
   ## - define "class" and many methods, plot, predict, ...
 
   ## Martin Maechler, 27.-28. Apr 2007
-
-
-  ## TODO: allow convexity instead of concavity
-  ##	 (directly instead of via " y <- -y ")
 
   ##  2)	use 'call'  in plot, etc...
 
@@ -63,67 +61,134 @@ conreg <- function(x, y = NULL, w = NULL, convex = FALSE,
   y <- xy$y
   x <- xy$x
   n <- length(x)
-  w <-
+  method <- match.arg(method)
+  isSR <- method == "SR"
+  if(isSR) {
+    if(!is.null(w))
+      stop("weights are not yet supported for method \"SR\"")
+    ## cobs() has all the weights; handling of ties, etc etc
+    ## Here, we only sort (if needed)
+    if(doSort <- is.unsorted(x)) {
+      i. <- sort.list(x, method="quick")
+      x. <- x[i.]
+      y. <- y[i.]
+    } else {
+      x. <- x
+      y. <- y
+    }
+    w. <- NULL
+    nx <- n
+
+  } else { ## (method == "Duembgen06_R")
+    w <-
       if(is.null(w)) rep(1, n)
       else {
-	  if(n != length(w)) stop("lengths of 'x' and 'w' must match")
-	  if(any(w < 0)) stop("all weights should be non-negative")
-	  if(all(w == 0)) stop("some weights should be positive")
-	  (w * sum(w > 0))/sum(w)
+        if(n != length(w)) stop("lengths of 'x' and 'w' must match")
+        if(any(w < 0)) stop("all weights should be non-negative")
+        if(all(w == 0)) stop("some weights should be positive")
+        (w * sum(w > 0))/sum(w)
       }# now sum(w) == #{obs. with weight > 0} == sum(w > 0)
 
-  ## Replace y[] (and w[]) for same x[] (to 6 digits precision) by their mean :
-  x <- signif(x, 6)
-  x. <- unique(sort(x))
-  nx <- length(x.)
-  if(nx == 0) stop("need at least one x value")
-  ## FIXME: for large n, the following is *very* slow
-  ox <- match(x, x.)
-  ## Faster, much simplified version of tapply()
-  tapply1 <- function (X, INDEX, FUN = NULL, ..., simplify = TRUE) {
+    ## Replace y[] (and w[]) for same x[] (to 6 digits precision) by their mean :
+    x <- signif(x, 6)
+    x. <- unique(sort(x))
+    nx <- length(x.)
+    if(nx == 0) stop("need at least one x value")
+    ## FIXME: for large n, the following is *very* slow
+    ox <- match(x, x.)
+    ## Faster, much simplified version of tapply()
+    tapply1 <- function (X, INDEX, FUN = NULL, ..., simplify = TRUE) {
       sapply(unname(split(X, INDEX)), FUN, ...,
              simplify = simplify, USE.NAMES = FALSE)
+    }
+    tmp <- matrix(unlist(tapply1(seq_along(y), ox,
+                                 function(i)
+                                   c(sum(w[i]), sum(w[i]*y[i]))#,sum(w[i]*y[i]^2))
+                                 ), use.names=FALSE),
+                  ncol = 2, #3,
+                  byrow=TRUE)
+    w. <- tmp[, 1]
+    y. <- tmp[, 2]/ifelse(w. > 0, w., 1)
+    ## yssw <- sum(tmp[, 3] - w.*y.^2) # will be added to RSS for GCV
   }
-  tmp <- matrix(unlist(tapply1(seq_along(y), ox,
-			      function(i)
-			      c(sum(w[i]), sum(w[i]*y[i]))#,sum(w[i]*y[i]^2))
-			      ), use.names=FALSE),
-		ncol = 2, #3,
-		byrow=TRUE)
-  w. <- tmp[, 1]
-  y. <- tmp[, 2]/ifelse(w. > 0, w., 1)
-  ## yssw <- sum(tmp[, 3] - w.*y.^2) # will be added to RSS for GCV
 
-  if(convex) y. <- - y. # and will revert at the end
+  ## sign switch: different for the two methods ! (?!)
+  convSwitch <- (isSR && !convex) || (!isSR && convex)
+
+  if(convSwitch) y. <- - y. # and will revert at the end
 
   stopifnot(length(maxit) >= 1, maxit == round(maxit))
   if(length(maxit) == 1) maxit <- rep.int(maxit, 2)
-
-  ## auxiliaries in locEstimate
-  i.n <- seq_len(nx)
-  rtW <- sqrt(w.)
-  rWy <- rtW * y.
+  stopifnot(length(tol) >= 1, tol >= 0)
+  if(length(tol) == 1) tol <- rep.int(tol, 2)
 
   ## rescale 'tol' to be x-scale equivariant:
   if(nx > 1) tol <- tol / sd(x.)
 
-  ## rather work with knot *indices* instead of logical (or 0/1):
-  iK <- if(nx > 1) c(1,nx) else 1
+  if(method == "SR") {
 
-  ## M = "current y.hat" :
-  M  <- locEstimate(x., rWy, rtW, iK)
-  wR <- (M-y.)* w.
-  H  <- locDirDeriv(x., wR, iK)
+    r <- .C(SR_R, # --> ../src/SR.c
+            n=  as.integer(n),
+            cc= as.double(x.[n] - x.[1L]), # x-scale: diff(range(x.))
+            m1= integer(1),
+            ind= integer(n+1),
+            x = as.double(x.),
+            y = as.double(y.),
+            r = double(n),
+            ## MM: what are these? -- surely some are interesting
+            ## ---> ../convexreg-PietGr/convexregres/main.c  outputs (x[],Y[]),  (x, H) and (x, D)
+            ##   but the
+            ##      ../convexreg-PietGr/convexregresnew/main.c  no longer does ..
+            ##  (if not, create and free in C !!)
+            R = double(n),
+            H = double(n),
+            S = double(n),
+            Y = double(n),
+            D = double(n),
+            tol = as.double(tol),
+            maxit = as.integer(maxit),
+            verbose = as.integer(verbose),
+            phiBL = double(1),
+            numIt = integer(1))
 
-  ## Precision parameter
-  ## MM[FIXME]: I think we should have TWO different 'prec' below
-  prec <- tol * mean(abs(wR))
-  eConv <- prec # should maybe be different
-  ## could also use "adaptive" prec:
-  ## while (max(H) > (prec <- tol * mean(abs(wR),trim=.1)) && iter < maxit) {
+    ## the vector r contains the convex LS estimates f[i] at the points x[i]
+    ## the data are in the vector y and phi is the criterion function
+    ## the vector of indices ind contains the indices of the points where the
+    ## solution has a kink (only for method 1) and m is the number of kinks
 
-  iter <- innerIt <- 0
-  while (max(H) > prec && iter < maxit[1]) {
+    M <- r$ r
+    H <- r$ H
+    ## TODO ?  'D' , 'S', ... ???
+
+    if(doSort) {
+      ## FIXME -- revert or ?????
+    }
+    iK <- r$ind[1L + seq_len(r$m1)]
+    iter <- r$numIt # FIXME? c(iter, innerIt)
+  }
+  else if(method == "Duembgen06_R") {
+    ## auxiliaries in locEstimate
+    i.n <- seq_len(nx)
+    rtW <- sqrt(w.)
+    rWy <- rtW * y.
+
+    ## rather work with knot *indices* instead of logical (or 0/1):
+    iK <- if(nx > 1) c(1,nx) else 1
+
+    ## M = "current y.hat" :
+    M  <- locEstimate(x., rWy, rtW, iK)
+    wR <- (M-y.)* w.
+    H  <- locDirDeriv(x., wR, iK)
+
+    ## Precision parameter: NB  length(tol) == 2
+    prec <- tol * mean(abs(wR))
+    eConv <- prec[2] # should maybe be different
+    prec <- prec[1]
+    ## could also use "adaptive" prec:
+    ## while (max(H) > (prec <- tol * mean(abs(wR),trim=.1)) && iter < maxit) {
+
+    iter <- innerIt <- 0
+    while (max(H) > prec && iter < maxit[1]) {
       ## extend the set of knots - at  max_H location:
       ## isKnot[(im <- which.max(H))] <- TRUE
       iK <- sort(c(iK, im <- which.max(H)))
@@ -136,58 +201,64 @@ conreg <- function(x, y = NULL, w = NULL, convex = FALSE,
       Conv_new	<- locConvexities(x., M_new)
       iit <- 0
       while (max(Conv_new) > eConv && iit < maxit[2]) {
-	  if(verbose) cat(".")
-	  ## modify M_new and (typically!) reduce the set of knots:
-	  JJ <- (Conv_new > eConv) # non-empty
-	  t <- min(- Conv[JJ] / (Conv_new[JJ] - Conv[JJ]))
-	  ## if(adjTol) ## FIXME: can restore 'M' from 'oM' -- or return 'oM' ??    oM <- M
-	  M <- (1 - t)*M + t*M_new
-	  Conv	<- locConvexities(x.,M)
-	  oiK <- iK
-	  iK <- c(1, i.n[Conv < -eConv], nx) ## = locKnInd(Conv,eConv)
-	  if(adjTol && identical(iK, oiK)) { ## may not converge ..
-	      if(verbose)
-		  cat("inner knot set unchanged; increasing eConv\n\t")
-	      eConv <- 8 * eConv
-	      next # while
-	  }
+        if(verbose) cat(".")
+        ## modify M_new and (typically!) reduce the set of knots:
+        JJ <- (Conv_new > eConv) # non-empty
+        t <- min(- Conv[JJ] / (Conv_new[JJ] - Conv[JJ]))
+        ## if(adjTol) ## FIXME: can restore 'M' from 'oM' -- or return 'oM' ??    oM <- M
+        M <- (1 - t)*M + t*M_new
+        Conv <- locConvexities(x.,M)
+        oiK <- iK
+        iK <- c(1, i.n[Conv < -eConv], nx) ## = locKnInd(Conv,eConv)
+        if(adjTol && identical(iK, oiK)) { ## may not converge ..
+          if(verbose)
+            cat("inner knot set unchanged; increasing eConv\n\t")
+          eConv <- 8 * eConv
+          next # while
+        }
 
-	  M_new	 <- locEstimate(x., rWy, rtW, iK)
-	  Conv_new  <- locConvexities(x.,M_new)
-	  iit <- iit + 1
+        M_new	 <- locEstimate(x., rWy, rtW, iK)
+        Conv_new  <- locConvexities(x.,M_new)
+        iit <- iit + 1
       }
       innerIt <- innerIt + iit
       if(verbose) cat("\n")
 
       if(iit == maxit[2])
-	  warning("** inner iterations did *not* converge in ",
-		  maxit[2], " steps")
+        warning("** inner iterations did *not* converge in ",
+                maxit[2], " steps")
       M <- M_new
       Conv <- Conv_new
       iK <- c(1L, i.n[Conv < -eConv], nx) ## = locKnInd(Conv,eConv)
       wR <- (M-y.)* w.
       H	 <- locDirDeriv(x., wR, iK)
       iter <- iter+1
-  } ## while (outer iter)
+    } ## while (outer iter)
 
-  if(iter == maxit[1])
-      warning("*** iterations did *not* converge in ", maxit[1], " steps")
-  else if(!iter) { ## did not need any iteration;  e.g. for n = 2
-      Conv <- locConvexities(x., M)
+    iter <- c(iter, innerIt)
+
+  } ## method "Duembgen06"
+
+
+  if(iter[1] == maxit[1])
+    warning("*** iterations did *not* converge in ", maxit[1], " steps")
+  else if(method != "Duembgen06" || !iter) {
+    ## did not need any iteration;  e.g. for n = 2
+    Conv <- locConvexities(x., M)
   }
 
-  if(convex) {## switch the signs back
-      y. <- -y.
-      M <- -M
-      H <- -H
-      Conv <- -Conv
+  if(convSwitch) {## switch the signs back
+    y. <- -y.
+    M <- -M
+    H <- -H
+    Conv <- -Conv
   }
   ## return
   structure(list(x = x., y = y., w = w., yf = M,
 		 convex = convex, call = match.call(),
 		 iKnots = iK, deriv.loc = H, conv.loc = Conv,
-		 iter = c(iter, innerIt)),
-	    class = "conreg") ## <<- find a better name
+		 iter = iter),
+	    class = "conreg")
 }
 
 ## auxiliary routines: Note that we could gain speed if
@@ -229,12 +300,12 @@ locDirDeriv <- function(x, wRes, iK) {
   ## p  <- length(iK)
   cs <- cumsum(wRes)
   for (i in seq_len(length(iK)-1)) {
-      if(iK[i]+2 <= iK[i+1]) { ## <- safety check
-	  ii <- iK[i]:(iK[i+1]-2)
-	  H[ii+1] <- cumsum((x[ii+1] - x[ii]) * cs[ii])
-      }
-      ## else ## does happen occasionally
-      ## message("DirDeriv: empty between knots ", iK[i]," and ", iK[i+1])
+    if((ik1 <- iK[i]) <= (ik2 <- iK[i+1L] - 2L)) {
+      ii <- ik1:ik2
+      H[ii+1L] <- cumsum((x[ii+1L] - x[ii]) * cs[ii])
+    }
+    ## else ## does happen occasionally
+    ## message("DirDeriv: empty between knots ", iK[i]," and ", iK[i+1])
   }
   H
 }
@@ -243,8 +314,8 @@ locDirDeriv <- function(x, wRes, iK) {
 locConvexities <- function(x,y) {
   n <- length(x)
   if(n > 2) {
-      tmp  <- (y[-1] - y[-n]) / (x[-1] - x[-n])
-      c(0, tmp[-1] - tmp[-(n-1)], 0)
+      tmp  <- (y[-1L] - y[-n]) / (x[-1L] - x[-n])
+      c(0, tmp[-1L] - tmp[-(n-1L)], 0)
   } else numeric(n)
 }
 
@@ -328,8 +399,26 @@ plot.conreg <-
 	      .add.ispline(x.kn, y.kn, lwd, force.iSpl))
 }
 
+##' Get  splines :: interpSpline() from a "conreg" object
+interpSplineCon <- function(object, ...) {
+    nk <- object$iKnots
+    interpSpline(object$x [nk],
+		 object$yf[nk], ...)
+}
+
+##' Check if the cubic interpolation spline fulfills the same convexity / concavity
+##' property as the as "linear spline" [which is the solution of conreg()]
+isIsplineCon <- function(object, isp, ...) {
+    if(missing(isp))
+	isp <- interpSplineCon(object, ...)
+    ## quadratic coef -> 2nd derivative <= 0 (for concave;  >= 0 for convex):
+    ## if(object$convex) all(coef(isp)[,3] >= 0) else all(coef(isp)[,3] <= 0):
+    sgn <- if(object$convex) -1 else 1
+    all(sgn*coef(isp)[,3] <= 0)
+}
+
 .add.ispline <- function(x, y, lwd, force) {
-    isp <- splines::interpSpline(x, y)
+    isp <- interpSpline(x, y)
     if(force || all(coef(isp)[,3] <= 0))
 	## quadratic coef -> 2nd derivative <= 0
 	lines(predict(isp), col = "gray", lwd=lwd)

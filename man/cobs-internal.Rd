@@ -26,7 +26,7 @@ loo.design2(x, w, constraint, ptConstr,
 
 shat(residual, tau, alpha, hs)
 
-.splValue(degree, knots, coef, xo)
+.splValue(degree, knots, coef, xo, deriv = 0L)
 .splBasis(ord, knots, ncoef, xo, derivs)
 
 %mesg(number, \dots)
