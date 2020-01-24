@@ -5,6 +5,8 @@
 #include "SR.h"
 /* --> dvector():       using malloc()   and
  *     free_dvector() : using free()
+ * ditto:  dmatrix() &
+ *         ivector()
  * FIXME: in R: preferably using R_alloc() ! */
 
 void	argmin(int m, int ind[], double x[], double *min, int *indmin);

@@ -2,30 +2,14 @@
 
 suppressMessages(library(cobs))
 
+## do *not* show platform info here (as have *.Rout.save), but in 0_pt-ex.R
 options(digits = 6)
+
 if(!dev.interactive(orNone=TRUE)) pdf("multi-constr.pdf")
 
 source(system.file("util.R", package = "cobs"))
-
-op <- options(warn = 2) ## << all warnings to errors!
-
-set.seed(101)
-x <- seq(-2,2, length = 100)
-y <- x^2 + 0.5*rnorm(100)
-## Constraints -- choosing ones that are true for  f(x) = x^2
-PW  <- rbind(
-             c(0, -3,9), # f(-3) = 9
-             c(0,  3,9), # f(3 ) = 9
-             c(2,  0,0)) # f'(0) = 0
-
-mod <- cobs (x,y,constraint = "convex", pointwise = PW)
-mod
-stopifnot(all.equal(predict(mod, c(-3, 3))[,"fit"], c(9,9), tol = 1e-12))
-
-## derivative 0 at 0 -- we miss a 'deriv = 1' argument [-> see ../TODO]
-eps <- 1e-6
-stopifnot(abs(diff(predict(mod, c(-eps, eps))[,"fit"])/(2*eps)) < .001 * eps)
-options(op)# allow warnings
+source(system.file(package="Matrix", "test-tools-1.R", mustWork=TRUE))
+##--> tryCatch.W.E(), showProc.time(), assertError(), relErrV(), ...
 
 
 set.seed(908)
@@ -60,7 +44,11 @@ all.equal(fitted(c1), fitted(c1i), tol = 1e-9)# but not 1e-10
 c1IC <- cobs(x,y, degree = 1, constraint = c("inc", "concave"), trace = 3)
 
 cp2   <- cobs(x,y,                          pointwise = con, trace = 3)
-cp2i  <- cobs(x,y, constraint = "increase", pointwise = con)# warn: check 'ifl'
+
+## Here, warning ".. 'ifl'.. " on *some* platforms (e.g. Windows 32bit) :
+r2i <- tryCatch.W.E( cobs(x,y, constraint = "increase", pointwise = con) )
+cp2i <- r2i$value
+if(doExtras()) print(r2i$warning) # not by default as long as have multi-constr.Rout.save
 ## when plotting it, we see that it gave a trivial constant!!
 cp2c  <- cobs(x,y, constraint = "concave",  pointwise = con, trace = 3)
 

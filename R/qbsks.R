@@ -20,7 +20,8 @@ qbsks2 <-
     smll.log <- 50*floor(log(.Machine$double.xmin)/50) # heavily rounding down
     finite.log <- function(x) {
         r <- log(x)
-        if(is.na(r) || r > -Inf) r else smll.log # = -750 for IEEE arithmetic
+        r[!is.na(r) & r == -Inf] <- smll.log # = -750 for IEEE arithmetic
+        r
     }
     n <- nrq
     ## xo <- x[order(x)]  <-- TODO ?
@@ -42,7 +43,7 @@ qbsks2 <-
         for(i in (nk.start-1):(nknots-1)) {
             Tknots <- knots[seq(1,nknots, len = i+1)]
             n.Tknts <- length(Tknots)
-            if(n.Tknts == 2 && degree == 1 && constraint %in% c("convex", "concave"))
+            if(n.Tknts == 2 && degree == 1 && all(constraint %in% c("convex", "concave")))
                 ## guard against trying convex fit when only 2 knots are used
                 constraint <- "none"
             dim.o <- getdim2(degree, n.Tknts, constraint)
@@ -102,7 +103,7 @@ qbsks2 <-
                 n.Tknts <- length(knots)
                 Tic1 <- rep.int(0, n.Tknts-2)
                 n.Tknts.1 <- n.Tknts - 1
-                if(n.Tknts.1 == 2 && degree == 1 && constraint %in% c("convex", "concave"))
+                if(n.Tknts.1 == 2 && degree == 1 && all(constraint %in% c("convex", "concave")))
                     ## guard against convex fit when only 2 knots are used
                     constraint <- "none"
                 dim.o <- getdim2(degree,n.Tknts.1, constraint)
@@ -201,7 +202,7 @@ qbsks2 <-
     knots[1] <- knots[1] - tol.kn*rk
     knots[nknots] <- knots[nknots] + tol.kn*rk
 
-    if(nknots == 2 && (constraint %in% c("convex", "concave")) &&
+    if(nknots == 2 && all(constraint %in% c("convex", "concave")) &&
        degree == 1) { # guard against convex fit when only 2 knots are used
         if(print.warn)
 	    cat(sprintf("WARNING: %s from \"%s\" to \"none\"\n",

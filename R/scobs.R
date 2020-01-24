@@ -160,7 +160,7 @@ function(x, y,
     ##
     dim.o <- getdim2(degree,nknots,constraint)
     ks <- dim.o$ks
-    neqc <- dim.o$n.eqc + ptConstr$n.equal + ptConstr$n.gradient
+    neqc <- dim.o$n.eqc + ptConstr$n.equal   + ptConstr$n.gradient
     niqc <- dim.o$n.iqc + ptConstr$n.greater + ptConstr$n.smaller
     if(lambda == 0) { ## quantile *regression* splines (no penalty)
 	##
@@ -176,7 +176,7 @@ function(x, y,
                      give.pseudo.x = keep.x.ps,
 		     rq.tol = rq.tol, tol.kn = toler.kn, tol.0res = tol.0res,
 		     print.warn = print.warn, nk.start = nk.start)
-	knots <- rr$knots
+	knots  <- rr$knots
 	nknots <- rr$nknots
     }
     else { ## lambda !=0 : quantile *smoothing* B-Splines with penalty
@@ -209,7 +209,7 @@ function(x, y,
 
         ## shift the first and last knot a tiny bit "outside" {same as in qbsks2()}:
         rk <- diff(range(knots))
-        knots[1] <- knots[1] - toler.kn*rk
+        knots[ 1L   ] <- knots[ 1L   ] - toler.kn*rk
         knots[nknots] <- knots[nknots] + toler.kn*rk
 
 	rr <- drqssbc2(x, y, w, pw = pw, knots = knots, degree = degree,
@@ -228,7 +228,7 @@ function(x, y,
 		constraint!="none") "\nCheck to make sure that your constraint is feasible",
 		immediate. = TRUE)
     if(!all(rr$ifl == 1)) ## had problem
-	warning("Check 'ifl'")
+	warning("drqssbc2(): Not all flags are normal (== 1), ifl : ", rr$ifl)
 
     nvar <- rr$nvar
     Tcoef <-

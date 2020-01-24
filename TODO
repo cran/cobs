@@ -1,7 +1,6 @@
 -*- org -*-
 
-* conreg(), SR()
-** Need a release with*OUT* SR(), because "old cobs" has Fortran fbounds problem
+* Finally add Piet Groeneboom's contribution SR() !
 ** see  convexreg-PietGr/convexregresnew/README_MM
 ** also ./src/Notes_SR
 ** ->  convexreg-PietGr/RcodeConvex.R  has an  "R-only" version *and* "testing" code

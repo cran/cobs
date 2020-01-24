@@ -23,14 +23,15 @@
 \source{
   From shar file available from \url{http://www.cba.nau.edu/pin-ng/cobs.html}
 
-  Also available from \url{.......STATLIB..........}
+  Has also been available from Statlib; then, with more variables, e.g., in
+  \code{help(wind, package = "gstat")} from CRAN package \CRANpkg{gstat}.
 }
 \references{
   Haslett, J. and Raftery, A. (1989)
   Space-Time Modelling with Long-Memory Dependence: Assessing
-  Ireland's Wind Power Resource.
-  .......... % FIXME -- no journal !
-  \bold{38}, 1--21.
+  Ireland's Wind Power Resource (with Discussion: 22-50).
+  \emph{Applied Statistics} \bold{38}, 1--50.
+  \doi{10.2307/2347679}
 
   COBS: Qualitatively Constrained Smoothing via Linear Programming;
   \emph{Computational Statistics} \bold{14}, 315--337.

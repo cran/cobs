@@ -1,6 +1,6 @@
 
-R version 3.3.2 Patched (2017-01-30 r72057) -- "Sincere Pumpkin Patch"
-Copyright (C) 2017 The R Foundation for Statistical Computing
+R Under development (unstable) (2020-01-16 r77667) -- "Unsuffered Consequences"
+Copyright (C) 2020 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -19,38 +19,15 @@ Type 'q()' to quit R.
 > 
 > suppressMessages(library(cobs))
 > 
+> ## do *not* show platform info here (as have *.Rout.save), but in 0_pt-ex.R
 > options(digits = 6)
+> 
 > if(!dev.interactive(orNone=TRUE)) pdf("multi-constr.pdf")
 > 
 > source(system.file("util.R", package = "cobs"))
-> 
-> op <- options(warn = 2) ## << all warnings to errors!
-> 
-> set.seed(101)
-> x <- seq(-2,2, length = 100)
-> y <- x^2 + 0.5*rnorm(100)
-> ## Constraints -- choosing ones that are true for  f(x) = x^2
-> PW  <- rbind(
-+              c(0, -3,9), # f(-3) = 9
-+              c(0,  3,9), # f(3 ) = 9
-+              c(2,  0,0)) # f'(0) = 0
-> 
-> mod <- cobs (x,y,constraint = "convex", pointwise = PW)
-qbsks2():
- Performing general knot selection ...
-
- Deleting unnecessary knots ...
-> mod
-COBS regression spline (degree = 2) from call:
-	 cobs(x = x, y = y, constraint = "convex", pointwise = PW)
-{tau=0.5}-quantile;  dimensionality of fit: 3 from {3}
-x$knots[1:2]: -2,  2
-> stopifnot(all.equal(predict(mod, c(-3, 3))[,"fit"], c(9,9), tol = 1e-12))
-> 
-> ## derivative 0 at 0 -- we miss a 'deriv = 1' argument [-> see ../TODO]
-> eps <- 1e-6
-> stopifnot(abs(diff(predict(mod, c(-eps, eps))[,"fit"])/(2*eps)) < .001 * eps)
-> options(op)# allow warnings
+> source(system.file(package="Matrix", "test-tools-1.R", mustWork=TRUE))
+Loading required package: tools
+> ##--> tryCatch.W.E(), showProc.time(), assertError(), relErrV(), ...
 > 
 > 
 > set.seed(908)
@@ -264,11 +241,16 @@ loo.design2(): ->  Xeq   50 x 4 (nz = 150 =^=  0.75%)
                   Xieq    2 x 4 (nz = 6 =^=  0.75%) 
 loo.design2(): ->  Xeq   50 x 5 (nz = 150 =^=   0.6%) 
                   Xieq    2 x 5 (nz = 6 =^=   0.6%) 
-> cp2i  <- cobs(x,y, constraint = "increase", pointwise = con)# warn: check 'ifl'
+> 
+> ## Here, warning ".. 'ifl'.. " on *some* platforms (e.g. Windows 32bit) :
+> r2i <- tryCatch.W.E( cobs(x,y, constraint = "increase", pointwise = con) )
 qbsks2():
  Performing general knot selection ...
 
  Deleting unnecessary knots ...
+> cp2i <- r2i$value
+> if(doExtras()) print(r2i$warning) # not by default as long as have multi-constr.Rout.save
+NULL
 > ## when plotting it, we see that it gave a trivial constant!!
 > cp2c  <- cobs(x,y, constraint = "concave",  pointwise = con, trace = 3)
 qbsks2():
@@ -308,7 +290,7 @@ loo.design2(): ->  Xeq   50 x 3 (nz = 150 =^=     1%)
                   Xieq    5 x 3 (nz = 15 =^=     1%) 
 Warning message:
 In cobs(x, y, constraint = c("inc", "concave"), pointwise = con,  :
-  Check 'ifl'
+  drqssbc2(): Not all flags are normal (== 1), ifl : 18
 > 
 > cp1   <- cobs(x,y, degree = 1,                            pointwise = con, trace = 3)
 qbsks2():
@@ -440,4 +422,4 @@ Warning messages:
 > 
 > proc.time()
    user  system elapsed 
-  1.592   0.160   1.852 
+  1.448   0.131   1.773 

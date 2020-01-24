@@ -220,7 +220,8 @@ drqssbc2 <-
 			     if(fieq) "rq.fit.sfnc" else "rq.fit.sfn"))
 		print( sol.err )
 	    }
-        } else sol.err <- NULL
+	} else
+	    sol.err <- NULL
 
 	solx <- sol1[, i.keep, drop = FALSE]
 	sicA <- sol1["fidel",]/n * n^(sol1["k",] /(2*n))
