@@ -14,7 +14,7 @@
 }
 \source{
   \file{temp.data} in file \file{cobs.shar} available from
-  \url{http://www.cba.nau.edu/pin-ng/cobs.html}.
+  \url{https://www2.nau.edu/PinNg/cobs.html}
 }
 \references{
   He, X. and Ng, P. (1999)

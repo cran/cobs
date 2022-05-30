@@ -16,7 +16,7 @@
   }
 }
 \source{
-  From shar file available from \url{http://www.cba.nau.edu/pin-ng/cobs.html}
+  From shar file available from \url{https://www2.nau.edu/PinNg/cobs.html}
 }
 \references{
   He, X. and Ng, P. (1999)

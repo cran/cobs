@@ -21,7 +21,7 @@
   references.  This is Example 3 of the COBS paper.
 }
 \source{
-  From shar file available from \url{http://www.cba.nau.edu/pin-ng/cobs.html}
+  From shar file available from \url{https://www2.nau.edu/PinNg/cobs.html}
 
   Has also been available from Statlib; then, with more variables, e.g., in
   \code{help(wind, package = "gstat")} from CRAN package \CRANpkg{gstat}.

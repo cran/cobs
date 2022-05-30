@@ -1,7 +1,7 @@
 /*  Routines for manipulating B-splines.  These are intended for use with
  *  the New S language described in Becker, Chambers, and Wilks (Wadsworth,
  *  1988).
- *  Copyright 1989 by Douglas M. Bates.  Permission to use, copy,
+ *  Copyright 1989, 2022 by Douglas M. Bates.  Permission to use, copy,
  *  modify and distribute is freely granted to all.
  *  The routines are loosely based on the pseudo-code in Schumaker (Wiley,
  *  1981) and the CMLIB library DBSPLINES.
@@ -74,12 +74,12 @@ void spline_value(double *knots, double *coeff, Sint *ncoeff, Sint *order,
   Sint n = *nx;
   double *a, *last = knots + *ncoeff;
 
-  a = (double *) S_alloc(*order, sizeof(double));
+  a = (double *) R_alloc(*order, sizeof(double));
 
   /* allocate the GLOBAL difference tables : */
   orderm1 = *order - 1;
-  rdel = (double *) S_alloc(orderm1, sizeof(double));
-  ldel = (double *) S_alloc(orderm1, sizeof(double));
+  rdel = (double *) R_alloc(orderm1, sizeof(double));
+  ldel = (double *) R_alloc(orderm1, sizeof(double));
 
   knots += *order;		/* First *order knots must be < all x's */
   while(n--) {
@@ -104,10 +104,10 @@ void spline_basis(double *knots, Sint *ncoeff, Sint *order,
 
   /* allocate the GLOBAL difference tables : */
   orderm1 = *order - 1;
-  rdel = (double *) S_alloc(orderm1, sizeof(double));
-  ldel = (double *) S_alloc(orderm1, sizeof(double));
+  rdel = (double *) R_alloc(orderm1, sizeof(double));
+  ldel = (double *) R_alloc(orderm1, sizeof(double));
 
-  coeff = (double *) S_alloc(*order, sizeof(double));
+  coeff = (double *) R_alloc(*order, sizeof(double));
   for( ; n--; xvals++, derivs++) {
     while(dpt < last && *dpt <= *xvals) dpt++;
     if (*derivs) {		/* slow method for derivatives */

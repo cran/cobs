@@ -187,7 +187,7 @@ cobs(x, y, constraint = c("none", "increase", "decrease",
   \emph{ACM Transaction on Mathematical Software} \bold{6}, 594--608.
 
   A postscript version of the paper that describes the details of COBS
-  can be downloaded from \url{http://www.cba.nau.edu/pin-ng/cobs.html}.
+  can be downloaded from \url{https://www2.nau.edu/PinNg/cobs.html}.
 }
 % \section{Warning}{
 %   This is still a beta version, and we do appreciate comments and

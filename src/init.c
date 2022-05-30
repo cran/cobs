@@ -8,21 +8,21 @@
 #include "splines.h"
 #include "SR.h"
 
-#define CDEF(name)  {#name, (DL_FUNC) &name, sizeof(name ## _t)/sizeof(name ## _t[0]), name ##_t}
+#define CDEF(name)  {#name, (DL_FUNC) &name, sizeof(name ## _typ)/sizeof(name ## _typ[0]), name ##_typ}
 
 #define CALLDEF(name, n)  {#name, (DL_FUNC) &name, n}
 
 // ./splines.c :
-static R_NativePrimitiveArgType spline_basis_t[] = {
+static R_NativePrimitiveArgType spline_basis_typ[] = {
     REALSXP, INTSXP, INTSXP,
     REALSXP, INTSXP, INTSXP,
     REALSXP, INTSXP };
 
-static R_NativePrimitiveArgType spline_value_t[] = {
+static R_NativePrimitiveArgType spline_value_typ[] = {
     REALSXP, REALSXP, INTSXP, INTSXP,
     REALSXP, INTSXP, INTSXP, REALSXP };
 
-static R_NativePrimitiveArgType SR_R_t[] = {
+static R_NativePrimitiveArgType SR_R_typ[] = {
     INTSXP, REALSXP, INTSXP, INTSXP,
     REALSXP, REALSXP,
     REALSXP, REALSXP, REALSXP,
