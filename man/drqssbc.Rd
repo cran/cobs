@@ -80,7 +80,7 @@ drqssbc2(x, y, w = rep.int(1,n), pw, knots, degree, Tlambda,
 \references{
   Ng, P. (1996)
   An Algorithm for Quantile Smoothing Splines,
-  \emph{Computational Statistics \& Data Analysis} \bold{22}, 99--118.
+  \emph{Computational Statistics & Data Analysis} \bold{22}, 99--118.
 }
 \author{Pin Ng; this help page: Martin Maechler.}
 \seealso{

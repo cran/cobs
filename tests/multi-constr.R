@@ -10,7 +10,19 @@ if(!dev.interactive(orNone=TRUE)) pdf("multi-constr.pdf")
 source(system.file("util.R", package = "cobs"))
 source(system.file(package="Matrix", "test-tools-1.R", mustWork=TRUE))
 ##--> tryCatch.W.E(), showProc.time(), assertError(), relErrV(), ...
+## IGNORE_RDIFF_BEGIN
+Sys.info()
+## IGNORE_RDIFF_END
+ Lnx  <- Sys.info()[["sysname"]] == "Linux"
+isMac <- Sys.info()[["sysname"]] == "Darwin"
+x86 <- (arch <- Sys.info()[["machine"]]) == "x86_64"
 
+Rsq <- function(obj) {
+    stopifnot(inherits(obj, "cobs"), is.numeric(res <- obj$resid))
+    1 - sum(res^2)/obj$SSy
+}
+list_ <- function (...) `names<-`(list(...), vapply(sys.call()[-1L], as.character, ""))
+is.cobs <- function(x) inherits(x, "cobs")
 
 set.seed(908)
 x <- seq(-1,2, len = 50)
@@ -48,19 +60,52 @@ cp2   <- cobs(x,y,                          pointwise = con, trace = 3)
 ## Here, warning ".. 'ifl'.. " on *some* platforms (e.g. Windows 32bit) :
 r2i <- tryCatch.W.E( cobs(x,y, constraint = "increase", pointwise = con) )
 cp2i <- r2i$value
-if(doExtras()) print(r2i$warning) # not by default as long as have multi-constr.Rout.save
+## IGNORE_RDIFF_BEGIN
+r2i$warning
+## IGNORE_RDIFF_END
 ## when plotting it, we see that it gave a trivial constant!!
 cp2c  <- cobs(x,y, constraint = "concave",  pointwise = con, trace = 3)
 
-## now gives warning (not error):
+## now gives warning (not error): but no warning on M1 mac -> IGNORE
+## IGNORE_RDIFF_BEGIN
 cp2IC <- cobs(x,y, constraint = c("inc", "concave"), pointwise = con, trace = 3)
-
+## IGNORE_RDIFF_END
 cp1   <- cobs(x,y, degree = 1,                            pointwise = con, trace = 3)
 cp1i  <- cobs(x,y, degree = 1, constraint = "increase",   pointwise = con, trace = 3)
 cp1c  <- cobs(x,y, degree = 1, constraint = "concave",    pointwise = con, trace = 3)
 
 cp1IC <- cobs(x,y, degree = 1, constraint = c("inc", "concave"), pointwise = con, trace = 3)
 
+## Named list of all cobs() results above -- sort() collation order matters for ls() !
+(curLC <- Sys.getlocale("LC_COLLATE"))
+Sys.setlocale("LC_COLLATE", "C")
+cobsL <- mget(Filter(\(nm) is.cobs(.GlobalEnv[[nm]]), ls(patt="c[12p]")),
+              envir = .GlobalEnv)
+Sys.setlocale("LC_COLLATE", curLC) # reverting
+
+knL <- lapply(cobsL, `[[`, "knots")
+str(knL[order(lengths(knL))])
+
+gotRsqrs <- sapply(cobsL, Rsq)
+Rsqrs <- c(c1  = 0.95079126, c1IC = 0.92974549, c1c  = 0.92974549, c1i  = 0.95079126,
+           c2  = 0.94637437, c2IC = 0.91375404, c2c  = 0.92505977, c2i  = 0.95022829,
+           cp1 = 0.9426453, cp1IC = 0.92223149, cp1c = 0.92223149, cp1i = 0.9426453,
+           cp2 = 0.94988863, cp2IC= 0.90051964, cp2c = 0.91375409, cp2i = 0.93611487)
+## M1 mac   "  =     "     , cp2IC= 0.91704726,  "   =      "    , cp2i = 0.94620178
+##                                  ^^^^^^^^^^                            ^^^^^^^^^^
+## remove these from testing, notably for the M1 Mac:
+iR2 <- if(!x86) setdiff(names(cobsL), c("cp2IC", "cp2i")) else TRUE
+## IGNORE_RDIFF_BEGIN
+dput(signif(gotRsqrs, digits=8))
+all.equal(Rsqrs[iR2], gotRsqrs[iR2], tolerance=0) #  2.6277e-9 (Lnx F 38); 2.6898e-9 (M1 mac)
+## IGNORE_RDIFF_END
+stopifnot(exprs = {
+    all.equal(Rsqrs[iR2], gotRsqrs[iR2])
+    identical(c(5L, 3L, 3L, 5L,
+                3L, 2L, 3L, 4L,
+                5L, 3L, 3L, 5L,
+                4L, 2L, 2L, 4L), unname(lengths(knL)))
+})
 
 plot(x,y, main = "cobs(*, degree= 1, constraint = *, pointwise= *)")
 matlines(x,cbind(fitted(c1),

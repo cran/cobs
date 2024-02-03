@@ -9,13 +9,13 @@
 }
 
 ## S+ does not allow "cut(*, labels = FALSE)" -- use cut00() for compatibility:
-if(is.R()) {
-    cut00 <- function(x, breaks)
-	cut.default(x, breaks, labels = FALSE, include.lowest = TRUE)
-} else { ## S-plus  (tested only with S+ 6.0):
-    cut00 <- function(x, breaks)
-	as.integer(cut.default(x, breaks, include.lowest = TRUE))
-}
+## if(is.R()) {
+cut00 <- function(x, breaks)
+    cut.default(x, breaks, labels = FALSE, include.lowest = TRUE)
+## } else { ## S-plus  (tested only with S+ 6.0):
+##     cut00 <- function(x, breaks)
+## 	as.integer(cut.default(x, breaks, include.lowest = TRUE))
+## }
 
 mk.pt.constr <- function(pointwise)
 {
@@ -347,9 +347,8 @@ predict.cobs <-
 
     interval <- match.arg(interval)
 
-    big	       <- if(is.R()) 3.4028234663852886e+38 else .Machine$single.xmax
-    ##IN
-    single.eps <- if(is.R())1.1920928955078125e-07 else .Machine$single.eps
+    big	       <- 3.4028234663852886e+38 # was .Machine$single.xmax
+    single.eps <- 1.1920928955078125e-07 # was .Machine$single.eps
 
     nknots <- length(knots)
     ord <- as.integer(degree + 1)

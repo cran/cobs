@@ -78,7 +78,7 @@ qbsks2(x,y,w,pw, knots,nknots, degree,Tlambda, constraint, ptConstr,
 \references{
   Ng, P. (1996)
   An Algorithm for Quantile Smoothing Splines,
-  \emph{Computational Statistics \& Data Analysis} \bold{22}, 99--118.
+  \emph{Computational Statistics & Data Analysis} \bold{22}, 99--118.
 
   See also the \emph{references} in \code{\link{cobs}}.
 }
