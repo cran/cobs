@@ -55,7 +55,7 @@ function(x, y,
 	 knots.add = FALSE, repeat.delete.add = FALSE, pointwise = NULL,
          keep.data = TRUE, keep.x.ps = TRUE,
 	 print.warn = TRUE, print.mesg = TRUE, trace = print.mesg,
-         lambdaSet = exp(seq(log(lambda.lo), log(lambda.hi), length= lambda.length)),
+         lambdaSet = exp(seq(log(lambda.lo), log(lambda.hi), length.out= lambda.length)),
 	 lambda.lo = f.lambda*1e-4, lambda.hi = f.lambda*1e3, lambda.length = 25,
 	 maxiter = 100, rq.tol = 1e-8, toler.kn = 1e-6, tol.0res = 1e-6, nk.start = 2)
 
@@ -113,10 +113,10 @@ function(x, y,
 	    if(method == "quantile") {
 		if(degree == 1 && lux == nknots)
 		    ux
-		else ux[seq(1, lux, len = nknots)] ## ``rounded'' quantiles
+		else ux[seq(1, lux, length.out = nknots)] ## ``rounded'' quantiles
 	    }
 	    else ## "equidistant"
-		seq(xo[1], xo[n], len = nknots)
+		seq(xo[1], xo[n], length.out = nknots)
     }
     else {
 	names(knots) <- NULL
@@ -364,9 +364,9 @@ predict.cobs <-
     if(missing(z)) {
 	if(minz >= maxz) stop("minz >= maxz")
 	##NOT YET (for "R CMD check" compatibility):
-	## z <- seq(minz, maxz, len = nz)
+	## z <- seq(minz, maxz, length.out = nz)
 	z <- seq(max(minz,knots[1]     + single.eps),
-                 min(maxz,knots[nknots]- single.eps), len = nz)
+                 min(maxz,knots[nknots]- single.eps), length.out = nz)
     }
     else {
         ## Careful:  predict(*, x) should predict at 'x', not sort(x) !!

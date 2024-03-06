@@ -16,7 +16,7 @@ cobs(x, y, constraint = c("none", "increase", "decrease",
      knots.add = FALSE, repeat.delete.add = FALSE, pointwise = NULL,
      keep.data = TRUE, keep.x.ps = TRUE,
      print.warn = TRUE, print.mesg = TRUE, trace = print.mesg,
-     lambdaSet = exp(seq(log(lambda.lo), log(lambda.hi), length = lambda.length)),
+     lambdaSet = exp(seq(log(lambda.lo), log(lambda.hi), length.out = lambda.length)),
      lambda.lo = f.lambda*1e-4, lambda.hi = f.lambda*1e3, lambda.length = 25,
      maxiter = 100,
      rq.tol = 1e-8, toler.kn = 1e-6, tol.0res = 1e-6, nk.start = 2)

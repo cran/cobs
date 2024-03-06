@@ -41,7 +41,7 @@ qbsks2 <-
         if(print.mesg) cat("qbsks2():\n Performing general knot selection ...\n")#4
         Tic <- Tifl <- double(nknots-1)
         for(i in (nk.start-1):(nknots-1)) {
-            Tknots <- knots[seq(1,nknots, len = i+1)]
+            Tknots <- knots[seq(1,nknots, length.out = i+1)]
             n.Tknts <- length(Tknots)
             if(n.Tknts == 2 && degree == 1 && all(constraint %in% c("convex", "concave")))
                 ## guard against trying convex fit when only 2 knots are used
@@ -89,7 +89,7 @@ qbsks2 <-
 	if(up.bound.reached && print.warn)
 	    warnUP(nknots, ic)
 
-        knots <- knots[seq(1,nknots, len = nknots.min+1)]
+        knots <- knots[seq(1,nknots, length.out = nknots.min+1)]
         names(knots) <- NULL
         ##
         ## perform knots deletion

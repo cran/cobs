@@ -77,7 +77,7 @@ l1.design2 <- function(x, w, constraint, ptConstr, knots,
                     ia = 1:1, ja=integer(0), ra = double(0))
         ## need to work with if(fieq) ... kludge:
 
-	for(i.cnstr in seq(along=constraint)) {
+	for(i.cnstr in seq_along(constraint)) {
 	    constr <- constraint[i.cnstr]
 	    niqc. <- niqc[i.cnstr]
 	    if(constr == "increase" || constr == "decrease") {

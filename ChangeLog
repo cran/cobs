@@ -1,3 +1,11 @@
+2024-03-05  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* tests/multi-constr.{R,Rout.save}: tweaks for 'noLD', 'MKL', 'openBLAS', ..
+
+2024-02-24  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 1.3-8
+	* R/l1Design.R, ..: partially matched args: use seq_along(); seq(..., length.out=.)
 2024-02-01  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* R/scobs.R (cut00): no longer use is.R()

@@ -70,7 +70,7 @@ loo.design2 <- function(x, w, constraint, ptConstr, knots,
 
     niqc4 <- niqc - (niqc1 + ptConstr$n.smaller + ptConstr$n.greater)
 
-    for(i.cnstr in seq(along=constraint)) {
+    for(i.cnstr in seq_along(constraint)) {
         constr <- constraint[i.cnstr]
         niqc4. <- niqc4[i.cnstr]
 
