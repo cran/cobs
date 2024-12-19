@@ -216,7 +216,7 @@ l1.design2 <- function(x, w, constraint, ptConstr, knots,
 	}
     }
     if(fieq)
-	return(list(Xeq = Xeq, Xieq = Xieq, fieq = fieq, niqc1 = niqc1))
+	list(Xeq = Xeq, Xieq = Xieq, fieq = fieq, niqc1 = niqc1)
     else
-	return(list(Xeq = Xeq,              fieq = fieq, niqc1 = niqc1))
-} ## l1.design
+	list(Xeq = Xeq,              fieq = fieq, niqc1 = niqc1)
+} ## l1.design2

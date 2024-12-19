@@ -6,7 +6,7 @@ drqssbc2 <-
              nrq = length(x), nl1, neqc, niqc, nvar, tau = 0.50,
              select.lambda = length(Tlambda) > 1, give.pseudo.x = FALSE,
              rq.tol = 1e-8 * sc.y, tol.0res = 1e-6, print.warn = TRUE,
-             rq.print.warn = FALSE)
+             rq.print.warn = trace >= 2)
 {
     ##=########################################################################
     ##
@@ -68,6 +68,14 @@ drqssbc2 <-
 	    sprintf("%s %4d x %d (nz = %d =^= %5.2g%%)",
 		    namX, d[1], d[2], k, k/prod(d))
 	}
+
+    ## rqCtrl :
+    ## In quantreg, a list typically produced via sfn.control()
+    ## as of 2024-11,  15.Oct 2020  quantreg/R/sfn.R :
+    ## sfn.control <- function(nsubmax = NULL, tmpmax = NULL, nnzlmax = NULL, 
+    ##                         cachsz = 64, small = 1e-6, maxiter=100, warn.mesg=TRUE)
+    ## list(nsubmax = nsubmax, tmpmax = tmpmax, nnzlmax = nnzlmax, cachsz = cachsz,
+    ##     small = small, maxiter = maxiter, warn.mesg = warn.mesg)
 
     rqCtrl <- list(maxiter=maxiter, warn.mesg = rq.print.warn, small= rq.tol)
     for(ilam in 1:nj0) { ## for each lambda in Tlambda[] : `` grid search ''
@@ -139,9 +147,9 @@ drqssbc2 <-
 	    else rq.fit.sfn(Xeq,Yeq,		tau=tau, rhs=rhs, control=rqCtrl)
         ## rq.fit.sfn[c] : both in ../../quantreg/R/sfn.R
         ##  these call .Fortran("srqfn[c]", ..) in
-        ##    -> ../../quantreg/src/srqfn.c and ..../srqfnc.c
-        ##  these both call chlfct() in ../../quantreg/src/chlfct.c   (was *.f)
-        ##  is built on misc.        in ../../quantreg/src/cholesky.c (was *.f)
+        ##    -> ../../quantreg/src/srqfn.f and ..../srqfnc.f
+        ##  these both call chlfct() in ../../quantreg/src/chlfct.f
+        ##  is built on misc.        in ../../quantreg/src/cholesky.f
 	if(any(is.na(z0$coef)))
 	    stop("The combination of 'constraint' and 'pointwise' is causing problems\n",
 		 "for the algorithm with the current knot selection,\n knots : ",

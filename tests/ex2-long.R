@@ -46,9 +46,10 @@ showProc.time()
 
 
 ## regularly spaced x :
-X <- seq(-1,1, len = 201)
-xx <- c(seq(-1.1, -1, len = 11), X,
-        seq( 1,  1.1, len = 11))
+seqL <- function(from, to, len) seq.int(from, to, length.out = len)
+X <- seqL(-1,1, len = 201)
+xx <- c(seqL(-1.1, -1, len = 11), X,
+        seqL( 1,  1.1, len = 11))
 y <- (fx <- exp(-X)) + rt(201,4)/4
 summaryCobs(cXy  <- cobs(X,y, "decrease"))
 1 - sum(cXy $ resid ^ 2) / sum((y - mean(y))^2) # R^2 = 77.2%

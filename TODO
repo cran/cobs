@@ -1,5 +1,9 @@
 -*- org -*-
 
+** 2024-12 (1.3-9) -- tests/multi-constr.R  why are {c1, c2} suddenly quite different,
+                      notably c1 and c1i are so much differing?
+		      Is the new c1 solution better ?
+
 * Finally add Piet Groeneboom's contribution SR() !
 ** see  convexreg-PietGr/convexregresnew/README_MM
 ** also ./src/Notes_SR
@@ -8,6 +12,7 @@
    -----  copyright protected, not to be used in GPL
 **  merge the two;  ask Piet Groeneboom about 'weights' for SR() :
 ** --> convexreg-PietGr/convexregres-PietGr.mail and more
+
 
 
 

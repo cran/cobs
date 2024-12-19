@@ -22,8 +22,8 @@ mk.pt.constr <- function(pointwise)
     ## Purpose: produce the 'ptConstr' list from the 'pointwise' 3-col. matrix
     ## Author: Martin Maechler, 29 Jul 2006
 
-    if(is.null(pointwise)) {
-	list(n.equal = 0, n.greater = 0, n.smaller = 0, n.gradient = 0)
+    if(is.null(pointwise)) { # default: *no* constraints
+	list(n.equal = 0L, n.greater = 0L, n.smaller = 0L, n.gradient = 0L)
     }
     else { ## 'pointwise'
 	if(!is.matrix(pointwise)|| dim(pointwise)[2] != 3)
@@ -50,15 +50,15 @@ function(x, y,
 			"convex", "concave", "periodic"),
 	 w = rep(1,n),
 	 knots, nknots = if(lambda == 0) 6 else 20,
-         method = "quantile", degree = 2, tau = 0.5, lambda = 0,
+         method = "quantile", degree = 2, tau = 0.5,
+         lambda = 0,
          ic = c("AIC", "SIC", "BIC", "aic", "sic", "bic"),
 	 knots.add = FALSE, repeat.delete.add = FALSE, pointwise = NULL,
          keep.data = TRUE, keep.x.ps = TRUE,
-	 print.warn = TRUE, print.mesg = TRUE, trace = print.mesg,
+	 print.warn = TRUE, print.mesg = TRUE, trace = print.mesg, rq.print.warn = FALSE,
          lambdaSet = exp(seq(log(lambda.lo), log(lambda.hi), length.out= lambda.length)),
 	 lambda.lo = f.lambda*1e-4, lambda.hi = f.lambda*1e3, lambda.length = 25,
 	 maxiter = 100, rq.tol = 1e-8, toler.kn = 1e-6, tol.0res = 1e-6, nk.start = 2)
-
 {
     ## preamble
     ##
@@ -99,7 +99,7 @@ function(x, y,
     lux <- length(ux <- unique(xo)) # needed in both cases
     if(missing(knots)) {
 	select.knots <- TRUE
-	nk.max <- if(degree == 1) lux else lux - 1
+	nk.max <- if(degree == 1) lux else lux - 1L
 	if(nknots > nk.max) {
 	    if(!missing(nknots)) ## 'nknots' specified explicitly
 		warning("You chose nknots = ", nknots,
@@ -168,14 +168,14 @@ function(x, y,
 	## stepwise knots selection or with fixed knots
 	##
         ic <- toupper(match.arg(ic))
-	rr <- qbsks2(x, y, w, pw = 0, knots, nknots, degree, Tlambda = lambda,
-		     constraint, ptConstr, maxiter, trace,
-		     nrq, nl1 = 0, neqc, tau, select.lambda = select.lambda,
-		     ks, do.select = select.knots, knots.add, repeat.delete.add, ic,
-		     print.mesg = print.mesg,
-                     give.pseudo.x = keep.x.ps,
+	rr <- qbsks2(x, y, w, pw = 0, knots=knots, nknots=nknots, degree=degree, Tlambda = lambda,
+		     constraint=constraint, ptConstr=ptConstr, maxiter=maxiter, trace=trace,
+		     nrq=nrq, nl1 = 0, neqc=neqc, tau=tau, select.lambda=select.lambda,
+		     ks=ks, do.select = select.knots, knots.add=knots.add, repeat.delete.add=repeat.delete.add,
+                     ic=ic, give.pseudo.x = keep.x.ps,
 		     rq.tol = rq.tol, tol.kn = toler.kn, tol.0res = tol.0res,
-		     print.warn = print.warn, nk.start = nk.start)
+		     print.mesg=print.mesg, print.warn=print.warn, rq.print.warn=rq.print.warn,
+                     nk.start=nk.start)
 	knots  <- rr$knots
 	nknots <- rr$nknots
     }
@@ -208,19 +208,19 @@ function(x, y,
 		"	   'lambda.length' from the default value of 25.\n") # 3
 
         ## shift the first and last knot a tiny bit "outside" {same as in qbsks2()}:
-        rk <- diff(range(knots))
-        knots[ 1L   ] <- knots[ 1L   ] - toler.kn*rk
-        knots[nknots] <- knots[nknots] + toler.kn*rk
+        del.k <- toler.kn * diff(range(knots))
+        knots[ 1L   ] <- knots[ 1L   ] - del.k
+        knots[nknots] <- knots[nknots] + del.k
 
 	rr <- drqssbc2(x, y, w, pw = pw, knots = knots, degree = degree,
 		       Tlambda = if(select.lambda) lambdaSet else lambda,
 		       constraint = constraint, ptConstr = ptConstr,
-		       maxiter = maxiter, trace = trace-1,
-		       nrq, nl1, neqc, niqc, nvar,
-		       tau = tau, select.lambda = select.lambda,
+		       maxiter=maxiter, trace = trace - 1,
+		       nrq=nrq, nl1=nl1, neqc=neqc, niqc=niqc, nvar=nvar,
+		       tau=tau, select.lambda=select.lambda,
 		       give.pseudo.x = keep.x.ps,
 		       rq.tol = rq.tol, tol.0res = tol.0res,
-		       print.warn = print.warn)
+		       print.warn = print.warn, rq.print.warn = rq.print.warn)
     }
     if(any(rr$icyc >= maxiter))
 	warning("The algorithm has not converged after ", maxiter, " iterations",
@@ -261,8 +261,8 @@ function(x, y,
                    icyc   = rr$icyc,
                    ifl    = rr$ifl,
                    pp.lambda = if(select.lambda) rr$pp.lambda,
-                   pp.sic	= if(select.lambda) rr$sic,
-                   i.mask	= if(select.lambda) rr$i.mask))
+                   pp.sic    = if(select.lambda) rr$sic,
+                   i.mask    = if(select.lambda) rr$i.mask))
 } ## cobs()
 
 knots.cobs <- function(Fn, ...) Fn$knots
@@ -438,7 +438,7 @@ predict.cobs <-
 ##   "2" : 2nd ("scobs") cobs version
 getdim2 <- function(degree, nknots,
 		   constraint = c("none", "increase", "decrease",
-		   "convex", "concave", "periodic"))
+                                  "convex", "concave", "periodic"))
 {
     ##=########################################################################
     ##
@@ -451,24 +451,25 @@ getdim2 <- function(degree, nknots,
     ##	   pairs of inequality contraints.
     ## Note 2: now also works for  *multiple* constraints
     ##	      n.iqc will be a vector of the same length as 'constraint'
-    if(degree == 1)	ks <- 2
-    else if(degree == 2)ks <- 3
+    stopifnot(nknots == (nkn <- as.integer(nknots)))
+    if(degree == 1L)	  ks <- 2L
+    else if(degree == 2L) ks <- 3L
     else stop("degree has to be either 1 or 2")
-    deg1 <- as.integer(degree == 1)
-    nvar <- nknots - 2 + ks
+    deg1 <- as.integer(degree == 1L)
+    nvar <- nkn - 2L + ks
     n.eqc <- # the number of EQuality Constraints
         0 ## if(constraint == "periodic") 2 else 0
     n.iqc <- # the number of IneQuality Constraints,  will be summed up :
 	sapply(match.arg(constraint, several.ok = TRUE),
 	       function(constr) {
 		   if(constr == "increase" || constr == "decrease")
-		       nknots - deg1
+		       nkn - deg1
 		   else if(constr == "concave" || constr == "convex")
-		       nknots - 1 - deg1
+		       nkn - 1L - deg1
 		   else if(constr == "periodic" )
-		       4
+		       4L
 		   else if(constr == "none")
-		       0
+		       0L
 	       })
     list(n.iqc = n.iqc, n.eqc = n.eqc, ks = ks, nvar = nvar)
 }

@@ -12,10 +12,12 @@ cobs(x, y, constraint = c("none", "increase", "decrease",
      w = rep(1,n),
      knots, nknots = if(lambda == 0) 6 else 20,
      method = "quantile", degree = 2, tau = 0.5,
-     lambda = 0, ic = c("AIC", "SIC", "BIC", "aic", "sic", "bic"),
+     lambda = 0,
+     ic = c("AIC", "SIC", "BIC", "aic", "sic", "bic"),
      knots.add = FALSE, repeat.delete.add = FALSE, pointwise = NULL,
      keep.data = TRUE, keep.x.ps = TRUE,
      print.warn = TRUE, print.mesg = TRUE, trace = print.mesg,
+     rq.print.warn = FALSE,
      lambdaSet = exp(seq(log(lambda.lo), log(lambda.hi), length.out = lambda.length)),
      lambda.lo = f.lambda*1e-4, lambda.hi = f.lambda*1e3, lambda.length = 25,
      maxiter = 100,
@@ -94,6 +96,8 @@ cobs(x, y, constraint = c("none", "increase", "decrease",
   \item{trace}{integer \eqn{\ge 0}{>= 0} indicating how much diagnostics
     the low-level code in \code{\link{drqssbc2}} should print;  defaults
     to \code{print.mesg}.}
+  \item{rq.print.warn}{flag passed to the fitting function, i.e., either
+    to \code{\link{qbsks2}()} or directly to \code{\link{drqssbc2}()}.}
   \item{lambdaSet}{numeric vector of lambda values to use for grid search;
     in that case, defaults to a geometric sequence (a \dQuote{grid in
       log scale}) from \code{lambda.lo} to \code{lambda.hi} of length
@@ -107,7 +111,7 @@ cobs(x, y, constraint = c("none", "increase", "decrease",
     \code{f.lambda <- sd(x)^degree}.
     %%% FIXME ?!? in quantreg
     Note however that currently the underlying algorithms in package
-    \pkg{quantreg} are \emph{not} scale equivariant yet.}
+    \CRANpkg{quantreg} are \emph{not} scale equivariant yet.}
   \item{lambda.length}{number of grid points in the grid search for
     optimal lambda.}
   \item{maxiter}{upper bound of the number of iterations; defaults to 100.}
@@ -131,7 +135,7 @@ cobs(x, y, constraint = c("none", "increase", "decrease",
   \item{coef}{B-spline coefficients.}
   \item{knots}{the final set of knots used in the computation.}
   \item{ifl}{exit code := \code{1 + ierr} and \code{ierr} is the error
-    from \code{\link[quantreg]{rq.fit.sfnc}} (package \pkg{quantreg});
+    from \code{\link[quantreg]{rq.fit.sfnc}} (package \CRANpkg{quantreg});
     consequently, \code{ifl = 1} means \dQuote{success}; all other
     values point to algorithmic problems or failures.}
   \item{icyc}{length 2: number of cycles taken to achieve convergence

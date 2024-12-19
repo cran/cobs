@@ -49,7 +49,10 @@ stopifnot(all.equal(co1[-ic], co1.1[-ic]),
           all.equal(co1[-ic], co1.2[-ic]))
 1 - sum(co1   $ resid ^2) / sum((dist - mean(dist))^2) # R^2 = 64.2%
 
-co2 <- cobs(speed, dist, "increase", lambda = -1)# 6 warnings
+## --- Oct. 2024: This "suddenly" gives problem on CRAN's F36 and Debian  clang 19.1 (new quantreg)
+##     ---------- An ERROR on F36,  and warnings (plus error further down) on Debian
+## --> add trace = 2                              vvvvvvvvv
+co2 <- cobs(speed, dist, "increase", lambda = -1, trace = 2)# 6 warnings
 summaryCobs(co2)
 1 - sum(co2 $ resid ^2) / sum((dist - mean(dist))^2)# R^2= 67.4%
 

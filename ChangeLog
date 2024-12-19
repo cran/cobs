@@ -1,10 +1,29 @@
+2024-12-17  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* tests/multi-constr.{R,Rout.save}: more tweaks for new (quantreg?!)
+	behaviour.  Release 1.3-9
+
+2024-11-08  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* README.md: instead of `README`
+	* R/scobs.R, R/qbsks.R (cobs, qbsks2): add `rq.print.warn` argument
+	to `cobs()` and `qbsks2()`
+
+2024-10-23  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* tests/ex2-long.R  amend for R-devel (Fedora 36 BDR)
+
+2024-07-30  Martin Maechler  <maechler@stat.math.ethz.ch>
+
+	* DESCRIPTION (Version): 1.3-9  (r413);  now has `Authors@R`
+
 2024-03-05  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* tests/multi-constr.{R,Rout.save}: tweaks for 'noLD', 'MKL', 'openBLAS', ..
 
 2024-02-24  Martin Maechler  <maechler@stat.math.ethz.ch>
 
-	* DESCRIPTION (Version): 1.3-8
+	* DESCRIPTION (Version): 1.3-8  (r405)
 	* R/l1Design.R, ..: partially matched args: use seq_along(); seq(..., length.out=.)
 2024-02-01  Martin Maechler  <maechler@stat.math.ethz.ch>
 
@@ -28,6 +47,7 @@
 2020-01-20  Martin Maechler  <maechler@stat.math.ethz.ch>
 
 	* tests/0_pt-ex.R: move duplicates, as has no *.Rout.save (373)
+
 	* tests/*.R;Rout.save: updates, tweaks
 	* DESCRIPTION (Version): 1.3-4
 

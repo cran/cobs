@@ -1,30 +1,33 @@
 Calling tree :
-~~~~~~~~~~~~
-
-scobs()
-|
-|-> shat
-|   |
-|   \-> dn
-|
-|-> qbsks
-|   |
-|---|-> getdim
-|   |
-|   v
-\-> drqssbc
-    |   /
-    |  /  (possibly calls itself once)
-    |--
-    |
-    |-> l1.design
-    |
-    |-> l00.design
-    |
-    \-> .Fortran("drqssbc", ..)
+=============
 
 
-----------------------------------------------------------------
+	cobs()
+		|
+		|-> shat()
+		|   |
+		|   \-> dn
+		|
+		|--> getdim2()
+		|
+		|-> qbsks()
+		|   |
+		|   |
+		|   v
+		\-> drqssbc2()
+			|   /^
+			|  /  (possibly calls itself once)
+			|--
+			|
+			|-> l1.design2()
+			|
+			|-> loo.design2()
+			|
+			|-> rq.fit.sfn()   {quantreg}
+			|
+			\-> rq.fit.sfnc()  {quantreg}
+
+
 
 qbsks(x,y,w,pw, knots,nknots, degree,Tlambda,constraint,
       equal,smaller,greater,gradient, coef,maxiter,
@@ -40,10 +43,8 @@ drqssbc(x,y,w,pw, knots, degree,Tlambda,constraint,
 
 -------------------------------------------------------------------------------
 
-The following relates to the older COBS version,
-nowadays in package   "cobs99"
---------------------------------------------------------
---------------------------------------------------------
+The following relates to the older COBS version, nowadays in package  `cobs99`
+=============================================================================
 
 COBS -- Constrained B-splines (Version 1.0)
 
@@ -55,9 +56,8 @@ smoothing.
 A postscript version of the paper that describes the detail of COBS
 can be downloaded from  http://www.cba.nau.edu/pin-ng/cobs.html
 
+This is a *beta* version (no longer the case)
 
-This is a *beta* version
-------------------------
 We do appreciate comments and suggestions.  Please send
 bugs or problems to Martin Maechler <maechler@stat.math.ethz.ch>
 and also  pin-ng@nau.edu or he@bahadur.stat.uiuc.edu
@@ -104,6 +104,6 @@ name		       content
 
 ------------------------------------------------------------------------------
 Martin Maechler <maechler@stat.math.ethz.ch>	http://stat.ethz.ch/~maechler/
-Seminar fuer Statistik, ETH-Zentrum  LEO C16	Leonhardstr. 27
+Seminar fuer Statistik, ETH-Zentrum
 ETH (Federal Inst. Technology)	8092 Zurich	SWITZERLAND
 

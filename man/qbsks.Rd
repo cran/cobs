@@ -7,18 +7,22 @@
   \bold{regression spline}, using Ng (1996)'s algorithm.
 }
 \usage{
-qbsks2(x,y,w,pw, knots,nknots, degree,Tlambda, constraint, ptConstr,
-      maxiter, trace, nrq,nl1, neqc, tau, select.lambda,
-      ks, do.select, knots.add, repeat.delete.add, ic, print.mesg,
-      give.pseudo.x = TRUE,
-      rq.tol = 1e-8, tol.kn = 1e-6, tol.0res = 1e-6, print.warn, nk.start)
+qbsks2(x,y,w, pw = 0, knots,nknots, degree,Tlambda, constraint, ptConstr,
+       maxiter, trace, nrq, nl1 = 0, neqc, tau, select.lambda,
+       ks, do.select,
+       knots.add = FALSE, repeat.delete.add = FALSE,
+       ic = c("AIC", "BIC", "SIC"),
+       give.pseudo.x = TRUE,
+       rq.tol = 1e-8, tol.kn = 1e-6, tol.0res = 1e-6, 
+       print.mesg = TRUE, print.warn = TRUE, rq.print.warn, nk.start)
+
 }
 \arguments{
   \item{x}{numeric vector, sorted increasingly, the abscissa values}
   \item{y}{numeric, same length as \code{x}, the observations.}
   \item{w}{numeric vector of weights, same length as \code{x}, as in
     \code{\link{cobs}}.}
-  \item{pw}{penalty weights vector ... ...}%% << FIXME, currently unused
+  \item{pw}{penalty; typically should be \code{0} here.}
   \item{knots}{numeric vector of knots of which \code{nknots} will be used.}
   \item{nknots}{number of \code{knots} to be used.}% FIXME: Say more in \details
   \item{degree}{integer specifying polynomial degree; must be 1 or 2.}
@@ -31,8 +35,8 @@ qbsks2(x,y,w,pw, knots,nknots, degree,Tlambda, constraint, ptConstr,
     passed to \code{\link{drqssbc2}}.}
   \item{trace}{integer or logical indicating the tracing level of the
     \emph{underlying} algorithms; not implemented (due to lack of trace
-    in quantreg ...)}
-  \item{nrq,nl1,neqc}{integers specifying dimensionalities, directly
+    in \CRANpkg{quantreg} ...)}
+  \item{nrq, nl1, neqc}{integers specifying dimensionalities, directly
     passed to \code{\link{drqssbc2}}, see there.}
   \item{tau}{desired quantile level (in interval \eqn{(0,1)}).}
   \item{select.lambda}{passed to \code{\link{drqssbc2}}, see there.}
@@ -41,8 +45,6 @@ qbsks2(x,y,w,pw, knots,nknots, degree,Tlambda, constraint, ptConstr,
     (instead of used as specified).}
   \item{knots.add, repeat.delete.add}{logicals, see \code{\link{cobs}}.}
   \item{ic}{information criterion to use, see \code{\link{cobs}}.}
-  \item{print.mesg}{an integer indicating how \code{qbsks2()} should
-    print message about its current stages.}
   \item{give.pseudo.x}{logical indicating if the pseudo design matrix
     \eqn{\tilde{X}}{X\~} should be returned (as \emph{sparse} matrix).}
   \item{rq.tol}{numeric convergence tolerance for the interior point
@@ -50,9 +52,13 @@ qbsks2(x,y,w,pw, knots,nknots, degree,Tlambda, constraint, ptConstr,
     \code{\link[quantreg]{rq.fit.sfn}()}.}
   \item{tol.kn}{\dQuote{tolerance} for shifting the outer knots.}
   \item{tol.0res}{tolerance passed to \code{\link{drqssbc2}}.}
+  \item{print.mesg}{an integer indicating how \code{qbsks2()} should
+    print message about its current stages.}
   \item{print.warn}{flag indicating if and how much warnings and
     information is to be printed; currently just passed to
     \code{\link{drqssbc2}}.}
+  \item{rq.print.warn}{flag for \CRANpkg{quantreg}'s fitting functions,
+    just passed to \code{\link{drqssbc2}}.}
   \item{nk.start}{number of starting knots used in automatic knot selection.}
 }
 \details{
@@ -61,7 +67,7 @@ qbsks2(x,y,w,pw, knots,nknots, degree,Tlambda, constraint, ptConstr,
   the source code!
 }
 \value{
-  a list with components
+  a \code{\link{list}} with components
   \item{coef}{..}
   \item{fidel}{..}
   \item{k}{dimensionality of model fit.}

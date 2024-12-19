@@ -12,7 +12,7 @@ drqssbc2(x, y, w = rep.int(1,n), pw, knots, degree, Tlambda,
         nrq = length(x), nl1, neqc, niqc, nvar,
         tau = 0.5, select.lambda, give.pseudo.x = FALSE,
         rq.tol = 1e-8 * sc.y, tol.0res = 1e-6,
-        print.warn = TRUE, rq.print.warn = FALSE)
+        print.warn = TRUE, rq.print.warn = trace >= 2)
 }
 \arguments{
   \item{x}{numeric vector, sorted increasingly, the abscissa values}
@@ -89,7 +89,7 @@ drqssbc2(x, y, w = rep.int(1,n), pw, knots, degree, Tlambda,
 
   \code{\link{l1.design2}} and \code{\link{loo.design2}};
   further \code{\link[quantreg]{rq.fit.sfnc}} and
-  \code{\link[quantreg]{rq.fit.sfn}} from package \pkg{quantreg}.
+  \code{\link[quantreg]{rq.fit.sfn}} from package \CRANpkg{quantreg}.
 }
 \examples{
 set.seed(1243)

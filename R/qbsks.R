@@ -1,12 +1,14 @@
 #### $Id: qbsks.R,v 1.22 2009/02/24 13:47:41 maechler Exp $
 
 qbsks2 <-
-    function(x,y,w,pw, knots,nknots, degree, Tlambda,
+    function(x,y,w, pw = 0, knots, nknots, degree, Tlambda,
              constraint, ptConstr, maxiter, trace,
-             nrq,nl1, neqc, tau, select.lambda,
-             ks, do.select, knots.add, repeat.delete.add, ic, print.mesg,
+             nrq, nl1 = 0, neqc, tau, select.lambda,
+             ks, do.select, knots.add = FALSE, repeat.delete.add = FALSE,
+             ic = c("AIC", "BIC", "SIC"),
              give.pseudo.x = TRUE,
-             rq.tol = 1e-8, tol.kn = 1e-6, tol.0res = 1e-6, print.warn, nk.start)
+             rq.tol = 1e-8, tol.kn = 1e-6, tol.0res = 1e-6,
+             print.mesg = TRUE, print.warn = TRUE, rq.print.warn, nk.start)
 {
     ##=########################################################################
     ##
@@ -17,6 +19,8 @@ qbsks2 <-
     ##
     ##=########################################################################
 
+    stopifnot(nk.start >= 2, is.list(ptConstr))
+
     smll.log <- 50*floor(log(.Machine$double.xmin)/50) # heavily rounding down
     finite.log <- function(x) {
         r <- log(x)
@@ -26,13 +30,12 @@ qbsks2 <-
     n <- nrq
     ## xo <- x[order(x)]  <-- TODO ?
     logn <- log(n)
-    f.IC <- switch(ic,
+    f.IC <- switch(match.arg(ic),
 		   "AIC" = 2,
 		   "BIC" =, "SIC" = logn,
 		   stop("in qbsks2(): invalid 'ic' = ", ic, call. = FALSE))
-    stopifnot(nk.start >= 2)
-    constraint.orig <- constraint
 
+    constraint.orig <- constraint
     n.gr.sm <- with(ptConstr, n.greater + n.smaller)
 
     if(do.select) { ##  perform first step : knots selection
@@ -41,22 +44,23 @@ qbsks2 <-
         if(print.mesg) cat("qbsks2():\n Performing general knot selection ...\n")#4
         Tic <- Tifl <- double(nknots-1)
         for(i in (nk.start-1):(nknots-1)) {
-            Tknots <- knots[seq(1,nknots, length.out = i+1)]
+            Tknots <- knots[seq.int(1,nknots, length.out = i+1)]
             n.Tknts <- length(Tknots)
             if(n.Tknts == 2 && degree == 1 && all(constraint %in% c("convex", "concave")))
                 ## guard against trying convex fit when only 2 knots are used
                 constraint <- "none"
             dim.o <- getdim2(degree, n.Tknts, constraint)
             ks <- dim.o$ks
-            Tnvar <- dim.o$nvar
+            nvar <- dim.o$nvar
             niqc <- dim.o$n.iqc + n.gr.sm
-	    rqss <- drqssbc2(x,y,w, pw, Tknots, degree, Tlambda,
-			     constraint, ptConstr, maxiter, trace=trace-1,
-			     nrq,nl1,neqc,niqc, Tnvar,
+	    rqss <- drqssbc2(x,y,w, pw=pw, knots = Tknots, degree=degree, Tlambda=Tlambda,
+			     constraint=constraint, ptConstr=ptConstr, maxiter=maxiter,
+                             trace = trace - 1L,
+			     nrq=nrq, nl1=nl1, neqc=neqc, niqc=niqc, nvar=nvar,
 			     tau=tau, select.lambda=select.lambda,
                              give.pseudo.x = give.pseudo.x,
 			     rq.tol = rq.tol, tol.0res = tol.0res,
-                             print.warn=print.warn)
+                             print.warn=print.warn)[c("fidel", "ifl")]
             constraint <- constraint.orig
             Tic[i] <- finite.log(rqss$fidel) -logn + (i-1+ks)*f.IC / n
             Tifl[i] <- rqss$ifl
@@ -89,7 +93,7 @@ qbsks2 <-
 	if(up.bound.reached && print.warn)
 	    warnUP(nknots, ic)
 
-        knots <- knots[seq(1,nknots, length.out = nknots.min+1)]
+        knots <- knots[seq.int(1,nknots, length.out = nknots.min+1L)]
         names(knots) <- NULL
         ##
         ## perform knots deletion
@@ -106,21 +110,22 @@ qbsks2 <-
                 if(n.Tknts.1 == 2 && degree == 1 && all(constraint %in% c("convex", "concave")))
                     ## guard against convex fit when only 2 knots are used
                     constraint <- "none"
-                dim.o <- getdim2(degree,n.Tknts.1, constraint)
-                ks <- dim.o$ks
-                Tnvar <- dim.o$nvar
+                dim.o <- getdim2(degree, n.Tknts.1, constraint)
+                ks   <- dim.o$ks
+                nvar <- dim.o$nvar
                 niqc <- dim.o$n.iqc + n.gr.sm
-                for(i in 2:(n.Tknts-1)) {
+                for(i in 2:(n.Tknts-1L)) {
                     Tknots <- knots[-i]
-		    rqss <- drqssbc2(x, y, w, pw, Tknots, degree, Tlambda, constraint,
-				     ptConstr, maxiter, trace=trace-1,
-				     nrq, nl1, neqc, niqc, Tnvar,
-				     tau=tau, select.lambda=select.lambda,
-				     give.pseudo.x = give.pseudo.x,
-				     rq.tol = rq.tol, tol.0res = tol.0res,
-				     print.warn = print.warn)
+		    rqss_fidel <-
+                        drqssbc2(x, y, w, pw=pw, knots = Tknots, degree=degree, Tlambda=Tlambda, constraint=constraint,
+                                 ptConstr=ptConstr, maxiter=maxiter, trace = trace - 1L,
+                                 nrq=nrq, nl1=nl1, neqc=neqc, niqc=niqc, nvar=nvar,
+                                 tau=tau, select.lambda=select.lambda,
+                                 give.pseudo.x = give.pseudo.x,
+                                 rq.tol = rq.tol, tol.0res = tol.0res,
+                                 print.warn = print.warn)$fidel
                     constraint <- constraint.orig
-                    Tic1[i-1] <- finite.log(rqss$fidel)-logn+(n.Tknts.1-2+ks)*f.IC / n
+                    Tic1[i-1L] <- finite.log(rqss_fidel) - logn + (n.Tknts.1-2+ks)*f.IC / n
                 }
                 Tic1.min <- min(Tic1)
                 idx.del <- min((2:(n.Tknts-1))[Tic1 == Tic1.min])
@@ -139,31 +144,32 @@ qbsks2 <-
             ##
             if(knots.add) {
                 add <- TRUE
-                n.Tknts <- length(knots)
+                n.Tknts <- length(knots) # must be >= 2 (FIXME? assert here ?)
                 if(print.mesg) cat("\n Searching for missing knots ...\n") # 8
                 while(add && n.Tknts < nknots) {
-                    Tic2 <- double(n.Tknts-1)
+                    Tic2 <- double(n.Tknts-1L)
                     knots.add.1 <- (knots[1:(n.Tknts-1)]+knots[2:n.Tknts])/2
                     n.Tknts.1 <- n.Tknts + 1
                     dim.o <- getdim2(degree,n.Tknts.1,constraint)
                     ks <- dim.o$ks
-                    Tnvar <- dim.o$nvar
+                    nvar <- dim.o$nvar
                     niqc <- dim.o$n.iqc + n.gr.sm
-                    for(i in 1:(n.Tknts-1)) {
+                    for(i in seq_len(n.Tknts-1L)) {
                         Tknots <- sort(c(knots,knots.add.1[i]))
                         if(length(unique(cut00(x, Tknots))) != n.Tknts)
                             Tic2[i] <- Tic.min+1
                         else {
-			    rqss <-
-				drqssbc2(x,y,w,pw,Tknots,degree, Tlambda,
-					 constraint, ptConstr, maxiter, trace=trace-1,
-					 nrq,nl1,neqc,niqc,Tnvar,
+			    rqss_fidel <-
+				drqssbc2(x,y,w, pw=pw, knots = Tknots, degree=degree, Tlambda=Tlambda,
+					 constraint=constraint, ptConstr=ptConstr, maxiter=maxiter,
+                                         trace = trace - 1L,
+					 nrq=nrq, nl1=nl1, neqc=neqc, niqc=niqc, nvar=nvar,
 					 tau=tau, select.lambda=select.lambda,
 					 give.pseudo.x = give.pseudo.x,
 					 rq.tol = rq.tol, tol.0res = tol.0res,
-					 print.warn = print.warn)
+					 print.warn = print.warn)$fidel
 
-                            Tic2[i] <- finite.log(rqss$fidel) -logn +
+                            Tic2[i] <- finite.log(rqss_fidel) - logn +
                                 (n.Tknts.1-2+ks)*f.IC / n
                         }
                     }
@@ -191,18 +197,18 @@ qbsks2 <-
 	if(up.bound.reached && print.warn)
 	    warnUP(nknots, ic)
         if(print.mesg >= 2) cat("\n Computing the final fit ...\n") # 11
-    } ## end if(do.select)
+    } ## end if(do.select) ----------------------------------------------------------
 
     ##
     ## compute the B-spline coefficients for the full sample
     ##
     nknots <- length(knots)
     ## shift the first and last knot a tiny bit "outside":
-    rk <- diff(range(knots))
-    knots[1] <- knots[1] - tol.kn*rk
-    knots[nknots] <- knots[nknots] + tol.kn*rk
+    del.k <- tol.kn * diff(range(knots))
+    knots[ 1L   ] <- knots[ 1L   ] - del.k
+    knots[nknots] <- knots[nknots] + del.k
 
-    if(nknots == 2 && all(constraint %in% c("convex", "concave")) &&
+    if(nknots == 2L && all(constraint %in% c("convex", "concave")) &&
        degree == 1) { # guard against convex fit when only 2 knots are used
         if(print.warn)
 	    cat(sprintf("WARNING: %s from \"%s\" to \"none\"\n",
@@ -210,20 +216,18 @@ qbsks2 <-
         constraint <- "none"
     }
     dim.o <- getdim2(degree, nknots, constraint)
-    ks <- dim.o$ks
-    Tnvar <- dim.o$nvar
+    ks   <- dim.o$ks
+    nvar <- dim.o$nvar
     niqc <- dim.o$n.iqc + n.gr.sm
-    rqss <- drqssbc2(x,y,w,pw, knots, degree,Tlambda,
-		     constraint, ptConstr, maxiter, trace=trace-1,
-		     nrq,nl1, neqc,niqc, Tnvar,
+    rqss <- drqssbc2(x,y,w, pw=pw, knots=knots, degree=degree, Tlambda=Tlambda,
+		     constraint=constraint, ptConstr=ptConstr, maxiter=maxiter,
+                     trace = trace - 1L,
+		     nrq=nrq, nl1=nl1, neqc=neqc, niqc=niqc, nvar=nvar,
 		     tau=tau, select.lambda=select.lambda,
 		     give.pseudo.x = give.pseudo.x,
 		     rq.tol = rq.tol, tol.0res = tol.0res,
-		     print.warn = print.warn)
+		     print.warn = print.warn)[c("coef", "fidel", "ifl", "icyc", "pseudo.x")]
     ## constraint <- constraint.orig
-
-    c(rqss[c("coef", "fidel", "ifl", "icyc", "pseudo.x")],
-      list(k = nknots-2+ks, knots = knots, nknots = nknots,
-	   nvar = Tnvar, lambda = Tlambda))
-
+    c(rqss,
+      list(k = nknots-2L+ks, knots=knots, nknots=nknots, nvar=nvar, lambda = Tlambda))
 } ## end qbsks()
