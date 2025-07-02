@@ -1,6 +1,6 @@
 
-R Under development (unstable) (2024-12-15 r87442) -- "Unsuffered Consequences"
-Copyright (C) 2024 The R Foundation for Statistical Computing
+R Under development (unstable) (2025-06-27 r88363) -- "Unsuffered Consequences"
+Copyright (C) 2025 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -37,11 +37,11 @@ Loading required package: tools
                                               sysname 
                                               "Linux" 
                                               release 
-                            "6.10.10-200.fc40.x86_64" 
+                             "6.14.9-300.fc42.x86_64" 
                                               version 
-"#1 SMP PREEMPT_DYNAMIC Thu Sep 12 18:26:09 UTC 2024" 
+"#1 SMP PREEMPT_DYNAMIC Thu May 29 14:27:53 UTC 2025" 
                                              nodename 
-                                            "v-lynne" 
+                                              "lynne" 
                                               machine 
                                              "x86_64" 
                                                 login 
@@ -76,7 +76,7 @@ Loading required package: tools
 > ## Using 'trace = 3' --> 'trace = 2' inside drqssbc2()
 > ##
 > ## Regression splines (lambda = 0)
-> c2   <- cobs(x,y,                               trace = 3)
+> c2   <- cobs(x,y,                               trace = 3) # gave warnings (till early 2025)
 qbsks2():
  Performing general knot selection ...
 loo.design2(): ->  Xeq   50 x 3 (nz = 150 =^=     1%) 
@@ -90,30 +90,6 @@ loo.design2(): ->  Xeq   50 x 4 (nz = 150 =^=  0.75%)
 loo.design2(): ->  Xeq   50 x 4 (nz = 150 =^=  0.75%) 
 loo.design2(): ->  Xeq   50 x 3 (nz = 150 =^=     1%) 
 loo.design2(): ->  Xeq   50 x 4 (nz = 150 =^=  0.75%) 
-Warning messages:
-1: In rq.fit.sfn(Xeq, Yeq, tau = tau, rhs = rhs, control = rqCtrl) :
-  tiny diagonals replaced with Inf when calling blkfct
-
-2: In rq.fit.sfn(Xeq, Yeq, tau = tau, rhs = rhs, control = rqCtrl) :
-  tiny diagonals replaced with Inf when calling blkfct
-
-3: In rq.fit.sfn(Xeq, Yeq, tau = tau, rhs = rhs, control = rqCtrl) :
-  tiny diagonals replaced with Inf when calling blkfct
-
-4: In rq.fit.sfn(Xeq, Yeq, tau = tau, rhs = rhs, control = rqCtrl) :
-  tiny diagonals replaced with Inf when calling blkfct
-
-5: In rq.fit.sfn(Xeq, Yeq, tau = tau, rhs = rhs, control = rqCtrl) :
-  tiny diagonals replaced with Inf when calling blkfct
-
-6: In rq.fit.sfn(Xeq, Yeq, tau = tau, rhs = rhs, control = rqCtrl) :
-  tiny diagonals replaced with Inf when calling blkfct
-
-7: In rq.fit.sfn(Xeq, Yeq, tau = tau, rhs = rhs, control = rqCtrl) :
-  tiny diagonals replaced with Inf when calling blkfct
-
-8: In cobs(x, y, trace = 3) :
-  drqssbc2(): Not all flags are normal (== 1), ifl : 18
 > c2i  <- cobs(x,y, constraint = "increase",      trace = 3)
 qbsks2():
  Performing general knot selection ...
@@ -183,7 +159,7 @@ loo.design2(): ->  Xeq   50 x 3 (nz = 150 =^=     1%)
 [1] "Mean relative difference: 0.0808156"
 > ## IGNORE_RDIFF_END
 > 
-> c1   <- cobs(x,y, degree = 1,                          trace = 3)
+> c1   <- cobs(x,y, degree = 1,                          trace = 3) # gave warnings (no longer in 2025-06)
 qbsks2():
  Performing general knot selection ...
  l1.design2(): ->  Xeq   50 x 2 (nz = 100 =^=     1%) 
@@ -197,24 +173,6 @@ qbsks2():
  l1.design2(): ->  Xeq   50 x 4 (nz = 100 =^=   0.5%) 
  l1.design2(): ->  Xeq   50 x 4 (nz = 100 =^=   0.5%) 
  l1.design2(): ->  Xeq   50 x 5 (nz = 100 =^=   0.4%) 
-Warning in cobs(x, y, degree = 1, trace = 3) :
-  The algorithm has not converged after 100 iterations
-Warning messages:
-1: In rq.fit.sfn(Xeq, Yeq, tau = tau, rhs = rhs, control = rqCtrl) :
-  tiny diagonals replaced with Inf when calling blkfct
-
-2: In rq.fit.sfn(Xeq, Yeq, tau = tau, rhs = rhs, control = rqCtrl) :
-  tiny diagonals replaced with Inf when calling blkfct
-
-3: In rq.fit.sfn(Xeq, Yeq, tau = tau, rhs = rhs, control = rqCtrl) :
-  tiny diagonals replaced with Inf when calling blkfct
-
-4: In rq.fit.sfn(Xeq, Yeq, tau = tau, rhs = rhs, control = rqCtrl) :
-  tiny diagonals replaced with Inf when calling blkfct
-
-5: In rq.fit.sfn(Xeq, Yeq, tau = tau, rhs = rhs, control = rqCtrl) :
-  tiny diagonals replaced with Inf when calling blkfct
-
 > c1i  <- cobs(x,y, degree = 1, constraint = "increase", trace = 3)
 qbsks2():
  Performing general knot selection ...
@@ -238,7 +196,7 @@ qbsks2():
                   Xieq    3 x 4 (nz = 6 =^=   0.5%) 
  l1.design2(): ->  Xeq   50 x 5 (nz = 100 =^=   0.4%) 
                   Xieq    4 x 5 (nz = 8 =^=   0.4%) 
-> c1c  <- cobs(x,y, degree = 1, constraint = "concave" , trace = 3)
+> c1c  <- cobs(x,y, degree = 1, constraint = "concave" , trace = 3) # no warnings (2025-06)
 qbsks2():
  Performing general knot selection ...
  l1.design2(): ->  Xeq   50 x 2 (nz = 100 =^=     1%) 
@@ -259,13 +217,6 @@ qbsks2():
  l1.design2(): ->  Xeq   50 x 2 (nz = 100 =^=     1%) 
  l1.design2(): ->  Xeq   50 x 3 (nz = 100 =^=  0.67%) 
                   Xieq    1 x 3 (nz = 3 =^=     1%) 
-Warning messages:
-1: In rq.fit.sfn(Xeq, Yeq, tau = tau, rhs = rhs, control = rqCtrl) :
-  tiny diagonals replaced with Inf when calling blkfct
-
-2: In rq.fit.sfn(Xeq, Yeq, tau = tau, rhs = rhs, control = rqCtrl) :
-  tiny diagonals replaced with Inf when calling blkfct
-
 > ## now gives warning (not error):
 > c1IC <- cobs(x,y, degree = 1, constraint=c("inc","concav"), trace = 3)
 qbsks2():
@@ -530,13 +481,13 @@ List of 16
 > iR2 <- setdiff(names(cobsL), nR2 <- c("cp2IC", "cp2i"))
 > ## IGNORE_RDIFF_BEGIN
 > dput(signif(gotRsqrs, digits=8))
-c(c1 = 0.95341697, c1IC = 0.92974549, c1c = 0.92974549, c1i = 0.95079126, 
-c2 = 0.94864721, c2IC = 0.91375404, c2c = 0.92505977, c2i = 0.95022829, 
+c(c1 = 0.95079126, c1IC = 0.92974549, c1c = 0.92974549, c1i = 0.95079126, 
+c2 = 0.94637437, c2IC = 0.91375404, c2c = 0.92505977, c2i = 0.95022829, 
 cp1 = 0.9426453, cp1IC = 0.92223149, cp1c = 0.92223149, cp1i = 0.9426453, 
 cp2 = 0.94988863, cp2IC = 0.90051964, cp2c = 0.91375409, cp2i = 0.93611487
 )
 > all.equal(Rsqrs[iR2], gotRsqrs[iR2], tolerance=0)# 2.6277e-9 (Lnx F 38); 2.6898e-9 (M1 mac)
-[1] "Mean relative difference: 0.000374227"
+[1] "Mean relative difference: 2.68981e-09"
 > ## c1 and c2 changed (Fedora new gcc/clang, quantreg 5.99.1 Date/Publication: 2024-11-22)
 > ## BUG ?? (in quantreg / cobs / Fortran / C/ .... ?) ____ TODO: *Find* out (c1 R^2 is *higher*, 2nd one is lower ..)
 > ##            vvvvvv

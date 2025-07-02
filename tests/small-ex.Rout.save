@@ -1,6 +1,6 @@
 
-R version 4.4.2 Patched (2024-12-13 r87442) -- "Pile of Leaves"
-Copyright (C) 2024 The R Foundation for Statistical Computing
+R Under development (unstable) (2025-06-27 r88363) -- "Unsuffered Consequences"
+Copyright (C) 2025 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -36,8 +36,6 @@ qbsks2():
    upper bound during general knot selection, you might want to rerun
    cobs with a larger number of knots. 
 [1] TRUE
-Warning message:
-In cobs(x, y) : drqssbc2(): Not all flags are normal (== 1), ifl : 18
 > summary(c1 <- cobs(x,y, constraint = "convex"))#  99.88 %
 qbsks2():
  Performing general knot selection ...
@@ -277,8 +275,8 @@ R^2 = 99.84% ;  empirical tau (over all): 3/7 = 0.428571 (target tau= 0.5)
 [100,] 12.000011 96.00008 91.45160 100.5486 91.48257 100.5176
 > 
 > cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''
-Time elapsed:  1.143 0.219 1.442 0.015 0.026 
+Time elapsed:  1.324 0.133 1.524 0.003 0.006 
 > 
 > proc.time()
    user  system elapsed 
-  1.158   0.246   1.442 
+  1.327   0.139   1.524 

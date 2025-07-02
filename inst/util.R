@@ -26,6 +26,16 @@ cpuTime <- function(expr)
 robrng <- function(x, coef=1.5)
     boxplot.stats(x, coef = coef, do.conf = FALSE, do.out = FALSE)$stats[c(1, 5)]
 
+## This is sfsmisc::relErr  
+##' Relative error typically returned by all.equal.numeric(),  "kept as simple as possible"
+relErr <- function(target, current) { ## make this work, also for 'Matrix' ==> no mean() ..
+    n <- length(current)
+    if(length(target) < n) # (as we don't use mean())
+        target <- rep(target, length.out = n)
+    sum(abs(target - current)) / sum(abs(target))
+}
+
+
 ## For testing (in ../tests/ ) only [in my other packages, have this hidden *in* pkg]
 doExtras <- function() {
     interactive() || nzchar(Sys.getenv("R_cobs_check_extra")) ||

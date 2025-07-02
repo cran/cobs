@@ -1,6 +1,6 @@
 
-R Under development (unstable) (2024-12-15 r87442) -- "Unsuffered Consequences"
-Copyright (C) 2024 The R Foundation for Statistical Computing
+R Under development (unstable) (2025-06-27 r88363) -- "Unsuffered Consequences"
+Copyright (C) 2025 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -27,13 +27,11 @@ Type 'q()' to quit R.
 > try( ## gives  "ifl = 5" !!!!!
 + cobw <- cobs(weight, height, knots = weight, nknots = length(weight))
 + )
-Warning messages:
-1: In cobs(weight, height, knots = weight, nknots = length(weight)) :
+Warning message:
+In cobs(weight, height, knots = weight, nknots = length(weight)) :
   The number of knots can't be equal to the number of unique x for degree = 2.
 'cobs' has automatically deleted the middle knot.
-2: In cobs(weight, height, knots = weight, nknots = length(weight)) :
-  drqssbc2(): Not all flags are normal (== 1), ifl : 18
 > 
 > cat('Time elapsed: ', proc.time(),'\n') # for ``statistical reasons''
-Time elapsed:  0.738 0.091 0.938 0 0 
+Time elapsed:  1.035 0.125 1.215 0.007 0.003 
 > 

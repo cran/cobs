@@ -39,7 +39,7 @@ plot(x,y); lines(x, f.true, col="gray", lwd=2, lty=3)
 ## Using 'trace = 3' --> 'trace = 2' inside drqssbc2()
 ##
 ## Regression splines (lambda = 0)
-c2   <- cobs(x,y,                               trace = 3)
+c2   <- cobs(x,y,                               trace = 3) # gave warnings (till early 2025)
 c2i  <- cobs(x,y, constraint = "increase",      trace = 3)
 c2c  <- cobs(x,y, constraint = "concave" ,      trace = 3)
 c2IC <- cobs(x,y, constraint=c("inc","concav"), trace = 3)
@@ -48,9 +48,9 @@ c2IC <- cobs(x,y, constraint=c("inc","concav"), trace = 3)
 all.equal(fitted(c2i), fitted(c2IC)) ## (2024-12) no longer ?!????
 ## IGNORE_RDIFF_END
 
-c1   <- cobs(x,y, degree = 1,                          trace = 3)
+c1   <- cobs(x,y, degree = 1,                          trace = 3) # gave warnings (no longer in 2025-06)
 c1i  <- cobs(x,y, degree = 1, constraint = "increase", trace = 3)
-c1c  <- cobs(x,y, degree = 1, constraint = "concave" , trace = 3)
+c1c  <- cobs(x,y, degree = 1, constraint = "concave" , trace = 3) # no warnings (2025-06)
 ## now gives warning (not error):
 c1IC <- cobs(x,y, degree = 1, constraint=c("inc","concav"), trace = 3)
 

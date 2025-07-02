@@ -1,5 +1,5 @@
-c1533e30190b5da1fb31edf744ed8345 *ChangeLog
-c3d90d993244b37370225ab99cdac3a0 *DESCRIPTION
+b89b328833207b47ba17abc675a71c03 *ChangeLog
+7a185127dc8204a9e3553aab0d248c89 *DESCRIPTION
 5dce8c6b4c9a944048511e4b4dd299b2 *NAMESPACE
 ac51c468be3b5c4dbfe7975202878139 *R/concaveRegr.R
 82eef7bc2d849eff5fa3abd1b9d5a2a4 *R/drqssbc.R
@@ -10,7 +10,7 @@ ce82106b0f7a0206f8b379d7ce95b6c6 *R/qbsks.R
 527c27c1e8e5a871fed20a3212f633e9 *R/splines.R
 4f4c788ecf85861b96ad99a820ed9247 *README.md
 9a76901dec98da9988129d3a1c5e0fb3 *TODO
-d30fb62438e3e6c40920c2d12cebb683 *build/partial.rdb
+af3401175684b1e7ff4b3d3b8941c6eb *build/partial.rdb
 129faa9a7dea1b2dc6c56fb2cf5d5e7d *data/DublinWind.tab
 0362e62ff05d9b1c082a3646ac9e1dac *data/USArmyRoofs.tab
 f920167b0904c6d5f314468380bf14b7 *data/exHe.tab
@@ -20,7 +20,7 @@ cc8b655020f7033e20271d5539828a3f *inst/scripts/README
 052040d3558d2934ae015b22c7ed7d3f *inst/scripts/roof.R
 de0797811a7ffd10da455c92a033351b *inst/scripts/temp.R
 f563606e8aa897e54faf5ab904b8ae4b *inst/scripts/wind.R
-d956d88f7a85eba46b317220a3c9c6a7 *inst/util.R
+9d568032cdd5337a9efdfab982aa097f *inst/util.R
 a65be6d67ba93009dedfbbd4a715465f *man/DublinWind.Rd
 bd83e474ea0fdeaad5a898a2dd498b33 *man/USArmyRoofs.Rd
 86b4495a211a90fbb92922f63c5d8b01 *man/cobs-internal.Rd
@@ -41,7 +41,7 @@ f51fa575be6d0edd344cce591ab28fdb *man/qbsks.Rd
 648f4c1ec0a7889ed90eb03d05983a55 *src/SR.h
 e2b672fc2e2f89f245e18fe3cbfbc6d9 *src/init.c
 ffb2bb14782fbb43d0fc93d53de023aa *src/nrutil.c
-a212e258d3bd2a275bb685bce3a81bea *src/nrutil.h
+b2adf75ccc56f0682f4ba65baefcc871 *src/nrutil.h
 27355758b104360f92ddf505c2e2d8f7 *src/splines.c
 0af34c33f4a058495f84a5c5ef92ced8 *src/splines.h
 4693882ed964b34bab49e27e19828d7c *tests/0_pt-ex.R
@@ -49,15 +49,15 @@ e666932cf5628448170c40f32a2b6606 *tests/README
 84c1f69b479c75231d384839b88572fc *tests/ex1.R
 8c55f652bb3e88a8b17981a9ee4a92e4 *tests/ex2-long.R
 718531d20bbcdafbdfca9d0d8e0de520 *tests/ex3.R
-742e536fe64e6a0450d79414080db09e *tests/ex3.Rout.save
-968c99e8a02a0e268f9e7d3c6f766159 *tests/multi-constr.R
-6d7a449a4d52d43064d4cba6d72fda7e *tests/multi-constr.Rout.save
+ed708bb3efb96998f1856538024ed00e *tests/ex3.Rout.save
+328702e6bf0f826e5a05a441aef5979f *tests/multi-constr.R
+f020a6a6ade2b2608a7b2e1e747c20ae *tests/multi-constr.Rout.save
 6adca369981e101e619d1c558eb594d0 *tests/roof.R
 44f4fd4af0e5d73d9495aed31fbd0320 *tests/roof.Rout.save
 7c1a4e05f292166af2c1d1a399965e43 *tests/small-ex.R
-600a515e7d31010b62d22f577e1b85a9 *tests/small-ex.Rout.save
+5c92168c4dc875d6c91efdceabf5db25 *tests/small-ex.Rout.save
 7c968c1411214611caffc88fa775c9f8 *tests/spline-ex.R
 7d9fb71740d7030e6872b0b589dd5ac1 *tests/spline-ex.Rout.save
 e17d744c0dc834a6f5478f067a31fb6d *tests/temp.R
-249b80dcf23b5fa5ff59266286eaa1aa *tests/temp.Rout.save
+365f7c13194a035815072ce3743f7ee1 *tests/temp.Rout.save
 1f477e83903e99007aa4462d3d2247c6 *tests/wind.R
